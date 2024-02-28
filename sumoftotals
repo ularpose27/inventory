@@ -37,3 +37,9 @@ prev_total_sum = prev['total'].sum()
 # Optionally, you can print these sums
 print(f"Sum of 'total' in current: {current_total_sum}")
 print(f"Sum of 'total' in prev: {prev_total_sum}")
+
+
+# Format the sums as currency (assuming USD for example)
+formatted_sum_current_total = "${:,.2f}".format(sum_current_total)
+formatted_sum_prev_total = "${:,.2f}".format(sum_prev_total)
+
