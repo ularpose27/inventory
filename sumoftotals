@@ -1,0 +1,15 @@
+import pandas as pd
+
+# Assuming 'current' and 'prev' are already defined pandas DataFrames
+
+# Sum 'total' in 'current' dataframe by 'customer ID' and 'Customer'
+current_totals = current.groupby(['customer ID', 'Customer'])['total'].sum().reset_index(name='current_total')
+
+# Sum 'total' in 'prev' dataframe by 'customer ID' and 'Customer'
+prev_totals = prev.groupby(['customer ID', 'Customer'])['total'].sum().reset_index(name='prev_total')
+
+# Merging the 'current_totals' and 'prev_totals' on 'customer ID' and 'Customer'
+merged_totals = pd.merge(current_totals, prev_totals, on=['customer ID', 'Customer'], how='outer')
+
+# The 'merged_totals' dataframe now contains the summed totals for each unique 'customer ID' and 'Customer' from both 'current' and 'prev'
+print(merged_totals)
