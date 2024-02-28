@@ -25,3 +25,15 @@ current = current[~current['facility'].astype(str).str.startswith(('5', '6'))]
 
 # If you want to reset the index after filtering
 current.reset_index(drop=True, inplace=True)
+
+
+
+# Sum of the 'total' column in the 'current' dataframe
+current_total_sum = current['total'].sum()
+
+# Sum of the 'total' column in the 'prev' dataframe
+prev_total_sum = prev['total'].sum()
+
+# Optionally, you can print these sums
+print(f"Sum of 'total' in current: {current_total_sum}")
+print(f"Sum of 'total' in prev: {prev_total_sum}")
