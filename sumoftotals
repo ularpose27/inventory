@@ -43,3 +43,50 @@ print(f"Sum of 'total' in prev: {prev_total_sum}")
 formatted_sum_current_total = "${:,.2f}".format(sum_current_total)
 formatted_sum_prev_total = "${:,.2f}".format(sum_prev_total)
 
+
+
+
+
+
+
+
+import pandas as pd
+
+# Assuming 'current' and 'prev' are your dataframes
+
+# Summing 'total' values grouped by 'customer ID' and 'Customer'
+current['current_total'] = current.groupby(['customer ID', 'Customer'])['total'].transform('sum')
+prev['prev_total'] = prev.groupby(['customer ID', 'Customer'])['total'].transform('sum')
+
+# Creating new columns for 'New Money'
+new_df = pd.DataFrame()
+new_df['New Money'] = current['current_total'] - prev['prev_total']
+
+# Summing 'total' values grouped by 'customer ID' and 'Category Type'
+for cat_type in ['A', 'B', 'S']:
+    # Current
+    current[f'Cat {cat_type} Current'] = current[current['Category Type'] == cat_type].groupby('customer ID')['total'].transform('sum')
+    # Prev
+    prev[f'Cat {cat_type} Prev'] = prev[prev['Category Type'] == cat_type].groupby('customer ID')['total'].transform('sum')
+
+    # Difference
+    new_df[f'Cat {cat_type}'] = current[f'Cat {cat_type} Current'] - prev[f'Cat {cat_type} Prev']
+
+# Summing 'total' values for 'committed (Y)' and 'committed (C)'
+for commitment in ['Y', 'C']:
+    # Current
+    current[f'Cat A committed ({commitment}) current'] = current[(current['Category Type'] == 'A') & (current['Committed'] == commitment)].groupby('customer ID')['total'].transform('sum')
+    # Prev
+    prev[f'Cat A committed ({commitment}) prev'] = prev[(prev['Category Type'] == 'A') & (prev['Committed'] == commitment)].groupby('customer ID')['total'].transform('sum')
+
+    # Difference
+    new_df[f'Cat A committed ({commitment}) difference'] = current[f'Cat A committed ({commitment}) current'] - prev[f'Cat A committed ({commitment}) prev']
+
+# Total Cat A committed
+new_df['Total Cat A committed'] = new_df['Cat A committed (Y) difference'] + new_df['Cat A committed (C) difference']
+
+# Concatenating all columns into one dataframe
+result_df = pd.concat([current[['current_total']], prev[['prev_total']], new_df], axis=1)
+
+# Displaying the resulting dataframe
+print(result_df)
