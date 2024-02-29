@@ -90,3 +90,59 @@ result_df = pd.concat([current[['current_total']], prev[['prev_total']], new_df]
 
 # Displaying the resulting dataframe
 print(result_df)
+
+
+
+FINAL
+
+import pandas as pd
+
+# Sample data for illustration purposes (replace with your actual DataFrames)
+# current = pd.DataFrame(...)
+# prev = pd.DataFrame(...)
+
+# Function to compute sum of 'total' for a given DataFrame, Category Type, and optional Committed Ind
+def sum_by_category_and_commitment(df, category, commitment=None):
+    if commitment:
+        filtered_df = df[(df['Category Type'] == category) & (df['Committed Ind'] == commitment)]
+    else:
+        filtered_df = df[df['Category Type'] == category]
+    return filtered_df.groupby('cif customer id')['total'].sum()
+
+# Create the new DataFrame
+new_df = pd.DataFrame()
+new_df['cif customer id'] = current['cif customer id'].unique()
+
+categories = ['A', 'B', 'S']
+commitments = [('Y', 'Cat A committed (Y)'), ('C', 'Cat A committed (C)')]
+
+for category in categories:
+    # Current and Prev sums
+    current_sum = sum_by_category_and_commitment(current, category)
+    prev_sum = sum_by_category_and_commitment(prev, category)
+    
+    # Merge into new DataFrame
+    new_df = new_df.merge(current_sum, on='cif customer id', how='left').rename(columns={'total': f'Cat {category} Current'})
+    new_df = new_df.merge(prev_sum, on='cif customer id', how='left').rename(columns={'total': f'Cat {category} Prev'})
+    
+    # Calculate difference
+    new_df[f'Cat {category}'] = new_df[f'Cat {category} Current'] - new_df[f'Cat {category} Prev']
+
+for commitment, col_prefix in commitments:
+    # Current and Prev sums for committed indicators
+    current_commit_sum = sum_by_category_and_commitment(current, 'A', commitment)
+    prev_commit_sum = sum_by_category_and_commitment(prev, 'A', commitment)
+    
+    # Merge and calculate difference
+    new_df = new_df.merge(current_commit_sum, on='cif customer id', how='left').rename(columns={'total': f'{col_prefix} current'})
+    new_df = new_df.merge(prev_commit_sum, on='cif customer id', how='left').rename(columns={'total': f'{col_prefix} prev'})
+    new_df[f'{col_prefix} difference'] = new_df[f'{col_prefix} current'] - new_df[f'{col_prefix} prev']
+
+# Calculate Total Cat A committed
+new_df['Total Cat A committed'] = new_df['Cat A committed (Y) difference'] + new_df['Cat A committed (C) difference']
+
+# Replace NaN values with 0 if necessary
+new_df.fillna(0, inplace=True)
+
+# Display the final DataFrame (for verification)
+print(new_df)
