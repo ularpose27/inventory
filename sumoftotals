@@ -180,3 +180,23 @@ combined_df = combined_df[new_column_order]
 
 # Display the combined DataFrame (for verification)
 print(combined_df)
+
+
+
+
+
+
+
+
+
+
+# Extract columns 8, 9, 10, and 11
+selected_columns = current.iloc[:, [8, 9, 10, 11]]
+
+# Drop the selected columns from the original DataFrame
+current.drop(current.columns[[8, 9, 10, 11]], axis=1, inplace=True)
+
+# Insert the selected columns between columns 1 and 2
+position = 2  # index position where the selected columns should be inserted
+for col in selected_columns.columns[::-1]:  # Reverse order to maintain column order
+    current.insert(position, col, selected_columns[col])
