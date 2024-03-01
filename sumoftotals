@@ -146,3 +146,37 @@ new_df.fillna(0, inplace=True)
 
 # Display the final DataFrame (for verification)
 print(new_df)
+
+
+
+
+
+
+
+
+
+
+# Assuming 'new_df' and 'merged_totals' are already defined
+
+# Ensure the CIF Customer Id column is named consistently in both DataFrames
+# If necessary, rename the column in either DataFrame to match the other
+# new_df.rename(columns={'cif customer id': 'CIF Customer Id'}, inplace=True)
+# merged_totals.rename(columns={'cif customer id': 'CIF Customer Id'}, inplace=True)
+
+# Perform the merge
+combined_df = pd.merge(new_df, merged_totals, on='CIF Customer Id', how='left')
+
+# Reorder columns to ensure CIF Customer Id is the first column followed by the rest of new_df's columns and then merged_totals' columns
+# First, list all columns of new_df (excluding 'CIF Customer Id' since it's already the first column)
+new_df_columns = [col for col in new_df.columns if col != 'CIF Customer Id']
+# Next, get columns from merged_totals excluding 'CIF Customer Id' to avoid duplication
+merged_totals_columns = [col for col in merged_totals.columns if col not in new_df.columns and col != 'CIF Customer Id']
+
+# Define the new column order
+new_column_order = ['CIF Customer Id'] + new_df_columns + merged_totals_columns
+
+# Reorder the columns in combined_df
+combined_df = combined_df[new_column_order]
+
+# Display the combined DataFrame (for verification)
+print(combined_df)
