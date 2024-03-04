@@ -21,3 +21,13 @@ def determine_region(country_name):
 result_df['Region'] = result_df['Country Name of Transfer Risk'].apply(determine_region)
 
 # result_df now includes the new 'Region' column with values 'LAM' or 'Non-LAM'
+
+
+
+
+
+# First, create a mapping series from 'current' dataframe
+map_series = current.set_index('CIF Customer Id')['final customer risk grade']
+
+# Now, use map to create a new column in 'result_df' based on 'CIF Customer Id'
+result_df['final customer risk grade'] = result_df['CIF Customer Id'].map(map_series)
