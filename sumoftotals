@@ -200,3 +200,15 @@ current.drop(current.columns[[8, 9, 10, 11]], axis=1, inplace=True)
 position = 2  # index position where the selected columns should be inserted
 for col in selected_columns.columns[::-1]:  # Reverse order to maintain column order
     current.insert(position, col, selected_columns[col])
+
+
+
+
+
+
+
+
+result_df = pd.merge(combined_df,
+                     current[['CIF Customer Id', 'Final Customer Risk Grade', 'Country Name of Transfer Risk']],
+                     on='CIF Customer Id',
+                     how='left')
