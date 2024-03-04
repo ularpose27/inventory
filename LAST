@@ -1,0 +1,23 @@
+region_mapping_df = pd.read_csv('Region_mapping.csv', usecols=['Country Name', 'Country Grouping'])
+
+# Create a dictionary for fast lookup, mapping country names to their grouping (e.g., 'Latin America')
+country_grouping_map = dict(zip(region_mapping_df['Country Name'], region_mapping_df['Country Grouping']))
+
+# Define a function to apply the mapping logic
+def determine_region(country_name):
+    # Look up the country's grouping using the country name
+    country_grouping = country_grouping_map.get(country_name, None)
+    
+    # Determine the region based on the country grouping
+    if country_grouping == 'Latin America':
+        return 'LAM'
+    elif country_grouping is not None:
+        return 'Non-LAM'
+    else:
+        # If the country name is not found in the mapping, you can decide to return 'Non-LAM' or None
+        return 'Non-LAM'  # or None
+
+# Apply the function to the 'Country Name of Transfer Risk' column to create the 'Region' column
+result_df['Region'] = result_df['Country Name of Transfer Risk'].apply(determine_region)
+
+# result_df now includes the new 'Region' column with values 'LAM' or 'Non-LAM'
