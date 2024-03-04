@@ -31,3 +31,29 @@ map_series = current.set_index('CIF Customer Id')['final customer risk grade']
 
 # Now, use map to create a new column in 'result_df' based on 'CIF Customer Id'
 result_df['final customer risk grade'] = result_df['CIF Customer Id'].map(map_series)
+
+
+
+
+
+
+
+
+
+# Keep the first occurrence and drop the rest
+current_unique = current.drop_duplicates(subset='CIF Customer Id', keep='first')
+
+# Then create your map series
+map_series = current_unique.set_index('CIF Customer Id')['final customer risk grade']
+
+# Use map to create the new column in 'result_df'
+result_df['final customer risk grade'] = result_df['CIF Customer Id'].map(map_series)
+
+# Example of using the mode (most frequent value)
+current_agg = current.groupby('CIF Customer Id')['final customer risk grade'].agg(lambda x: x.mode()[0] if not x.mode().empty else np.nan).reset_index()
+
+# Create your map series from the aggregated dataframe
+map_series = current_agg.set_index('CIF Customer Id')['final customer risk grade']
+
+# Use map to create the new column in 'result_df'
+result_df['final customer risk grade'] = result_df['CIF Customer Id'].map(map_series)
