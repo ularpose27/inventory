@@ -1,24 +1,26 @@
 # New Money GBM Report Generator
 
 **Creator**: Ulises Armando Ponce Sesma  
-**Script Version**: [Specify version number here]
+**Script Version**: 1
 
 ## Purpose
 This Python script generates a comprehensive report, titled "GBM New Money file", summarizing new approvals of $50 million or more for the current month-end reporting period.
 
 ## Prerequisites
-- Python [specify version] installed.
+- Python 3.11 installed.
+- Required Python libraries: `pandas`, `numpy`, `openpyxl`, `datetime`.
+  Install them using the command `pip install pandas numpy openpyxl datetime` if not already installed.
 - Access to Qlik Sense for obtaining the necessary data files.
 
 ## Required Data Files
-1. **Current Month Data**: A file named `current.csv`, representing the current month's data, obtainable from Qlik Sense.
-2. **Previous Month Data**: A file named `prev.csv`, representing the previous month's data, also sourced from Qlik Sense.
+1. **Current Month Data**: A file named `current.xlsx`, representing the current month's data, obtainable from Qlik Sense.
+2. **Previous Month Data**: A file named `prev.xlsx`, representing the previous month's data, also sourced from Qlik Sense.
 3. **Region Mapping**: A static file named `Region_mapping.csv`, provided to the user and consistent across all months.
 
 ## Instructions
-1. Ensure the `current.csv` and `prev.csv` files are saved with their respective names in a known directory after downloading them from Qlik Sense.
+1. Ensure the `current.xlsx` and `prev.xlsx` files are saved with their respective names in a known directory after downloading them from Qlik Sense.
 2. Place the `Region_mapping.csv` file in a directory that does not change from month to month. This file should not require updates or path changes unless it is moved to a new location.
-3. Run the script. When prompted, input the full paths to the `current.csv` and `prev.csv` files. The path for `Region_mapping.csv` is predefined in the script and does not require manual input unless the file's location has changed.
+3. Run the script. When prompted, input the full paths to the `current.xlsx` and `prev.xlsx` files. The path for `Region_mapping.csv` is predefined in the script and does not require manual input unless the file's location has changed.
 4. Follow the inline comments within the script for any additional configuration or steps that might be necessary during execution.
 
 ## Output
