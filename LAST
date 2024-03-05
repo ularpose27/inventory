@@ -73,3 +73,17 @@ result_descending = result_descending[new_order]
 # Rename 'Final Customer Risk Grade' to 'CRR'
 result_descending.rename(columns={'Final Customer Risk Grade': 'CRR'}, inplace=True)
 
+
+
+
+
+# Drop the specified columns by index
+result_descending.drop(result_descending.columns[[2, 3, 8, 9]], axis=1, inplace=True)
+
+# Move 'Final Customer Risk Grade' column to position 2
+# First, store the column to be moved
+final_customer_risk_grade = result_descending['Final Customer Risk Grade']
+# Then, drop the column
+result_descending.drop(['Final Customer Risk Grade'], axis=1, inplace=True)
+# Finally, insert it back at the new position
+result_descending.insert(2, 'CRR', final_customer_risk_grade)
