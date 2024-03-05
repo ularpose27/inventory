@@ -57,3 +57,19 @@ map_series = current_agg.set_index('CIF Customer Id')['final customer risk grade
 
 # Use map to create the new column in 'result_df'
 result_df['final customer risk grade'] = result_df['CIF Customer Id'].map(map_series)
+
+
+
+
+# Assuming `result_descending` is your DataFrame
+# Drop the specified columns by index
+result_descending.drop(result_descending.columns[[2, 3, 8, 9]], axis=1, inplace=True)
+
+# Reorder columns to place 'Final Customer Risk Grade' after 'Customer Name'
+cols = result_descending.columns.tolist()
+new_order = [cols[0]] + [cols[1]] + ['Final Customer Risk Grade'] + cols[2:8] + cols[9:]
+result_descending = result_descending[new_order]
+
+# Rename 'Final Customer Risk Grade' to 'CRR'
+result_descending.rename(columns={'Final Customer Risk Grade': 'CRR'}, inplace=True)
+
