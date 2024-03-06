@@ -1,89 +1,20 @@
-region_mapping_df = pd.read_csv('Region_mapping.csv', usecols=['Country Name', 'Country Grouping'])
+import pandas as pd
+import datetime
 
-# Create a dictionary for fast lookup, mapping country names to their grouping (e.g., 'Latin America')
-country_grouping_map = dict(zip(region_mapping_df['Country Name'], region_mapping_df['Country Grouping']))
+# Calculate last month's date
+last_month_date = datetime.datetime.now() - pd.offsets.MonthBegin(1)
 
-# Define a function to apply the mapping logic
-def determine_region(country_name):
-    # Look up the country's grouping using the country name
-    country_grouping = country_grouping_map.get(country_name, None)
-    
-    # Determine the region based on the country grouping
-    if country_grouping == 'Latin America':
-        return 'LAM'
-    elif country_grouping is not None:
-        return 'Non-LAM'
-    else:
-        # If the country name is not found in the mapping, you can decide to return 'Non-LAM' or None
-        return 'Non-LAM'  # or None
+# Format the output file name as "Monthly Extract CHECK [MMM][YY].xlsx"
+output_file_name = f"Monthly Extract CHECK {last_month_date.strftime('%b').upper()}{last_month_date.strftime('%y')}.xlsx"
 
-# Apply the function to the 'Country Name of Transfer Risk' column to create the 'Region' column
-result_df['Region'] = result_df['Country Name of Transfer Risk'].apply(determine_region)
+# Load the Excel files
+df_current = pd.read_excel("current.xlsx")
+df_prev = pd.read_excel("prev.xlsx")
 
-# result_df now includes the new 'Region' column with values 'LAM' or 'Non-LAM'
+# Create a Pandas Excel writer using XlsxWriter as the engine
+with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
+    # Write each dataframe to a different worksheet
+    df_current.to_excel(writer, sheet_name='Current', index=False)
+    df_prev.to_excel(writer, sheet_name='Previous', index=False)
 
-
-
-
-
-# First, create a mapping series from 'current' dataframe
-map_series = current.set_index('CIF Customer Id')['final customer risk grade']
-
-# Now, use map to create a new column in 'result_df' based on 'CIF Customer Id'
-result_df['final customer risk grade'] = result_df['CIF Customer Id'].map(map_series)
-
-
-
-
-
-
-
-
-
-# Keep the first occurrence and drop the rest
-current_unique = current.drop_duplicates(subset='CIF Customer Id', keep='first')
-
-# Then create your map series
-map_series = current_unique.set_index('CIF Customer Id')['final customer risk grade']
-
-# Use map to create the new column in 'result_df'
-result_df['final customer risk grade'] = result_df['CIF Customer Id'].map(map_series)
-
-# Example of using the mode (most frequent value)
-current_agg = current.groupby('CIF Customer Id')['final customer risk grade'].agg(lambda x: x.mode()[0] if not x.mode().empty else np.nan).reset_index()
-
-# Create your map series from the aggregated dataframe
-map_series = current_agg.set_index('CIF Customer Id')['final customer risk grade']
-
-# Use map to create the new column in 'result_df'
-result_df['final customer risk grade'] = result_df['CIF Customer Id'].map(map_series)
-
-
-
-
-# Assuming `result_descending` is your DataFrame
-# Drop the specified columns by index
-result_descending.drop(result_descending.columns[[2, 3, 8, 9]], axis=1, inplace=True)
-
-# Reorder columns to place 'Final Customer Risk Grade' after 'Customer Name'
-cols = result_descending.columns.tolist()
-new_order = [cols[0]] + [cols[1]] + ['Final Customer Risk Grade'] + cols[2:8] + cols[9:]
-result_descending = result_descending[new_order]
-
-# Rename 'Final Customer Risk Grade' to 'CRR'
-result_descending.rename(columns={'Final Customer Risk Grade': 'CRR'}, inplace=True)
-
-
-
-
-
-# Drop the specified columns by index
-result_descending.drop(result_descending.columns[[2, 3, 8, 9]], axis=1, inplace=True)
-
-# Move 'Final Customer Risk Grade' column to position 2
-# First, store the column to be moved
-final_customer_risk_grade = result_descending['Final Customer Risk Grade']
-# Then, drop the column
-result_descending.drop(['Final Customer Risk Grade'], axis=1, inplace=True)
-# Finally, insert it back at the new position
-result_descending.insert(2, 'CRR', final_customer_risk_grade)
+print(f"Output file '{output_file_name}' has been created.")
