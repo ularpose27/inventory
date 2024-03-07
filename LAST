@@ -9,3 +9,24 @@ if os.path.exists(file_path):
 else:
     # If the path does not exist, send a message to verify the path
     print("Please verify the path.")
+
+
+
+
+import pandas as pd
+
+# Load the Excel files into DataFrames
+current = pd.read_excel("Current.xlsx")
+industry = pd.read_excel("Industry.xlsx")
+
+# Join the "SIC Code" column from 'current' into 'industry' based on "Customer Name"
+# Assuming "Customer Name" is unique and present in both DataFrames
+merged_df = industry.merge(current[['Customer Name', 'SIC Code']], on="Customer Name", how="left")
+
+# If you want to overwrite the 'industry' DataFrame with the merged DataFrame
+industry = merged_df
+
+# If you need to save the merged DataFrame to a new Excel file
+# industry.to_excel("Merged_Data.xlsx", index=False)
+
+print(industry)
