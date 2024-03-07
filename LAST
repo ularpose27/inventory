@@ -30,3 +30,11 @@ industry = merged_df
 # industry.to_excel("Merged_Data.xlsx", index=False)
 
 print(industry)
+
+
+
+
+null_sic_code1_rows = Industry[pd.isnull(Industry['SIC Code 1'])]
+
+# To see these rows, you can simply print or inspect 'null_sic_code1_rows'
+print(null_sic_code1_rows)
