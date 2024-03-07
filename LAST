@@ -82,3 +82,30 @@ current2['Final Customer Risk Grade'] = current['Final Customer Risk Grade']
 # Merge with 'difference_df' to bring in the new money columns based on "CIF Customer Id"
 difference_df_subset = difference_df[['CIF Customer Id', 'New Cat A Money', 'New Cat B Money', 'New Cat S Money', 'Total New Money']]
 current2 = pd.merge(current2, difference_df_subset, on='CIF Customer Id', how='left')
+
+
+
+
+
+
+
+
+
+
+# Define the columns to sum
+sum_columns = ['Cat A money', 'Cat B money', 'Cat S money', 'Master Total Approved']
+
+# Get all column names
+all_columns = current.columns.tolist()
+
+# Columns to take the first value
+first_value_columns = [col for col in all_columns if col not in sum_columns and col != 'CIF Customer Id']
+
+# Define the aggregation dictionary
+aggregation_dict = {col: 'first' for col in first_value_columns}
+aggregation_dict.update({col: 'sum' for col in sum_columns})
+
+# Group by 'CIF Customer Id' and aggregate
+result_df = current.groupby('CIF Customer Id', as_index=False).agg(aggregation_dict)
+
+# result_df will have the aggregated results
