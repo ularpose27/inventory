@@ -56,3 +56,29 @@ difference_df['New Cat A Money'] = difference_df['*Cat A Money'] - difference_df
 difference_df['New Cat B Money'] = difference_df['*Cat B Money'] - difference_df['*Cat B Money prev']
 difference_df['New Cat S Money'] = difference_df['*Cat S Money'] - difference_df['*Cat S Money prev']
 difference_df['Total New Money'] = difference_df['Master Total Approved'] - difference_df['Master Total Approved prev']
+
+
+
+·············
+
+industry_mapping = pd.read_excel('Industry Mapping.xlsx', engine='openpyxl')
+
+# Convert the "Date" column to the desired format and create 'current2' DataFrame
+current['Date'] = pd.to_datetime(current['Date'], format='%m/%d/%Y').dt.strftime('b-%y')
+current2 = current[['Date']].copy()
+
+# Rename and select columns as per your requirements
+current2['Business'] = current['FCL FTP Functional Hierarchy Lvl 05 Desc']
+current2['Customer Name'] = current['Customer Name']
+current2['CIF Customer Id'] = current['CIF Customer Id']
+current2['SIC Code'] = current['SIC Code 1']
+
+# Join the "Industry" column from "industry_mapping" based on "SIC Code 1"
+current2 = pd.merge(current2, industry_mapping[['SIC Code 1', 'Industry']], left_on='SIC Code', right_on='SIC Code 1', how='left').drop(columns=['SIC Code 1'])
+
+# Continue with the rest of the columns
+current2['Final Customer Risk Grade'] = current['Final Customer Risk Grade']
+
+# Merge with 'difference_df' to bring in the new money columns based on "CIF Customer Id"
+difference_df_subset = difference_df[['CIF Customer Id', 'New Cat A Money', 'New Cat B Money', 'New Cat S Money', 'Total New Money']]
+current2 = pd.merge(current2, difference_df_subset, on='CIF Customer Id', how='left')
