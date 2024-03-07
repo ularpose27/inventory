@@ -34,7 +34,25 @@ print(industry)
 
 
 
-null_sic_code1_rows = Industry[pd.isnull(Industry['SIC Code 1'])]
 
-# To see these rows, you can simply print or inspect 'null_sic_code1_rows'
-print(null_sic_code1_rows)
+
+
+
+
+# Rename the columns in 'prev' DataFrame before merging
+prev_renamed = prev.rename(columns={
+    'Master Total Approved': 'Master Total Approved prev',
+    '*Cat A Money': '*Cat A Money prev',
+    '*Cat B Money': '*Cat B Money prev',
+    '*Cat S Money': '*Cat S Money prev'
+})
+
+# Merge 'current' and 'prev_renamed' DataFrames on 'CIF Customer'
+difference_df = pd.merge(current, prev_renamed[['CIF Customer', 'Master Total Approved prev', '*Cat A Money prev', '*Cat B Money prev', '*Cat S Money prev']],
+                         on='CIF Customer', how='left')
+
+# Calculate the new columns based on the difference
+difference_df['New Cat A Money'] = difference_df['*Cat A Money'] - difference_df['*Cat A Money prev']
+difference_df['New Cat B Money'] = difference_df['*Cat B Money'] - difference_df['*Cat B Money prev']
+difference_df['New Cat S Money'] = difference_df['*Cat S Money'] - difference_df['*Cat S Money prev']
+difference_df['Total New Money'] = difference_df['Master Total Approved'] - difference_df['Master Total Approved prev']
