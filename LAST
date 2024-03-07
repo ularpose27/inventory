@@ -1,20 +1,11 @@
-import pandas as pd
-import datetime
-
-# Calculate last month's date
-last_month_date = datetime.datetime.now() - pd.offsets.MonthBegin(1)
-
-# Format the output file name as "Monthly Extract CHECK [MMM][YY].xlsx"
-output_file_name = f"Monthly Extract CHECK {last_month_date.strftime('%b').upper()}{last_month_date.strftime('%y')}.xlsx"
-
-# Load the Excel files
-df_current = pd.read_excel("current.xlsx")
-df_prev = pd.read_excel("prev.xlsx")
-
-# Create a Pandas Excel writer using XlsxWriter as the engine
-with pd.ExcelWriter(output_file_name, engine='xlsxwriter') as writer:
-    # Write each dataframe to a different worksheet
-    df_current.to_excel(writer, sheet_name='Current', index=False)
-    df_prev.to_excel(writer, sheet_name='Previous', index=False)
-
-print(f"Output file '{output_file_name}' has been created.")
+if os.path.exists(file_path):
+    try:
+        # Attempt to read the Excel file
+        df = pd.read_excel(file_path)
+        print("The path was correct. The Excel file has been successfully loaded.")
+    except Exception as e:
+        # If there's an error reading the file, it might not be a valid Excel file
+        print(f"An error occurred while trying to read the Excel file: {e}")
+else:
+    # If the path does not exist, send a message to verify the path
+    print("Please verify the path.")
