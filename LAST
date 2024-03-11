@@ -109,3 +109,16 @@ aggregation_dict.update({col: 'sum' for col in sum_columns})
 result_df = current.groupby('CIF Customer Id', as_index=False).agg(aggregation_dict)
 
 # result_df will have the aggregated results
+
+
+
+
+
+# Sorting the DataFrame by the 'Total New Money' column in descending order.
+sorted_df = difference_df.sort_values(by='Total New Money', ascending=False)
+
+# Keeping only the records where 'Total New Money' is greater than 10 million.
+filtered_df = sorted_df[sorted_df['Total New Money'] > 10000000]
+
+# You can then view the filtered DataFrame
+filtered_df.head()
