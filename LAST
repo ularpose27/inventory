@@ -114,6 +114,16 @@ result_df = current.groupby('CIF Customer Id', as_index=False).agg(aggregation_d
 
 
 
+import pandas as pd
+
+# Assuming you have the 'industry_mapping' DataFrame
+industry_mapping['SIC Code 1'] = industry_mapping['SIC Code 1'].str.replace(r'\.0$', '')
+
+# This will remove any trailing ".0" from the strings in the column
+
+
+
+
 # Sorting the DataFrame by the 'Total New Money' column in descending order.
 sorted_df = difference_df.sort_values(by='Total New Money', ascending=False)
 
