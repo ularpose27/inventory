@@ -132,3 +132,19 @@ filtered_df = sorted_df[sorted_df['Total New Money'] > 10000000]
 
 # You can then view the filtered DataFrame
 filtered_df.head()
+
+
+
+
+
+
+import pandas as pd
+
+# Assuming you have the 'industry_mapping' DataFrame
+# Replace non-finite values with a placeholder (e.g., "N/A")
+industry_mapping['SIC Code 1'] = industry_mapping['SIC Code 1'].fillna("N/A")
+
+# Convert to integer (removing decimals) and then to string
+industry_mapping['SIC Code 1'] = industry_mapping['SIC Code 1'].astype(float).astype(int).astype(str)
+
+# Now the 'SIC Code 1' column contains integer values without decimals, converted to strings
