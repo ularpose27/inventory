@@ -11,4 +11,21 @@ print(df)
 
 
 
+import pandas as pd
+
+# Assuming `industry_mapping` and `difference_df` are already loaded
+
+# Performing a left merge on 'SIC Code 1' of difference_df and 'SIC Code' of industry_mapping
+# This will match the 'SIC Code 1' in difference_df with 'SIC Code' in industry_mapping
+# and append the corresponding 'Industry' from industry_mapping to difference_df
+merged_df = pd.merge(difference_df, industry_mapping, how='left', left_on='SIC Code 1', right_on='SIC Code')
+
+# Now, merged_df contains all columns from difference_df plus the 'Industry' from industry_mapping
+# If you just want to keep the original columns of difference_df plus the new 'Industry', you might want to drop the extra 'SIC Code' column
+merged_df = merged_df.drop(columns=['SIC Code'])
+
+# If you want to replace the original difference_df with this new version that includes the 'Industry' column:
+difference_df = merged_df
+
+
 
