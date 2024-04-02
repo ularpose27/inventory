@@ -19,3 +19,18 @@ def calculate_differences(group):
 # Apply the calculation and drop the rows where 'source' is not 'current', as well as the 'source' column
 result = combined_df.groupby('CIF Customer Id').apply(calculate_differences).reset_index()
 result = result[result['source'] == 'current'].drop(columns=['source'])
+
+
+
+
+
+import pandas as pd
+
+# Assuming combined_df is your DataFrame
+
+# Filter rows where the 'source' column contains 'prev'
+# The column is of type 'object', which is typical for string data in pandas
+mask = combined_df['source'].str.contains('prev', na=False)
+
+# Multiply specified columns by -1 for these rows
+combined_df.loc[mask, ['Cat A Money', 'Cat B Money', 'Cat S Money']] *= -1
