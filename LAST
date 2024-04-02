@@ -1,17 +1,21 @@
-# List of columns to keep
-columns_to_keep = ["Date", "Business", "Customer Name", "Industry", "Final Customer Risk Grade", "New Cat A Money", "New Cat B Money", "New Cat S Money", "Total New Money"]
+# Mark each dataframe to distinguish between 'current' and 'previous' rows
+result_df_current['source'] = 'current'
+result_df_prev['source'] = 'prev'
 
-# Keep only the columns in columns_to_keep and in the specified order
-difference_df = difference_df[columns_to_keep]
+# Append dataframes together
+combined_df = pd.concat([result_df_current, result_df_prev])
 
+# Group by 'CIF Customer Id' and calculate the differences
+def calculate_differences(group):
+    if 'current' in group['source'].values:
+        current = group[group['source'] == 'current'][['Cat A Money', 'Cat B Money', 'Cat S Money']]
+        prev = group[group['source'] == 'prev'][['Cat A Money', 'Cat B Money', 'Cat S Money']]
+        # If there is no previous record, fill with zeros to keep current values
+        if prev.empty:
+            return current
+        return current.values - prev.values if not prev.empty else current
+    return None
 
-
-
-
-# Create a list of target values
-target_values = ["Corporate Banking", "Total CRE & AHF", "Innovation Banking"]
-
-# Filter the DataFrame
-filtered_df = filtered_df[filtered_df["Business"].isin(target_values)]
-
-# Now 'filtered_df' contains only the desired records
+# Apply the calculation and drop the rows where 'source' is not 'current', as well as the 'source' column
+result = combined_df.groupby('CIF Customer Id').apply(calculate_differences).reset_index()
+result = result[result['source'] == 'current'].drop(columns=['source'])
