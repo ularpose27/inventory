@@ -3,3 +3,15 @@ columns_to_keep = ["Date", "Business", "Customer Name", "Industry", "Final Custo
 
 # Keep only the columns in columns_to_keep and in the specified order
 difference_df = difference_df[columns_to_keep]
+
+
+
+
+
+# Create a list of target values
+target_values = ["Corporate Banking", "Total CRE & AHF", "Innovation Banking"]
+
+# Filter the DataFrame
+filtered_df = filtered_df[filtered_df["Business"].isin(target_values)]
+
+# Now 'filtered_df' contains only the desired records
