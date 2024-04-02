@@ -1,31 +1,5 @@
+# List of columns to keep
+columns_to_keep = ["Date", "Business", "Customer Name", "Industry", "Final Customer Risk Grade", "New Cat A Money", "New Cat B Money", "New Cat S Money", "Total New Money"]
 
-# Option 1: Fill NaN with a placeholder (e.g., -1) and handle inf by replacing with a large number
-df['float_numbers'].replace([np.inf, -np.inf], np.nan, inplace=True)  # Replace inf with NaN
-df['float_numbers'].fillna(-1, inplace=True)  # Replace NaN with a placeholder, e.g., -1
-df['float_numbers'] = df['float_numbers'].astype(int)
-
-# Option 2: Directly convert to pandas nullable integer type (This will keep NaN as pd.NA)
-df['float_numbers'] = pd.to_numeric(df['float_numbers'], errors='coerce').astype('Int64')
-
-print(df)
-
-
-
-import pandas as pd
-
-# Assuming `industry_mapping` and `difference_df` are already loaded
-
-# Performing a left merge on 'SIC Code 1' of difference_df and 'SIC Code' of industry_mapping
-# This will match the 'SIC Code 1' in difference_df with 'SIC Code' in industry_mapping
-# and append the corresponding 'Industry' from industry_mapping to difference_df
-merged_df = pd.merge(difference_df, industry_mapping, how='left', left_on='SIC Code 1', right_on='SIC Code')
-
-# Now, merged_df contains all columns from difference_df plus the 'Industry' from industry_mapping
-# If you just want to keep the original columns of difference_df plus the new 'Industry', you might want to drop the extra 'SIC Code' column
-merged_df = merged_df.drop(columns=['SIC Code'])
-
-# If you want to replace the original difference_df with this new version that includes the 'Industry' column:
-difference_df = merged_df
-
-
-
+# Keep only the columns in columns_to_keep and in the specified order
+difference_df = difference_df[columns_to_keep]
