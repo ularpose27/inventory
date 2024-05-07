@@ -34,3 +34,22 @@ mask = combined_df['source'].str.contains('prev', na=False)
 
 # Multiply specified columns by -1 for these rows
 combined_df.loc[mask, ['Cat A Money', 'Cat B Money', 'Cat S Money']] *= -1
+
+
+
+
+import pandas as pd
+
+# Assuming 'corp' is your DataFrame and is already defined
+# If 'corp' needs to be created or loaded from a file, do that first
+
+# Define the file path and the sheet name you want to write to
+file_path = 'path_to_your_excel_file.xlsx'
+sheet_name = 'desired_sheet_name'
+
+# Load the existing Excel file using openpyxl
+with pd.ExcelWriter(file_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    # Write the DataFrame to the specified sheet in the Excel file
+    corp.to_excel(writer, sheet_name=sheet_name, index=False)
+
+# Note: Set index=False if you do not want to write the DataFrame index as a column in the Excel file
