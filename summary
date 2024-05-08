@@ -18,3 +18,22 @@ final_step.to_excel(writer, sheet_name='Current', startrow=1, startcol=0, index=
 
 # Save the changes
 writer.save()
+
+
+
+
+import pandas as pd
+import numpy as np
+
+# Define the number of rows and columns
+num_rows = 1000
+num_columns = 10
+
+# Generate random data
+data = np.random.rand(num_rows, num_columns)
+
+# Create a DataFrame
+df = pd.DataFrame(data, columns=[f'Column{i+1}' for i in range(num_columns)])
+
+# Display the DataFrame
+print(df)
