@@ -1,50 +1,29 @@
-# New Money GBM Report Generator
+import openpyxl
 
-**Creator**: Ulises Armando Ponce Sesma  
-**Script Version**: 1
+# Path to the source Excel file
+source_path = r"J:\CRM\REPORTING\RCC.XLSX"
+# Path to the destination Excel file
+destination_path = r"Chemicals2.xlsx"
 
-## Purpose
-This Python script generates a comprehensive report, titled "GBM New Money file", summarizing new approvals of $50 million or more for the current month-end reporting period.
+# Load the source workbook and the specific worksheet
+source_wb = openpyxl.load_workbook(source_path, data_only=True)
+source_ws = source_wb['Current']
 
-## Prerequisites
-- Python 3.11 installed.
-- Required Python libraries: `pandas`, `numpy`, `openpyxl`, `datetime`.
-  Install them using the command `pip install pandas numpy openpyxl datetime` if not already installed.
-- Access to Qlik Sense for obtaining the necessary data files.
+# Load the destination workbook and the specific worksheet
+destination_wb = openpyxl.load_workbook(destination_path)
+destination_ws = destination_wb['Previous']
 
-## Required Data Files
-1. **Current Month Data**: A file named `current.xlsx`, representing the current month's data, obtainable from Qlik Sense.
-2. **Previous Month Data**: A file named `prev.xlsx`, representing the previous month's data, also sourced from Qlik Sense.
-3. **Region Mapping**: A static file named `Region_mapping.csv`, provided to the user and consistent across all months.
+# Clear existing data in destination worksheet
+for row in destination_ws['A1:Z100']:  # Adjust the range according to your data size
+    for cell in row:
+        cell.value = None
 
-## Instructions
-1. Ensure the `current.xlsx` and `prev.xlsx` files are saved with their respective names in a known directory after downloading them from Qlik Sense.
-2. Place the `Region_mapping.csv` file in a directory that does not change from month to month. This file should not require updates or path changes unless it is moved to a new location.
-3. Run the script. When prompted, input the full paths to the `current.xlsx` and `prev.xlsx` files. The path for `Region_mapping.csv` is predefined in the script and does not require manual input unless the file's location has changed.
-4. Follow the inline comments within the script for any additional configuration or steps that might be necessary during execution.
+# Copy values from source to destination worksheet
+for row in source_ws.iter_rows(values_only=True):
+    destination_ws.append(row)
 
-## Output
-Upon successful execution, the script will create a new Excel report titled "GBM New Money file_[CreationDate].xlsx", where "[CreationDate]" is the date when the report is generated. The report will be saved in the same directory from which the script is run.
+# Save the destination workbook
+destination_wb.save(destination_path)
 
-**Note**: Ensure that any required libraries or dependencies are installed before running the script. Refer to the script's comments for guidance on installing any dependencies.
+print("Data transferred successfully.")
 
-
-
-
-import pandas as pd
-
-# Assuming 'corp' is your DataFrame loaded from an Excel file
-# Example to load DataFrame:
-# corp = pd.read_excel('path_to_your_file.xlsx')
-
-# Filter the DataFrame based on the conditions
-filtered_corp = corp[
-    (corp['Faci Use'].isin(['MMK', 'INV', 'ISRK', 'MPL', 'DPL']) == False) &
-    (corp['SME Indicator'].str.startswith('N') | corp['SME Indicator'].isnull()) &
-    (corp['Second Order Risk'] == 'No') &
-    (corp['GICS Group'] == 'Chemicals') &
-    (corp['FCL Cost Center Id'].isin(['460100', '900506']) == False) &
-    (corp['Category Type'] != 'S')
-]
-
-# This 'filtered_corp' DataFrame now contains the rows that meet all the specified conditions
