@@ -77,3 +77,32 @@ wb.close()
 
 # Display the first few rows of the DataFrame
 print(df_current.head())
+
+
+
+
+Final.....
+
+
+import openpyxl
+
+# Load the source Excel file
+source_wb = openpyxl.load_workbook('RCC.xlsx')
+source_ws = source_wb['Current']
+
+# Load the destination Excel file
+dest_wb = openpyxl.load_workbook('Chemicals2.xlsx')
+dest_ws = dest_wb['Previous']
+
+# Ensure the destination worksheet is clear before pasting new data
+for row in dest_ws['A1:Z1000']:  # Adjust the range according to your expected data size
+    for cell in row:
+        cell.value = None
+
+# Copy values from source to destination
+for row in source_ws.iter_rows():
+    for cell in row:
+        dest_ws.cell(row=cell.row, column=cell.column, value=cell.value)
+
+# Save the destination Excel file
+dest_wb.save('Chemicals2.xlsx')
