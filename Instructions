@@ -27,3 +27,24 @@ destination_wb.save(destination_path)
 
 print("Data transferred successfully.")
 
+
+
+
+
+
+
+import pandas as pd
+
+# Specify the path to the Excel file
+file_path = r"J:\CRM\REPORTING\RCC.XLSX"
+
+# Load the workbook using openpyxl to access the data_only option
+wb = pd.ExcelFile(file_path, engine='openpyxl')
+# Ensure we only get values, not formulas
+wb.book.data_only = True
+
+# Load the data from the "Current" tab into a DataFrame
+df_current = wb.parse(sheet_name='Current')
+
+# Display the first few rows of the DataFrame
+print(df_current.head())
