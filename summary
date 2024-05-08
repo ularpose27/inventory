@@ -37,3 +37,30 @@ df = pd.DataFrame(data, columns=[f'Column{i+1}' for i in range(num_columns)])
 
 # Display the DataFrame
 print(df)
+
+
+
+
+
+import pandas as pd
+from openpyxl import load_workbook
+
+# Assuming 'final_step' is your DataFrame
+# final_step = pd.DataFrame(...)
+
+# Load the existing Excel file
+file_path = 'Chemicals.xlsx'
+book = load_workbook(file_path)
+
+# Select the 'Current' sheet using the workbook object with the ExcelWriter
+writer = pd.ExcelWriter(file_path, engine='openpyxl', if_sheet_exists='overlay')
+writer.book = book
+
+# Map the sheet names to the Worksheet objects
+writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+
+# Write the data to the 'Current' sheet starting at cell A2
+final_step.to_excel(writer, sheet_name='Current', startrow=1, startcol=0, index=False, header=False)
+
+# Save the changes
+writer.save()
