@@ -1,0 +1,20 @@
+import pandas as pd
+from openpyxl import load_workbook
+
+# Assuming 'final_step' is your DataFrame
+# final_step = pd.DataFrame(...)
+
+# Load the existing Excel file
+file_path = 'Chemicals.xlsx'
+book = load_workbook(file_path)
+
+# Select the 'Current' sheet
+writer = pd.ExcelWriter(file_path, engine='openpyxl')
+writer.book = book
+writer.sheets = {ws.title: ws for ws in book.worksheets}
+
+# Write the data to the 'Current' sheet starting at cell A2
+final_step.to_excel(writer, sheet_name='Current', startrow=1, startcol=0, index=False, header=False)
+
+# Save the changes
+writer.save()
