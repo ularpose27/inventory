@@ -106,3 +106,18 @@ for row in source_ws.iter_rows():
 
 # Save the destination Excel file
 dest_wb.save('Chemicals2.xlsx')
+
+
+
+
+
+
+
+
+
+
+# Filter the DataFrame to keep only rows where the "INDUSTRY_GROUP" column is "Chemicals"
+df_filtered = df_financing[df_financing['INDUSTRY_GROUP'] == 'Chemicals']
+
+# Display the first few rows of the filtered DataFrame to confirm the filter is applied correctly
+print(df_filtered.head())
