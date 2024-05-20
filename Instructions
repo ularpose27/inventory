@@ -1,143 +1,23 @@
-import openpyxl
-
-# Path to the source Excel file
-source_path = r"J:\CRM\REPORTING\RCC.XLSX"
-# Path to the destination Excel file
-destination_path = r"Chemicals2.xlsx"
-
-# Load the source workbook and the specific worksheet
-source_wb = openpyxl.load_workbook(source_path, data_only=True)
-source_ws = source_wb['Current']
-
-# Load the destination workbook and the specific worksheet
-destination_wb = openpyxl.load_workbook(destination_path)
-destination_ws = destination_wb['Previous']
-
-# Clear existing data in destination worksheet
-for row in destination_ws['A1:Z100']:  # Adjust the range according to your data size
-    for cell in row:
-        cell.value = None
-
-# Copy values from source to destination worksheet
-for row in source_ws.iter_rows(values_only=True):
-    destination_ws.append(row)
-
-# Save the destination workbook
-destination_wb.save(destination_path)
-
-print("Data transferred successfully.")
-
-
-
-
-
-
-
 import pandas as pd
 
-# Specify the path to the Excel file
-file_path = r"J:\CRM\REPORTING\RCC.XLSX"
+# Load the Excel file and the specific sheet, skipping the first row
+df = pd.read_excel('HFS.xlsx', sheet_name='April 30', skiprows=1)
 
-# Load the workbook using openpyxl to access the data_only option
-wb = pd.ExcelFile(file_path, engine='openpyxl')
-# Ensure we only get values, not formulas
-wb.book.data_only = True
+# Initialize the 'Category' column with NaN values
+df['Category'] = pd.NA
 
-# Load the data from the "Current" tab into a DataFrame
-df_current = wb.parse(sheet_name='Current')
+# Variable to store the current category
+category = None
 
-# Display the first few rows of the DataFrame
-print(df_current.head())
+# Iterate over DataFrame rows to determine and set the 'Category' based on conditions
+for index, row in df.iterrows():
+    if pd.isna(row['Facility Id']) and pd.notna(row['Status / Customer Name']):
+        category = row['Status / Customer Name']
+    if pd.notna(row['Facility Id']):
+        df.at[index, 'Category'] = category
 
+# Keep only the specified columns
+df = df[['Category', 'Status / Customer Name', 'Facility Id']]
 
-
-
-
-
-import pandas as pd
-import openpyxl
-
-# Specify the path to the Excel file
-file_path = r"J:\CRM\REPORTING\RCC.XLSX"
-
-# Load the workbook using openpyxl with data_only=True to get values not formulas
-wb = openpyxl.load_workbook(file_path, data_only=True)
-ws = wb['Current']
-
-# Extract data from the worksheet into a list of lists (rows and their cells' values)
-data = []
-for row in ws.iter_rows(values_only=True):
-    data.append(list(row))
-
-# Convert the list of lists into a DataFrame
-df_current = pd.DataFrame(data, columns=[cell.value for cell in ws[1]])  # Assuming the first row contains headers
-
-# Close the workbook
-wb.close()
-
-# Display the first few rows of the DataFrame
-print(df_current.head())
-
-
-
-
-Final.....
-
-
-import openpyxl
-
-# Load the source Excel file
-source_wb = openpyxl.load_workbook('RCC.xlsx')
-source_ws = source_wb['Current']
-
-# Load the destination Excel file
-dest_wb = openpyxl.load_workbook('Chemicals2.xlsx')
-dest_ws = dest_wb['Previous']
-
-# Ensure the destination worksheet is clear before pasting new data
-for row in dest_ws['A1:Z1000']:  # Adjust the range according to your expected data size
-    for cell in row:
-        cell.value = None
-
-# Copy values from source to destination
-for row in source_ws.iter_rows():
-    for cell in row:
-        dest_ws.cell(row=cell.row, column=cell.column, value=cell.value)
-
-# Save the destination Excel file
-dest_wb.save('Chemicals2.xlsx')
-
-
-
-
-
-
-
-
-
-import pandas as pd
-
-# Assuming df is your DataFrame
-df = pd.DataFrame({
-    'Column1': [1, 2, 3],
-    'Column2': [4, 5, 6]
-})
-
-# Create a Pandas Excel writer using XlsxWriter as the engine.
-with pd.ExcelWriter('output.xlsx', engine='xlsxwriter') as writer:
-    # Write the dataframe data to XlsxWriter. Turn off the default header and
-    # index and also specify the sheet name to 'Current'
-    df.to_excel(writer, sheet_name='Current', index=False)
-
-
-
-
-
-
-
-
-# Filter the DataFrame to keep only rows where the "INDUSTRY_GROUP" column is "Chemicals"
-df_filtered = df_financing[df_financing['INDUSTRY_GROUP'] == 'Chemicals']
-
-# Display the first few rows of the filtered DataFrame to confirm the filter is applied correctly
-print(df_filtered.head())
+# Display the resulting DataFrame
+print(df)
