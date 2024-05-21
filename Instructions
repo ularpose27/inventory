@@ -1,27 +1,8 @@
-# Script Instructions
+import pandas as pd
 
-## Purpose
-This script automates part of the Chemicals RCC process. It is designed to integrate and process data from multiple Excel files.
+# Assuming 'final_step' is your DataFrame and 'As of Date' is the column with date information
+# Convert the 'As of Date' column to datetime format if it's not already
+final_step['As of Date'] = pd.to_datetime(final_step['As of Date'])
 
-## Prerequisites
-- **Python Libraries:** Ensure the following libraries are installed: `pandas`, `numpy`, `os`, `datetime`, `openpyxl`.
-- **File Preparation:** Before running this script, ensure that all required files are present in the same directory as this Jupyter notebook.
-
-## Required Input Files
-You will need to provide paths to the following five Excel files when prompted:
-1. **Corp Ind File** - Corporate Indicator data.
-2. **Previous Month Chemicals RCC Report** - Last month's RCC report.
-3. **HNAH Financing Profile** - Financing profile data.
-4. **ISRK Results** - Results from ISRK.
-5. **HFS Report** - HFS reporting data.
-
-## Template File
-- **Location:** Save the template file named `Chemicals2.xlsx` in the same directory as this script.
-- **Source:** The original template can be obtained from `J:\CTM\corp\` with the filename `rccchemicals.xlsx`.
-
-## Output
-- **Result:** The script will populate `Chemicals2.xlsx` with the processed data.
-- **Next Steps:** After the script completes, continue with the analysis of the information in `Chemicals2.xlsx`.
-
-## Execution
-Run the script by executing all cells. You will be prompted to enter the paths for the input files as required. Ensure that the template file `Chemicals2.xlsx` is in the correct location before starting the script.
+# Change the date format to 'DDMMAA'
+final_step['As of Date'] = final_step['As of Date'].dt.strftime('%d%m%y')
