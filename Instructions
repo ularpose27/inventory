@@ -1,23 +1,27 @@
-import pandas as pd
+# Script Instructions
 
-# Load the Excel file and the specific sheet, skipping the first row
-df = pd.read_excel('HFS.xlsx', sheet_name='April 30', skiprows=1)
+## Purpose
+This script automates part of the Chemicals RCC process. It is designed to integrate and process data from multiple Excel files.
 
-# Initialize the 'Category' column with NaN values
-df['Category'] = pd.NA
+## Prerequisites
+- **Python Libraries:** Ensure the following libraries are installed: `pandas`, `numpy`, `os`, `datetime`, `openpyxl`.
+- **File Preparation:** Before running this script, ensure that all required files are present in the same directory as this Jupyter notebook.
 
-# Variable to store the current category
-category = None
+## Required Input Files
+You will need to provide paths to the following five Excel files when prompted:
+1. **Corp Ind File** - Corporate Indicator data.
+2. **Previous Month Chemicals RCC Report** - Last month's RCC report.
+3. **HNAH Financing Profile** - Financing profile data.
+4. **ISRK Results** - Results from ISRK.
+5. **HFS Report** - HFS reporting data.
 
-# Iterate over DataFrame rows to determine and set the 'Category' based on conditions
-for index, row in df.iterrows():
-    if pd.isna(row['Facility Id']) and pd.notna(row['Status / Customer Name']):
-        category = row['Status / Customer Name']
-    if pd.notna(row['Facility Id']):
-        df.at[index, 'Category'] = category
+## Template File
+- **Location:** Save the template file named `Chemicals2.xlsx` in the same directory as this script.
+- **Source:** The original template can be obtained from `J:\CTM\corp\` with the filename `rccchemicals.xlsx`.
 
-# Keep only the specified columns
-df = df[['Category', 'Status / Customer Name', 'Facility Id']]
+## Output
+- **Result:** The script will populate `Chemicals2.xlsx` with the processed data.
+- **Next Steps:** After the script completes, continue with the analysis of the information in `Chemicals2.xlsx`.
 
-# Display the resulting DataFrame
-print(df)
+## Execution
+Run the script by executing all cells. You will be prompted to enter the paths for the input files as required. Ensure that the template file `Chemicals2.xlsx` is in the correct location before starting the script.
