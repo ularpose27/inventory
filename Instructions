@@ -1,24 +1,28 @@
-import pandas as pd
-from openpyxl import load_workbook
+import openpyxl
+from openpyxl.formula.translate import Translator
 
 # Load the workbook and select the specified sheet
 file_path = "Chemicals2.xlsx"
 sheet_name = "Indirect"
-wb = load_workbook(file_path)
+wb = openpyxl.load_workbook(file_path)
 sheet = wb[sheet_name]
 
-# Convert the sheet to a DataFrame
-data = pd.DataFrame(sheet.values)
-
 # Find the last row with a value in column AQ
-last_row = data[36].last_valid_index() + 2  # 36 is the zero-based index for AQ (column 37 in 1-based index)
+last_row = 0
+for row in range(2, sheet.max_row + 1):
+    if sheet[f"AQ{row}"].value is not None:
+        last_row = row
 
-# Drag down the formulas in AR2, AS2, and AT2
-for col in ['AR', 'AS', 'AT']:
-    cell = sheet[f"{col}2"]
-    formula = cell.value
-    for row in range(3, last_row + 1):
-        sheet[f"{col}{row}"].value = f"={formula[1:].replace('$', '')}".replace("2", str(row))
+# Get the initial formulas in AR2, AS2, and AT2
+formula_ar = sheet["AR2"].value
+formula_as = sheet["AS2"].value
+formula_at = sheet["AT2"].value
+
+# Drag down the formulas using Translator
+for row in range(3, last_row + 1):
+    sheet[f"AR{row}"].value = Translator(formula_ar, origin="AR2").translate_formula(f"AR{row}")
+    sheet[f"AS{row}"].value = Translator(formula_as, origin="AS2").translate_formula(f"AS{row}")
+    sheet[f"AT{row}"].value = Translator(formula_at, origin="AT2").translate_formula(f"AT{row}")
 
 # Save the workbook
 wb.save(file_path)
