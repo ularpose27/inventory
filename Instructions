@@ -1,28 +1,24 @@
-import openpyxl
+import pandas as pd
+from openpyxl import load_workbook
 
 # Load the workbook and select the specified sheet
 file_path = "Chemicals2.xlsx"
 sheet_name = "Indirect"
-wb = openpyxl.load_workbook(file_path)
+wb = load_workbook(file_path)
 sheet = wb[sheet_name]
 
+# Convert the sheet to a DataFrame
+data = pd.DataFrame(sheet.values)
+
 # Find the last row with a value in column AQ
-last_row = sheet.max_row
-for row in range(2, last_row + 1):
-    if sheet[f"AQ{row}"].value is None:
-        last_row = row - 1
-        break
+last_row = data[36].last_valid_index() + 2  # 36 is the zero-based index for AQ (column 37 in 1-based index)
 
-# Get the formulas in AR2, AS2, and AT2
-formula_ar = sheet["AR2"].value
-formula_as = sheet["AS2"].value
-formula_at = sheet["AT2"].value
-
-# Drag down the formulas
-for row in range(3, last_row + 1):
-    sheet[f"AR{row}"].value = formula_ar
-    sheet[f"AS{row}"].value = formula_as
-    sheet[f"AT{row}"].value = formula_at
+# Drag down the formulas in AR2, AS2, and AT2
+for col in ['AR', 'AS', 'AT']:
+    cell = sheet[f"{col}2"]
+    formula = cell.value
+    for row in range(3, last_row + 1):
+        sheet[f"{col}{row}"].value = f"={formula[1:].replace('$', '')}".replace("2", str(row))
 
 # Save the workbook
 wb.save(file_path)
