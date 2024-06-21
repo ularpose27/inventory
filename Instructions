@@ -1,5 +1,5 @@
 if non_formula_rows > formula_rows:
-    for col in range(3, 6):  # Columns AR, AS, and AT are 44, 45, 46
+    for col in [44, 45, 46]:  # Columns AR, AS, and AT
         for row in range(formula_rows + 1, non_formula_rows + 1):
             source_cell = sheet.cell(row=2, column=col)
             destination_cell = sheet.cell(row=row, column=col)
@@ -7,6 +7,6 @@ if non_formula_rows > formula_rows:
             translated_formula = translator.translate_formula(destination_cell.coordinate)
             destination_cell.value = translated_formula
 elif non_formula_rows < formula_rows:
-    for col in range(3, 6):
+    for col in [44, 45, 46]:  # Columns AR, AS, and AT
         for row in range(non_formula_rows + 1, formula_rows + 1):
             sheet.cell(row=row, column=col).value = None
