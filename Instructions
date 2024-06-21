@@ -1,8 +1,30 @@
-import pandas as pd
+import openpyxl
 
-# Assuming 'final_step' is your DataFrame and 'As of Date' is the column with date information
-# Convert the 'As of Date' column to datetime format if it's not already
-final_step['As of Date'] = pd.to_datetime(final_step['As of Date'])
+# Load the workbook and select the specified sheet
+file_path = "Chemicals2.xlsx"
+sheet_name = "Indirect"
+wb = openpyxl.load_workbook(file_path)
+sheet = wb[sheet_name]
 
-# Change the date format to 'DDMMAA'
-final_step['As of Date'] = final_step['As of Date'].dt.strftime('%d%m%y')
+# Find the last row with a value in column AQ
+last_row = sheet.max_row
+for row in range(2, last_row + 1):
+    if sheet[f"AQ{row}"].value is None:
+        last_row = row - 1
+        break
+
+# Get the formulas in AR2, AS2, and AT2
+formula_ar = sheet["AR2"].value
+formula_as = sheet["AS2"].value
+formula_at = sheet["AT2"].value
+
+# Drag down the formulas
+for row in range(3, last_row + 1):
+    sheet[f"AR{row}"].value = formula_ar
+    sheet[f"AS{row}"].value = formula_as
+    sheet[f"AT{row}"].value = formula_at
+
+# Save the workbook
+wb.save(file_path)
+
+print(f"Formulas dragged down to row {last_row} in columns AR, AS, and AT.")
