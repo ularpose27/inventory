@@ -1,30 +1,12 @@
-import openpyxl
-from openpyxl.formula.translate import Translator
-
-# Load the workbook and select the specified sheet
-file_path = "Chemicals2.xlsx"
-sheet_name = "Indirect"
-wb = openpyxl.load_workbook(file_path)
-sheet = wb[sheet_name]
-
-# Find the last row with a value in column AQ
-last_row = 0
-for row in range(2, sheet.max_row + 1):
-    if sheet[f"AQ{row}"].value is not None:
-        last_row = row
-
-# Get the initial formulas in AR2, AS2, and AT2
-formula_ar = sheet["AR2"].value
-formula_as = sheet["AS2"].value
-formula_at = sheet["AT2"].value
-
-# Drag down the formulas using Translator
-for row in range(3, last_row + 1):
-    sheet[f"AR{row}"].value = Translator(formula_ar, origin="AR2").translate_formula(f"AR{row}")
-    sheet[f"AS{row}"].value = Translator(formula_as, origin="AS2").translate_formula(f"AS{row}")
-    sheet[f"AT{row}"].value = Translator(formula_at, origin="AT2").translate_formula(f"AT{row}")
-
-# Save the workbook
-wb.save(file_path)
-
-print(f"Formulas dragged down to row {last_row} in columns AR, AS, and AT.")
+if non_formula_rows > formula_rows:
+    for col in range(3, 6):  # Columns AR, AS, and AT are 44, 45, 46
+        for row in range(formula_rows + 1, non_formula_rows + 1):
+            source_cell = sheet.cell(row=2, column=col)
+            destination_cell = sheet.cell(row=row, column=col)
+            translator = Translator(source_cell.value, source_cell.coordinate)
+            translated_formula = translator.translate_formula(destination_cell.coordinate)
+            destination_cell.value = translated_formula
+elif non_formula_rows < formula_rows:
+    for col in range(3, 6):
+        for row in range(non_formula_rows + 1, formula_rows + 1):
+            sheet.cell(row=row, column=col).value = None
