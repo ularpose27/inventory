@@ -1,12 +1,15 @@
-if non_formula_rows > formula_rows:
-    for col in [44, 45, 46]:  # Columns AR, AS, and AT
-        for row in range(formula_rows + 1, non_formula_rows + 1):
-            source_cell = sheet.cell(row=2, column=col)
-            destination_cell = sheet.cell(row=row, column=col)
-            translator = Translator(source_cell.value, source_cell.coordinate)
-            translated_formula = translator.translate_formula(destination_cell.coordinate)
-            destination_cell.value = translated_formula
-elif non_formula_rows < formula_rows:
-    for col in [44, 45, 46]:  # Columns AR, AS, and AT
-        for row in range(non_formula_rows + 1, formula_rows + 1):
-            sheet.cell(row=row, column=col).value = None
+import pandas as pd
+
+# Assuming new_values and base_period are your dataframes and 'A3' corresponds to a specific column in new_values
+# Replace 'A3' with the actual column name, for example, 'id'
+
+# Merge dataframes
+merged_df = new_values.merge(base_period[['N']], left_on='A3', right_on='N', how='left', indicator=True)
+
+# Apply conditional logic
+merged_df['new_column'] = merged_df['_merge'].apply(lambda x: "doesn't exist, new" if x == 'left_only' else "exist")
+
+# Drop the '_merge' column if not needed
+merged_df = merged_df.drop(columns=['_merge', 'N'])
+
+# The merged_df now contains the new column with the desired values
