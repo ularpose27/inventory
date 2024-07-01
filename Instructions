@@ -1,18 +1,2 @@
 
 
-Hello Fred,
-
-I hope you are well.
-
-I am working on the CMB report and encountered an issue with the new RDP query. Previously, we used a filter called "Month End Indicator" with two options, "C" and "M." However, the new query includes a filter named "Frequency" with additional options.
-
-I attempted to use the "All Daily" option, but the result was 22,383 records, whereas the previous query returned 22,387 records. I am unsure if I selected the correct option within the new "Frequency" filter or if the new query is expected to have a slight difference in the number of records.
-
-Could you please advise which option I should select in the new filter?
-
-Best regards,
-Armando
-
----
-
-This version is more concise, clear, and organized.
