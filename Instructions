@@ -1,15 +1,18 @@
-import pandas as pd
 
-# Assuming new_values and base_period are your dataframes and 'A3' corresponds to a specific column in new_values
-# Replace 'A3' with the actual column name, for example, 'id'
 
-# Merge dataframes
-merged_df = new_values.merge(base_period[['N']], left_on='A3', right_on='N', how='left', indicator=True)
+Hello Fred,
 
-# Apply conditional logic
-merged_df['new_column'] = merged_df['_merge'].apply(lambda x: "doesn't exist, new" if x == 'left_only' else "exist")
+I hope you are well.
 
-# Drop the '_merge' column if not needed
-merged_df = merged_df.drop(columns=['_merge', 'N'])
+I am working on the CMB report and encountered an issue with the new RDP query. Previously, we used a filter called "Month End Indicator" with two options, "C" and "M." However, the new query includes a filter named "Frequency" with additional options.
 
-# The merged_df now contains the new column with the desired values
+I attempted to use the "All Daily" option, but the result was 22,383 records, whereas the previous query returned 22,387 records. I am unsure if I selected the correct option within the new "Frequency" filter or if the new query is expected to have a slight difference in the number of records.
+
+Could you please advise which option I should select in the new filter?
+
+Best regards,
+Armando
+
+---
+
+This version is more concise, clear, and organized.
