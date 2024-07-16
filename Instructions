@@ -1,52 +1,13 @@
 import pandas as pd
-from openpyxl import load_workbook
-from openpyxl.utils.dataframe import dataframe_to_rows
-import datetime
 
-# Function to get the next month in "MMM'YY" format
-def get_next_month(last_month):
-    last_date = datetime.datetime.strptime(last_month, "%b'%y")
-    next_date = last_date + pd.DateOffset(months=1)
-    return next_date.strftime("%b'%y")
+# Path to the previous file
+previous_path = '/mnt/data/file-7O2LXvFX7Akml2VEnMAsrxwI'
 
-# Paths for the files
-previous_path = 'path_to_previous_file.xlsx'
-file_path_template = 'path_to_template_file.xlsx'
-
-# Read the "Trend" tab from previous_path
+# Read the "Trend" tab from previous_path into a DataFrame
 df_previous = pd.read_excel(previous_path, sheet_name='Trend', header=None)
 
-# Load the template file and access the "Trend" sheet
-wb = load_workbook(file_path_template)
-ws = wb['Trend']
+# Display the DataFrame to verify the extracted values
+print(df_previous)
 
-# Clear the existing "Trend" sheet (optional)
-for row in ws.iter_rows(min_row=2, max_col=ws.max_column, max_row=ws.max_row):
-    for cell in row:
-        cell.value = None
-
-# Paste the values from the previous file into the template
-for r_idx, row in enumerate(dataframe_to_rows(df_previous, index=False, header=False), 1):
-    for c_idx, value in enumerate(row, 1):
-        ws.cell(row=r_idx, column=c_idx, value=value)
-
-# Determine the header for the new column
-last_header = df_previous.iloc[0, -1]
-next_month = get_next_month(last_header)
-ws.cell(row=1, column=ws.max_column + 1, value=next_month)
-
-# Load the previous workbook to extract formulas
-wb_previous = load_workbook(previous_path, data_only=False)
-ws_previous = wb_previous['Trend']
-
-# Copy formulas from the previous file to the new file
-for row in range(3, 99):
-    ws.cell(row=row, column=ws.max_column, value=ws_previous.cell(row=row, column=ws_previous.max_column - 1).value)
-
-for row in range(3, 13):
-    ws.cell(row=row, column=ws.max_column + 1, value=ws_previous.cell(row=row, column=ws_previous.max_column).value)
-
-# Save the updated template file
-wb.save(file_path_template)
-
-print("Report updated successfully!")
+# You can also save the DataFrame to a new Excel file if needed
+df_previous.to_excel('extracted_trend_values.xlsx', index=False, header=False)
