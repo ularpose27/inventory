@@ -6,8 +6,14 @@ previous_path = '/mnt/data/file-7O2LXvFX7Akml2VEnMAsrxwI'
 # Read the "Trend" tab from previous_path into a DataFrame
 df_previous = pd.read_excel(previous_path, sheet_name='Trend', header=None)
 
-# Display the DataFrame to verify the extracted values
-print(df_previous)
+# Find the last column index with a value in the first row
+last_valid_index = df_previous.iloc[0].last_valid_index()
 
-# You can also save the DataFrame to a new Excel file if needed
-df_previous.to_excel('extracted_trend_values.xlsx', index=False, header=False)
+# Drop all columns after the last valid column
+df_trimmed = df_previous.iloc[:, :last_valid_index + 1]
+
+# Display the trimmed DataFrame to verify the changes
+print(df_trimmed)
+
+# Save the trimmed DataFrame to a new Excel file if needed
+df_trimmed.to_excel('trimmed_trend_values.xlsx', index=False, header=False)
