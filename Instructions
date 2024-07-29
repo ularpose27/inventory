@@ -1,19 +1,5 @@
-import pandas as pd
+# Calculate the difference between the last two columns for rows 3 to 12 (0-based index: 2 to 11)
+df_trend_combined.iloc[2:12, -1] = df_trend_combined.iloc[2:12, -2] - df_trend_combined.iloc[2:12, -3]
 
-# Path to the previous file
-previous_path = '/mnt/data/file-7O2LXvFX7Akml2VEnMAsrxwI'
-
-# Read the "Trend" tab from previous_path into a DataFrame
-df_previous = pd.read_excel(previous_path, sheet_name='Trend', header=None)
-
-# Find the last column index with a value in the first row
-last_valid_index = df_previous.iloc[0].last_valid_index()
-
-# Drop all columns after the last valid column
-df_trimmed = df_previous.iloc[:, :last_valid_index + 1]
-
-# Display the trimmed DataFrame to verify the changes
-print(df_trimmed)
-
-# Save the trimmed DataFrame to a new Excel file if needed
-df_trimmed.to_excel('trimmed_trend_values.xlsx', index=False, header=False)
+# Display the modified dataframe to verify the changes
+import ace_tools as tools; tools.display_dataframe_to_user(name="Modified DataFrame", dataframe=df_trend_combined)
