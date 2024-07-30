@@ -1,5 +1,28 @@
-# Calculate the difference between the last two columns for rows 3 to 12 (0-based index: 2 to 11)
-df_trend_combined.iloc[2:12, -1] = df_trend_combined.iloc[2:12, -2] - df_trend_combined.iloc[2:12, -3]
+import openpyxl
+import pandas as pd
 
-# Display the modified dataframe to verify the changes
-import ace_tools as tools; tools.display_dataframe_to_user(name="Modified DataFrame", dataframe=df_trend_combined)
+# Path to your Excel file
+file_path = 'path_to_your_excel_file.xlsx'
+
+# Load the workbook with data_only=True to get the evaluated results of formulas
+wb = openpyxl.load_workbook(file_path, data_only=True)
+
+# Select the sheet by name
+ws = wb['Formula_Trend']
+
+# Extract the values from the sheet
+data = []
+for row in ws.iter_rows(values_only=True):
+    data.append(row)
+
+# Convert the data to a pandas DataFrame for easier manipulation and viewing
+df = pd.DataFrame(data)
+
+# Print the DataFrame to verify the values
+print(df)
+
+# Save the DataFrame to a new Excel file (optional)
+df.to_excel('extracted_values.xlsx', index=False)
+
+# Close the workbook
+wb.close()
