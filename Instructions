@@ -23,3 +23,15 @@ worksheet['G1'] = formatted_date_str
 
 # Save the workbook
 workbook.save(file_path)
+
+
+2024 Self-Assessment
+
+Reflecting on 2024, my first full year with HSBC, I am grateful for the opportunities I’ve had to learn, grow, and contribute meaningfully to our team’s goals. As I immersed myself in the company’s culture and processes, I quickly took on responsibilities for multiple reports, gaining a deep understanding of our data management and reporting systems. Early in the year, I began to identify potential areas for improvement, focusing especially on enhancing efficiency and exploring possibilities for automation.
+
+A major highlight this year was my participation in HSBC’s Python Clinic. This experience was invaluable, providing me with fresh insights into advanced Python techniques that could drive further improvements in our work. The clinic also fostered collaboration across departments, especially with the Data Analytics team, expanding my perspective on cross-functional innovation and equipping me with new ideas for enhancing our reporting processes.
+
+Following the clinic, my colleague Eduardo and I leveraged our updated Python skills to implement automation in key reporting tasks. By streamlining repetitive processes, we achieved significant time savings, reduced potential for error, and enhanced the overall consistency and accuracy of our reports. This project not only underscored the impact of automation but also strengthened my commitment to continuous improvement and innovation within our team.
+
+Looking forward, I am excited about the possibilities for further advancements and am eager to take on new challenges that will contribute to HSBC’s goals. I believe the insights and skills I have gained this year position me well to drive positive change, and I am enthusiastic about continuing to explore innovative solutions that add value to our team and the organization as a whole.
+
