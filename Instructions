@@ -4,8 +4,25 @@ Since the previous query was not viable, I attempted to use the new RDP. However
 
 Additionally, the column structure in this new query differs from the previous one. Specifically, the Facility ID column was removed, making it difficult to identify the HSI facilities that needed to be excluded. To address this, I cross-referenced the data with the RDP Daily BO for February to filter out the necessary records.
 
-After excluding the HSI facilities, I was left with approximately 15,000 records, which is three times the usual average.
+After excluding the HSI facilities, I was left 
 
-Please let me know if you need further details.
 
-Best regards,
+
+Fred, could you advise on the best way to proceed? I would greatly appreciate your input on the following:
+
+Do you know who could assist in reloading the data for the previous query?
+
+Is there someone who could adjust the new RDP query to align it more closely with the previous version?
+
+Do you think it would be possible to filter the current RDP query results to bring the record count closer to the expected 5,000?
+
+
+
+
+Fred, could you advise on the best way to proceed? I would greatly appreciate your input on the following:
+
+Do you know who could assist in reloading the data for the previous query?
+
+Is there someone who could adjust the new RDP query to align it more closely with the previous version?
+
+Do you think it would be possible to filter the current RDP query results to bring the record count closer to the expected 5,000?
