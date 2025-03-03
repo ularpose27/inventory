@@ -1,1 +1,11 @@
+assisted me in extracting the latest information using the original Qlik Sense query. However, the data was only available up to February 3rd, so despite having access to the query, we were unable to retrieve the complete dataset for February.
 
+Since the previous query was not viable, I attempted to use the new RDP. However, this query returned over 27,000 records, whereas I typically expect around 5,000 records.
+
+Additionally, the column structure in this new query differs from the previous one. Specifically, the Facility ID column was removed, making it difficult to identify the HSI facilities that needed to be excluded. To address this, I cross-referenced the data with the RDP Daily BO for February to filter out the necessary records.
+
+After excluding the HSI facilities, I was left with approximately 15,000 records, which is three times the usual average.
+
+Please let me know if you need further details.
+
+Best regards,
