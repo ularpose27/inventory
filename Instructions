@@ -1,41 +1,11 @@
 import pandas as pd
 
-# Load your datasets
-df_full = pd.read_csv('dataset_a.csv')      # Full dataset
-df_filtered = pd.read_csv('dataset_b.csv')  # Filtered dataset
+def add_category_money_columns(df):
+    df['*Cat A Money'] = df['Master Total Approved'].where(df['Category Type'] == 'A', 0)
+    df['*Cat B Money'] = df['Master Total Approved'].where(df['Category Type'] == 'B', 0)
+    df['*Cat S Money'] = df['Master Total Approved'].where(df['Category Type'] == 'S', 0)
+    return df
 
-# Identify common columns
-common_cols = list(set(df_full.columns) & set(df_filtered.columns))
-
-print("Probable filters to apply:\n")
-
-for col in common_cols:
-    full_series = df_full[col].dropna()
-    filtered_series = df_filtered[col].dropna()
-
-    if full_series.empty or filtered_series.empty:
-        continue
-
-    if df_full[col].dtype == 'object' or df_full[col].dtype.name == 'category':
-        full_vals = set(full_series.unique())
-        filtered_vals = set(filtered_series.unique())
-
-        if filtered_vals != full_vals:
-            filter_values = sorted(filtered_vals)
-            print(f"For column '{col}', apply the filters: value IN {filter_values}")
-    
-    elif pd.api.types.is_numeric_dtype(df_full[col]):
-        full_min, full_max = full_series.min(), full_series.max()
-        filtered_min, filtered_max = filtered_series.min(), filtered_series.max()
-
-        if filtered_min > full_min or filtered_max < full_max:
-            print(f"For column '{col}', apply the filters: value BETWEEN {filtered_min} AND {filtered_max}")
-
-    elif pd.api.types.is_datetime64_any_dtype(df_full[col]):
-        full_min, full_max = full_series.min(), full_series.max()
-        filtered_min, filtered_max = filtered_series.min(), filtered_series.max()
-
-        if filtered_min > full_min or filtered_max < full_max:
-            print(f"For column '{col}', apply the filters: date BETWEEN '{filtered_min}' AND '{filtered_max}'")
-
-print("\nAnalysis complete.")
+# Apply the function to both dataframes
+current = add_category_money_columns(current)
+prev = add_category_money_columns(prev)
