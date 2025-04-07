@@ -1,11 +1,20 @@
 import pandas as pd
+from tkinter import Tk, filedialog
 
-def add_category_money_columns(df):
-    df['*Cat A Money'] = df['Master Total Approved'].where(df['Category Type'] == 'A', 0)
-    df['*Cat B Money'] = df['Master Total Approved'].where(df['Category Type'] == 'B', 0)
-    df['*Cat S Money'] = df['Master Total Approved'].where(df['Category Type'] == 'S', 0)
-    return df
+# Step 1: Ask the user to select the Excel file
+Tk().withdraw()  # Hides the root window
+file_path = filedialog.askopenfilename(title="Select Excel File", filetypes=[("Excel Files", "*.xlsx *.xls")])
 
-# Apply the function to both dataframes
-current = add_category_money_columns(current)
-prev = add_category_money_columns(prev)
+# Step 2: Load the data from the specified sheet
+sheet_name = "1 current corp_indv"
+df = pd.read_excel(file_path, sheet_name=sheet_name)
+
+# Step 3: Create a new DataFrame with unique values from "GICS Group" and "SIC Code"
+# Drop rows with missing values in these columns
+df_filtered = df[['GICS Group', 'SIC Code']].dropna().drop_duplicates()
+
+# Step 4: Save the new DataFrame to a new Excel file
+output_path = "SIC Mapping file.xlsx"
+df_filtered.to_excel(output_path, index=False)
+
+print(f"File saved successfully as '{output_path}'")
