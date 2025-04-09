@@ -1,1 +1,20 @@
-=VLOOKUP(A2, '[SIC Mapping file.xlsx]Sheet1'!B:A, 2, FALSE)
+DateTable = 
+VAR BaseCalendar = 
+    ADDCOLUMNS (
+        CALENDAR (DATE(2015,1,1), DATE(2030,12,31)),
+        "Year", YEAR([Date]),
+        "Quarter", "Q" & FORMAT([Date], "Q"),
+        "Month Number", MONTH([Date]),
+        "Month", FORMAT([Date], "MMMM"),
+        "Month Short", FORMAT([Date], "MMM"),
+        "Month Year", FORMAT([Date], "MMM YYYY"),
+        "Weekday Number", WEEKDAY([Date], 2),
+        "Weekday", FORMAT([Date], "dddd"),
+        "Weekday Short", FORMAT([Date], "ddd"),
+        "Week Number", WEEKNUM([Date], 2),
+        "Day", DAY([Date]),
+        "Is Weekend", IF(WEEKDAY([Date], 2) > 5, TRUE, FALSE),
+        "Is Today", IF([Date] = TODAY(), TRUE, FALSE),
+        "Year-Month", FORMAT([Date], "YYYY-MM")
+    )
+RETURN BaseCalendar
