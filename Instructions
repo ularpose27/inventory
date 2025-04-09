@@ -1,20 +1,26 @@
-DateTable = 
-VAR BaseCalendar = 
-    ADDCOLUMNS (
-        CALENDAR (DATE(2015,1,1), DATE(2030,12,31)),
-        "Year", YEAR([Date]),
-        "Quarter", "Q" & FORMAT([Date], "Q"),
-        "Month Number", MONTH([Date]),
-        "Month", FORMAT([Date], "MMMM"),
-        "Month Short", FORMAT([Date], "MMM"),
-        "Month Year", FORMAT([Date], "MMM YYYY"),
-        "Weekday Number", WEEKDAY([Date], 2),
-        "Weekday", FORMAT([Date], "dddd"),
-        "Weekday Short", FORMAT([Date], "ddd"),
-        "Week Number", WEEKNUM([Date], 2),
-        "Day", DAY([Date]),
-        "Is Weekend", IF(WEEKDAY([Date], 2) > 5, TRUE, FALSE),
-        "Is Today", IF([Date] = TODAY(), TRUE, FALSE),
-        "Year-Month", FORMAT([Date], "YYYY-MM")
+Diff Cat A MoM (New Money) =
+VAR SelectedMonthValue =
+    CALCULATE(
+        SUM(YourDataTableName[Cat A]),                     -- 1. Sum the Cat A column
+        FILTER(                                            -- 2. Filter the main table:
+            YourDataTableName,
+            YourDataTableName[Source.Name] = "New Money input.xlsx" -- Only rows from the specified file
+        )
+        // Slicer implicitly filters for the selected month via DateTable relationship
     )
-RETURN BaseCalendar
+VAR PreviousMonthValue =
+    CALCULATE(
+        SUM(YourDataTableName[Cat A]),                     -- 1. Sum the Cat A column
+        PREVIOUSMONTH(DateTable[Date]),                    -- 2. Apply previous month time intelligence
+        FILTER(                                            -- 3. Filter the main table:
+            YourDataTableName,
+            YourDataTableName[Source.Name] = "New Money input.xlsx" -- Only rows from the specified file
+        )
+    )
+RETURN
+    IF(                                                    -- Optional: Handle cases where one month has data but the other doesn't
+        NOT ISBLANK(SelectedMonthValue) || NOT ISBLANK(PreviousMonthValue),
+        COALESCE(SelectedMonthValue, 0) - COALESCE(PreviousMonthValue, 0), -- Calculate difference, treating BLANK as 0
+        BLANK()                                           -- Return BLANK if neither month has data
+    )
+
