@@ -1,26 +1,9 @@
-Diff Cat A MoM (New Money) =
-VAR SelectedMonthValue =
-    CALCULATE(
-        SUM(YourDataTableName[Cat A]),                     -- 1. Sum the Cat A column
-        FILTER(                                            -- 2. Filter the main table:
-            YourDataTableName,
-            YourDataTableName[Source.Name] = "New Money input.xlsx" -- Only rows from the specified file
-        )
-        // Slicer implicitly filters for the selected month via DateTable relationship
-    )
-VAR PreviousMonthValue =
-    CALCULATE(
-        SUM(YourDataTableName[Cat A]),                     -- 1. Sum the Cat A column
-        PREVIOUSMONTH(DateTable[Date]),                    -- 2. Apply previous month time intelligence
-        FILTER(                                            -- 3. Filter the main table:
-            YourDataTableName,
-            YourDataTableName[Source.Name] = "New Money input.xlsx" -- Only rows from the specified file
-        )
-    )
-RETURN
-    IF(                                                    -- Optional: Handle cases where one month has data but the other doesn't
-        NOT ISBLANK(SelectedMonthValue) || NOT ISBLANK(PreviousMonthValue),
-        COALESCE(SelectedMonthValue, 0) - COALESCE(PreviousMonthValue, 0), -- Calculate difference, treating BLANK as 0
-        BLANK()                                           -- Return BLANK if neither month has data
-    )
+After reviewing both files, here are my comments:
 
+1. In the Ratings Activity Report, I filtered out entries with "GBM" in the "Business" column, leaving 61 records. In comparison, the WMR Deteriorating CRR Report contains 64 records — that is, 3 more than the Ratings Activity Report.
+
+
+2. The WMR Deteriorating CRR Report includes two additional customer names not present in the Ratings Activity Report: Millitobanki and WFGHowni.
+
+
+3. The third additional customer is Armikii, whose record includes both GBM and CMB facilities.
