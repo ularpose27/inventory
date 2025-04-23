@@ -1,1 +1,19 @@
-gg
+Hello, I hope you're doing well.
+
+Please find attached the "WMR Deteriorating Report" and the "Ratings Activity Report", which, as Fred mentioned, should contain the same data—provided that the "Ratings Activity Report" is filtered to exclude "GBM".
+
+To improve efficiency going forward, we would appreciate it if you could review both files and confirm whether the "Ratings Activity Report" contains the information you need.
+
+You’ll notice that the "WMR Deteriorating Report" includes two additional records: WDHHH and MILL.
+
+WDHHH appears due to a timing difference—it was already included in last month’s "Ratings Activity Report" and is now appearing in this month’s "WMR Deteriorating Report".
+
+MILL was included in the "WMR Deteriorating Report" due to a rounding threshold (from 4.9M to 5M), as both reports apply a 5M limit. In this case, rounding was applied in the "WMR Deteriorating Report" but not in the "Ratings Activity Report".
+
+
+Aside from these two records, both files align.
+
+Please let us know if the "Ratings Activity Report" would be suitable for your needs in future months.
+
+Best regards,
+Armando
