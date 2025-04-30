@@ -1,5 +1,1 @@
-TotalApproved_Previous = 
-CALCULATE(
-    SUM('YourData'[Total Approved]),
-    PREVIOUSMONTH('DateTable'[Date])
-)
+
