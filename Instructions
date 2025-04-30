@@ -1,1 +1,8 @@
-
+TotalApproved_Current = 
+CALCULATE(
+    SUM('YourData'[Total Approved]),
+    FILTER(
+        ALL('DateTable'),
+        'DateTable'[MonthYear] = SELECTEDVALUE('DateTable'[MonthYear])
+    )
+)
