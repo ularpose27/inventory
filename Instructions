@@ -1,8 +1,5 @@
-TotalApproved_Current = 
+TotalApproved_Previous = 
 CALCULATE(
     SUM('YourData'[Total Approved]),
-    FILTER(
-        ALL('DateTable'),
-        'DateTable'[MonthYear] = SELECTEDVALUE('DateTable'[MonthYear])
-    )
+    PREVIOUSMONTH('DateTable'[Date])
 )
