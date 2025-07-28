@@ -1,103 +1,41 @@
-import pandas as pd
-import numpy as np
+5. Save the New DataFrame to a CSV File ---
+        # The filename will be dynamically generated from the first entry in the 'As of Date' column.
+        try:
+            output_path = "filtered_customer_data.csv" # Default fallback name
+            
+            # Check if 'As of Date' column exists in the original DataFrame and is not empty
+            if 'As of Date' in original_df.columns and not original_df['As of Date'].dropna().empty:
+                # Get the very first non-NA value from the column
+                first_date_str = original_df['As of Date'].dropna().iloc[0]
+                
+                # Try to parse the date string. The format '%d-%b-%y' matches '30-Apr-24'.
+                try:
+                    date_for_filename = pd.to_datetime(first_date_str, format='%d-%b-%y')
+                    # Format the date as "Month Year", e.g., "April 2024"
+                    filename_prefix = date_for_filename.strftime('%B %Y')
+                    output_path = f"{filename_prefix}.csv"
+                    print(f"\n💾 Dynamically named file based on the first 'As of Date' value: '{first_date_str}'")
+                except (ValueError, TypeError):
+                     print(f"\n⚠️ Could not parse the first date value: '{first_date_str}'. It may not be in 'dd-Mon-yy' format. Using default filename.")
+            else:
+                 print("\n⚠️ 'As of Date' column not found or is empty. Using default filename.")
 
-# --- 1. Load the Excel File ---
-# Prompt the user to enter the full path to the Excel file.
-# Example for Windows: C:\Users\YourUser\Documents\data.xlsx
-# Example for macOS/Linux: /Users/YourUser/Documents/data.xlsx
-file_path = input("Please enter the full path to your Excel file: ")
+            print(f"Saving the new DataFrame to '{output_path}'...")
 
-try:
-    # Read the Excel file into a pandas DataFrame
-    # The `engine='openpyxl'` is specified for modern .xlsx files.
-    original_df = pd.read_excel(file_path, engine='openpyxl')
-    print("✅ Excel file loaded successfully!")
-    print("-" * 30)
+            # Save the DataFrame to a CSV file.
+            # `index=False` prevents pandas from writing the DataFrame index as a column.
+            filtered_df.to_csv(output_path, index=False)
 
-except FileNotFoundError:
-    print(f"❌ Error: The file was not found at the path: {file_path}")
-    print("Please check the path and try again.")
-except Exception as e:
-    print(f"❌ An unexpected error occurred: {e}")
+            print(f"🎉 Success! The file has been saved to your current directory.")
+            print(f"Path: {output_path}")
 
-else:
-    # --- 2. Explore the Original DataFrame ---
-    # This section helps you understand the initial state of your data.
-    print("\n🔍 Exploring the Original DataFrame...")
-    print("\n--- First 5 Rows ---")
-    print(original_df.head())
+        except Exception as e:
+            print(f"❌ An error occurred during file saving: {e}")
 
-    print("\n--- DataFrame Info (Columns, Data Types, Non-Null Counts) ---")
-    original_df.info()
-
-    print("\n--- Descriptive Statistics for Numerical Columns ---")
-    # This provides count, mean, std, min, max, etc. for number-based columns.
-    print(original_df.describe())
-    print("-" * 30)
-
-
-    # --- 3. Create a New DataFrame with Specific Columns ---
-    # Define the list of columns you want to keep.
-    columns_to_keep = [
-        "Customer Name", "Trc Parent Name", "Cin No", "HUB Customer Id",
-        "Ctry Inc", "Cust Grade", "Approval System Id", "Faci Use", "Gr",
-        "LGD -Loss Given Default", "Original Approval Date", "Expire Date",
-        "Review Date", "Category Type", "Max Maturity Date", "Total Exposure",
-        "Last Approval Date", "PD - Table Based", "Net Total Exposure"
-    ]
-
-    print("\n✨ Creating a new DataFrame with selected columns...")
-    # Create the new DataFrame by selecting only the desired columns.
-    # We use a try-except block to catch potential KeyErrors if a column doesn't exist.
-    try:
-        filtered_df = original_df[columns_to_keep].copy()
-        print("✅ New DataFrame created successfully.")
-        print("-" * 30)
-
-        # --- 4. Handle Missing (NA) Values ---
-        print("\n🧹 Handling missing values (NA)...")
-
-        # Create a dictionary to specify how to fill NA values for each data type.
-        # - For object (text) columns, we'll use 'Unknown'.
-        # - For number columns (int, float), we'll use 0.
-        # - For datetime columns, we'll forward-fill (use the last valid observation).
-        fill_values = {}
-        for col in filtered_df.columns:
-            if filtered_df[col].dtype == 'object':
-                fill_values[col] = 'Unknown'
-            elif pd.api.types.is_numeric_dtype(filtered_df[col]):
-                fill_values[col] = 0
-            elif pd.api.types.is_datetime64_any_dtype(filtered_df[col]):
-                # For dates, you might prefer forward-fill or a specific placeholder
-                filtered_df[col] = filtered_df[col].fillna(method='ffill')
-
-
-        # Apply the filling logic
-        filtered_df.fillna(value=fill_values, inplace=True)
-
-        print("Total missing values in the new DataFrame after cleaning:")
-        print(filtered_df.isnull().sum())
-        print("✅ Missing values have been handled.")
-        print("-" * 30)
-
-
-        # --- 5. Save the New DataFrame to a CSV File ---
-        output_path = "filtered_customer_data.csv"
-        print(f"\n💾 Saving the new DataFrame to '{output_path}'...")
-
-        # Save the DataFrame to a CSV file.
-        # `index=False` prevents pandas from writing the DataFrame index as a column.
-        filtered_df.to_csv(output_path, index=False)
-
-        print(f"🎉 Success! The file has been saved to your current directory.")
-        print(f"Path: {output_path}")
 
     except KeyError as e:
         print(f"❌ Error: One of the specified columns was not found in the Excel file: {e}")
         print("Please verify the column names and try again.")
     except Exception as e:
         print(f"❌ An unexpected error occurred during processing: {e}")
-
-
-
 
