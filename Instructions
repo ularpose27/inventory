@@ -1,41 +1,15 @@
-5. Save the New DataFrame to a CSV File ---
-        # The filename will be dynamically generated from the first entry in the 'As of Date' column.
-        try:
-            output_path = "filtered_customer_data.csv" # Default fallback name
-            
-            # Check if 'As of Date' column exists in the original DataFrame and is not empty
-            if 'As of Date' in original_df.columns and not original_df['As of Date'].dropna().empty:
-                # Get the very first non-NA value from the column
-                first_date_str = original_df['As of Date'].dropna().iloc[0]
-                
-                # Try to parse the date string. The format '%d-%b-%y' matches '30-Apr-24'.
-                try:
-                    date_for_filename = pd.to_datetime(first_date_str, format='%d-%b-%y')
-                    # Format the date as "Month Year", e.g., "April 2024"
-                    filename_prefix = date_for_filename.strftime('%B %Y')
-                    output_path = f"{filename_prefix}.csv"
-                    print(f"\n💾 Dynamically named file based on the first 'As of Date' value: '{first_date_str}'")
-                except (ValueError, TypeError):
-                     print(f"\n⚠️ Could not parse the first date value: '{first_date_str}'. It may not be in 'dd-Mon-yy' format. Using default filename.")
-            else:
-                 print("\n⚠️ 'As of Date' column not found or is empty. Using default filename.")
+# --- Step 1: Request Excel file path from user ---
 
-            print(f"Saving the new DataFrame to '{output_path}'...")
+import os
 
-            # Save the DataFrame to a CSV file.
-            # `index=False` prevents pandas from writing the DataFrame index as a column.
-            filtered_df.to_csv(output_path, index=False)
+# Ask the user for the full path to the Excel file
+file_path = input("Please enter the full path of the Excel file you'd like to extract data from:\n> ")
 
-            print(f"🎉 Success! The file has been saved to your current directory.")
-            print(f"Path: {output_path}")
+# Validate that the file exists and is an Excel file
+if not os.path.exists(file_path):
+    raise FileNotFoundError(f"❌ The file was not found at the specified location: {file_path}")
 
-        except Exception as e:
-            print(f"❌ An error occurred during file saving: {e}")
+if not (file_path.endswith(".xlsx") or file_path.endswith(".xls")):
+    raise ValueError("⚠️ The provided file must be an Excel file (.xlsx or .xls)")
 
-
-    except KeyError as e:
-        print(f"❌ Error: One of the specified columns was not found in the Excel file: {e}")
-        print("Please verify the column names and try again.")
-    except Exception as e:
-        print(f"❌ An unexpected error occurred during processing: {e}")
-
+print(f"✅ File found! Proceeding to extract data from: {file_path}")
