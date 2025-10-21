@@ -1,12 +1,4 @@
-# --- Add 'Category' column to each DataFrame ---
-
-# For Managed
-df_managed["Category"] = "Managed"
-
-# For Shadows (singular form)
-df_shadows["Category"] = "Shadow"
-
-# For Resolved
-df_resolved["Category"] = "Resolved"
-
-print("✅ 'Category' column added to all DataFrames.")
+with pd.ExcelWriter("Combined_Output.xlsx", engine="openpyxl") as writer:
+    df_managed.to_excel(writer, sheet_name="Managed", index=False)
+    df_shadows.to_excel(writer, sheet_name="Shadows", index=False)
+    df_resolved.to_excel(writer, sheet_name="Resolved", index=False)
