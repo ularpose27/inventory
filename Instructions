@@ -1,15 +1,19 @@
-# --- Step 1: Request Excel file path from user ---
+# --- Load data from three sheets and clean rows without 'Customer Name' ---
 
-import os
+import pandas as pd
 
-# Ask the user for the full path to the Excel file
-file_path = input("Please enter the full path of the Excel file you'd like to extract data from:\n> ")
+# Read each sheet, starting from row 3 (header=2 means the third row is the header)
+df_manage  = pd.read_excel(file_path, sheet_name="Manage", header=2)
+df_shadows = pd.read_excel(file_path, sheet_name="Shadows", header=2)
+df_result  = pd.read_excel(file_path, sheet_name="Result",  header=2)
 
-# Validate that the file exists and is an Excel file
-if not os.path.exists(file_path):
-    raise FileNotFoundError(f"❌ The file was not found at the specified location: {file_path}")
+# Remove rows where 'Customer Name' is missing or blank
+for df in [df_manage, df_shadows, df_result]:
+    df.dropna(subset=["Customer Name"], inplace=True)
+    df = df[df["Customer Name"].astype(str).str.strip() != ""]
 
-if not (file_path.endswith(".xlsx") or file_path.endswith(".xls")):
-    raise ValueError("⚠️ The provided file must be an Excel file (.xlsx or .xls)")
-
-print(f"✅ File found! Proceeding to extract data from: {file_path}")
+# Quick confirmation
+print("Shapes after cleaning:")
+print("Manage:", df_manage.shape)
+print("Shadows:", df_shadows.shape)
+print("Result:", df_result.shape)
