@@ -1,4 +1,60 @@
-with pd.ExcelWriter("Combined_Output.xlsx", engine="openpyxl") as writer:
-    df_managed.to_excel(writer, sheet_name="Managed", index=False)
-    df_shadows.to_excel(writer, sheet_name="Shadows", index=False)
-    df_resolved.to_excel(writer, sheet_name="Resolved", index=False)
+# --- Standardize three DataFrames to the objective schema and merge ---
+
+import pandas as pd
+
+# 1) Target schema (ordered)
+OBJ_COLS = [
+    "Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status",
+    "Resolution Date", "Resolution Type", "RM Name", "Business",
+    "Total Relationship Name", "LCL_CUST_ID", "CRR", "CAT AB Exposure", "DoD"
+]
+
+DATE_COLS  = ["Month Added", "Resolution Date"]
+INT_COLS   = ["NO OF CUST", "LCL_CUST_ID"]
+FLOAT_COLS = ["CRR", "CAT AB Exposure"]
+TEXT_COLS  = [c for c in OBJ_COLS if c not in DATE_COLS + INT_COLS + FLOAT_COLS]
+
+def _to_datetime_safe(s):
+    return pd.to_datetime(s, errors="coerce")
+
+def _align_to_objective(df: pd.DataFrame) -> pd.DataFrame:
+    # Add any missing columns with NA
+    for col in OBJ_COLS:
+        if col not in df.columns:
+            df[col] = pd.NA
+
+    # Keep only the objective columns and reorder
+    df = df[OBJ_COLS].copy()
+
+    # Coerce dtypes (dates, ints, floats); leave text as object
+    for c in DATE_COLS:
+        df[c] = _to_datetime_safe(df[c])
+
+    for c in INT_COLS:
+        df[c] = pd.to_numeric(df[c], errors="coerce").astype("Int64")  # pandas nullable integer
+
+    for c in FLOAT_COLS:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    # Trim whitespace in text columns
+    for c in TEXT_COLS:
+        df[c] = df[c].astype("string").str.strip()
+
+    return df
+
+# 2) Standardize each DF you created earlier (df_managed, df_shadows, df_resolved)
+managed_std  = _align_to_objective(df_managed)
+shadows_std  = _align_to_objective(df_shadows)
+resolved_std = _align_to_objective(df_resolved)
+
+# 3) Merge (append) into one objective DataFrame
+df_objective = pd.concat([managed_std, shadows_std, resolved_std], ignore_index=True)
+
+# 4) Fill empties with "NA" for TEXT columns ONLY (to keep dates/numerics typed)
+for c in TEXT_COLS:
+    df_objective[c] = df_objective[c].fillna("NA")
+    df_objective[c] = df_objective[c].replace(r"^\s*$", "NA", regex=True)
+
+# Quick check
+print(df_objective.info())
+print("Rows:", len(df_objective))
