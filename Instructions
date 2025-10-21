@@ -1,19 +1,1 @@
-# --- Load data from three sheets and clean rows without 'Customer Name' ---
 
-import pandas as pd
-
-# Read each sheet, starting from row 3 (header=2 means the third row is the header)
-df_manage  = pd.read_excel(file_path, sheet_name="Manage", header=2)
-df_shadows = pd.read_excel(file_path, sheet_name="Shadows", header=2)
-df_result  = pd.read_excel(file_path, sheet_name="Result",  header=2)
-
-# Remove rows where 'Customer Name' is missing or blank
-for df in [df_manage, df_shadows, df_result]:
-    df.dropna(subset=["Customer Name"], inplace=True)
-    df = df[df["Customer Name"].astype(str).str.strip() != ""]
-
-# Quick confirmation
-print("Shapes after cleaning:")
-print("Manage:", df_manage.shape)
-print("Shadows:", df_shadows.shape)
-print("Result:", df_result.shape)
