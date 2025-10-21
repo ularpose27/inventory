@@ -1,14 +1,12 @@
-# --- Step 1: Request Excel file path from user ---
+# --- Add 'Category' column to each DataFrame ---
 
-import os
+# For Managed
+df_managed["Category"] = "Managed"
 
-file_path = input("Please enter the full path of the Excel file you'd like to extract data from:\n> ")
+# For Shadows (singular form)
+df_shadows["Category"] = "Shadow"
 
-# Validate that the file exists and is an Excel-compatible format
-if not os.path.exists(file_path):
-    raise FileNotFoundError(f"❌ The file was not found at the specified location: {file_path}")
+# For Resolved
+df_resolved["Category"] = "Resolved"
 
-if not (file_path.endswith((".xlsx", ".xls", ".xlsm"))):
-    raise ValueError("⚠️ The provided file must be an Excel file (.xlsx, .xls, or .xlsm)")
-
-print(f"✅ File found! Proceeding to extract data from: {file_path}")
+print("✅ 'Category' column added to all DataFrames.")
