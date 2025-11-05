@@ -1,60 +1,7 @@
-# --- Standardize three DataFrames to the objective schema and merge ---
+Now that 2025 is coming to an end, it is important to reflect on what this year has been at HSBC. In general, I’ve had another amazing year at the bank, continuing with many of the activities from the previous year while also taking on new challenges and responsibilities.
 
-import pandas as pd
+During this year, I had the opportunity to manage the Chemicals and Retail RCC processes. At the beginning, these tasks were quite challenging, but over time I became very familiar with them and developed strong expertise, receiving positive feedback from the stakeholders involved.
 
-# 1) Target schema (ordered)
-OBJ_COLS = [
-    "Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status",
-    "Resolution Date", "Resolution Type", "RM Name", "Business",
-    "Total Relationship Name", "LCL_CUST_ID", "CRR", "CAT AB Exposure", "DoD"
-]
+In addition, I continued improving other processes that relied on legacy tools such as Access, and I successfully migrated them to Python to make them more efficient and easier to maintain.
 
-DATE_COLS  = ["Month Added", "Resolution Date"]
-INT_COLS   = ["NO OF CUST", "LCL_CUST_ID"]
-FLOAT_COLS = ["CRR", "CAT AB Exposure"]
-TEXT_COLS  = [c for c in OBJ_COLS if c not in DATE_COLS + INT_COLS + FLOAT_COLS]
-
-def _to_datetime_safe(s):
-    return pd.to_datetime(s, errors="coerce")
-
-def _align_to_objective(df: pd.DataFrame) -> pd.DataFrame:
-    # Add any missing columns with NA
-    for col in OBJ_COLS:
-        if col not in df.columns:
-            df[col] = pd.NA
-
-    # Keep only the objective columns and reorder
-    df = df[OBJ_COLS].copy()
-
-    # Coerce dtypes (dates, ints, floats); leave text as object
-    for c in DATE_COLS:
-        df[c] = _to_datetime_safe(df[c])
-
-    for c in INT_COLS:
-        df[c] = pd.to_numeric(df[c], errors="coerce").astype("Int64")  # pandas nullable integer
-
-    for c in FLOAT_COLS:
-        df[c] = pd.to_numeric(df[c], errors="coerce")
-
-    # Trim whitespace in text columns
-    for c in TEXT_COLS:
-        df[c] = df[c].astype("string").str.strip()
-
-    return df
-
-# 2) Standardize each DF you created earlier (df_managed, df_shadows, df_resolved)
-managed_std  = _align_to_objective(df_managed)
-shadows_std  = _align_to_objective(df_shadows)
-resolved_std = _align_to_objective(df_resolved)
-
-# 3) Merge (append) into one objective DataFrame
-df_objective = pd.concat([managed_std, shadows_std, resolved_std], ignore_index=True)
-
-# 4) Fill empties with "NA" for TEXT columns ONLY (to keep dates/numerics typed)
-for c in TEXT_COLS:
-    df_objective[c] = df_objective[c].fillna("NA")
-    df_objective[c] = df_objective[c].replace(r"^\s*$", "NA", regex=True)
-
-# Quick check
-print(df_objective.info())
-print("Rows:", len(df_objective))
+Looking ahead, I feel very excited about my new role in the Special Credit Unit (SCU). I plan to use my experience in data manipulation and automation with Python to help make reporting more efficient and deliver solid results, just as I did in my previous position.
