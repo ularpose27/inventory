@@ -1,24 +1,27 @@
-import pandas as pd
+Responsibilities
 
-# Create a date range from Jan 2019 to Dec 2030
-dates = pd.date_range(start='2019-01-01', end='2030-12-31', freq='MS')
+Reporting & Automation
 
-# Build the calendar table
-calendar_df = pd.DataFrame({
-    'Date': dates,
-    'Year': dates.year,
-    'MonthNumber': dates.month,
-    'MonthName': dates.strftime('%B'),       # Full month name
-    'MonthShort': dates.strftime('%b'),      # Short month name (Jan, Feb, etc.)
-    'YearMonth': dates.strftime('%Y-%m'),    # YYYY-MM format (good for sorting)
-    'YearMonthText': dates.strftime('%b %Y') # For slicer display (Jan 2020, etc.)
-})
+Successfully automated the Loan Sale calculation process, improving accuracy and efficiency.
 
-# Optional: sort columns by date
-calendar_df = calendar_df.sort_values(by='Date').reset_index(drop=True)
+Platform migration initiated by COE Mexico: Beginning the transition from the previous SharePoint to the new online SharePoint, laying the groundwork for improved collaboration and data management.
 
-# Show the result
-print(calendar_df.head(15))
+Early-stage data remapping and automation efforts aimed at increasing accuracy, reducing manual effort, and ensuring reliable information flow.
 
-# Export to CSV (ready to load into Power BI)
-calendar_df.to_csv('Calendar_2019_2030.csv', index=False)
+Enhancing data input processes to ensure consistent customer grading and higher-quality reporting in the coming months.
+
+
+
+---
+
+Key Outcomes (in progress / expected)
+
+Establish a more streamlined reporting process that will feed into Securities and Exchange Commission submissions.
+
+Deliver two new regional reporting projects, including the IFRS9 Model Project for HBAP (Asia Pacific).
+
+Develop a global reporting model designed to reduce turnaround times and increase reporting efficiency.
+
+Strengthen COE Mexico’s regional and global role through expanded support for SCU MI reporting and governance migration.
+
+Advance automation and innovation initiatives from COE Mexico, positioning the team as a key contributor to global WCR performance.
