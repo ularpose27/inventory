@@ -1,1 +1,15 @@
+import pandas as pd
 
+# --- Load files ---
+daily = pd.read_excel("01_Raw/RDP Daily BO.xlsx", sheet_name="Report 2")
+scu_universe = pd.read_excel("01_Raw/SCU_ActiveUniverse.xlsx")
+
+# --- Standardize CIF column names just in case ---
+daily['CustomerId'] = daily['CIF Customer Id'].astype(str).str.strip()
+scu_universe['CustomerId'] = scu_universe['CustomerId'].astype(str).str.strip()
+
+# --- Filter to SCU active customers ---
+scu_subset = daily[daily['CustomerId'].isin(scu_universe['CustomerId'])]
+
+# --- Save output for SharePoint ---
+scu_subset.to_excel("03_Outputs/CustomerRepository_Update.xlsx", index=False)
