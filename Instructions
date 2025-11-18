@@ -1,1 +1,20 @@
+# --- FIX BLANK FIRST ROW / FORCE CORRECT HEADERS ---
 
+# Read the file WITHOUT assuming the first row is headers
+df = pd.read_excel(file_path, sheet_name=xls.sheet_names[0], header=None)
+
+# Drop the first row because it is blank
+df = df.drop(index=0)
+
+# Reset index
+df = df.reset_index(drop=True)
+
+# Use the NEW first row as headers
+df.columns = df.iloc[0]
+
+# Drop that row from data
+df = df[1:].reset_index(drop=True)
+
+print("✔ Blank first row handled.")
+print("New shape:", df.shape)
+print("New headers:", df.columns.tolist())
