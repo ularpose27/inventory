@@ -1,60 +1,3 @@
-import pandas as pd
-
-# Paths to the files we are working with
-file_path_rdp = r"C:\Users\45365912\OneDrive - HSBC\SCU_DataPipeline\01_Raw\RDP Daily BO.xlsx"
-file_path_scu = r"C:\Users\45365912\OneDrive - HSBC\SCU_DataPipeline\01_Raw\SCU_ActiveUniverse.xlsx"
-
-# -------------------------------------------------
-# 1. Build the SCU subset from Report 2 (as before)
-# -------------------------------------------------
-
-# Load the Daily BO file, Report 2 tab.
-# The first row is always empty, so we tell pandas to skip it (header=1).
-df_rdp = pd.read_excel(
-    file_path_rdp,
-    sheet_name="Report 2",
-    header=1
-).dropna(how="all")   # Just cleaning up any fully empty rows.
-
-# Load the file that contains the list of SCU customers we actually care about.
-df_scu = pd.read_excel(file_path_scu)
-
-# These are the column names for the CIF fields in both files.
-# If your files use slightly different names, adjust here.
-cif_rdp_col = "CIF Customer Id"
-cif_scu_col = "CIF Customer Id"
-
-# Here I'm filtering Report 2 to keep ONLY the customers that appear in the SCU list.
-df_filtered = df_rdp[df_rdp[cif_rdp_col].isin(df_scu[cif_scu_col])]
-
-# -------------------------------------------------
-# 2. Read Daily BO tab and prepare the extra columns
-# -------------------------------------------------
-
-# Load the Daily BO tab.
-# Same pattern: first row is empty, real headers are on the second row.
-df_dailybo = pd.read_excel(
-    file_path_rdp,
-    sheet_name="Daily BO",
-    header=1
-).dropna(how="all")   # Drop completely empty rows just in case.
-
-# Make sure CIF Customer Id is treated as a number.
-# If there are weird values, they will become NaN and we drop them.
-df_dailybo["CIF Customer Id"] = pd.to_numeric(
-    df_dailybo["CIF Customer Id"],
-    errors="coerce"
-)
-
-# Drop rows where CIF Customer Id could not be converted
-df_dailybo = df_dailybo.dropna(subset=["CIF Customer Id"])
-
-# Keep only the first record per customer (first occurrence wins).
-df_dailybo = df_dailybo.sort_values("CIF Customer Id").drop_duplicates(
-    subset=["CIF Customer Id"],
-    keep="first"
-)
-
 # Now keep ONLY the columns we care about from the Daily BO tab.
 cols_keep = [
     "CIF Customer Id",
@@ -64,28 +7,11 @@ cols_keep = [
     "FCL FTP Fubctional Hierarchy Lvl 05",
     "Country Name of Incorporation"
 ]
+
 df_dailybo_slim = df_dailybo[cols_keep]
 
-# -------------------------------------------------
-# 3. Merge the extra Daily BO columns into the SCU subset
-# -------------------------------------------------
-
-# Here I'm joining the SCU subset (from Report 2)
-# with the slim Daily BO dataset, using CIF Customer Id as the key.
-df_final = df_filtered.merge(
-    df_dailybo_slim,
-    how="left",
-    left_on=cif_rdp_col,
-    right_on="CIF Customer Id"
-)
-
-# -------------------------------------------------
-# 4. Save the final Customer Repository extract
-# -------------------------------------------------
-
-output_path = r"C:\Users\45365912\OneDrive - HSBC\SCU_DataPipeline\03_Outputs\CustomerRepository_Update.xlsx"
-
-# Save the filtered + enriched dataset – this is the actual SCU customer repository update.
-df_final.to_excel(output_path, index=False)
-
-print("SCU subset created:", df_final.shape[0], "rows")
+# Rename the hierarchy columns
+df_dailybo_slim = df_dailybo_slim.rename(columns={
+    "FCL FTP Fubctional Hierarchy Lvl 04": "Business",
+    "FCL FTP Fubctional Hierarchy Lvl 05": "Legacy Business"
+})
