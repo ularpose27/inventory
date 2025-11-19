@@ -1,15 +1,25 @@
 import pandas as pd
 
-# --- Load files ---
-daily = pd.read_excel("01_Raw/RDP Daily BO.xlsx", sheet_name="Report 2")
-scu_universe = pd.read_excel("01_Raw/SCU_ActiveUniverse.xlsx")
+# Load the Daily BO file, Report 2 tab.
+# The first row is always empty, so we tell pandas to skip it (header=1).
+df_rdp = pd.read_excel(
+    "01_Raw/RDP Daily BO.xlsx",
+    sheet_name="Report 2",
+    header=1
+).dropna(how="all")   # Just cleaning up any fully empty rows.
 
-# --- Standardize CIF column names just in case ---
-daily['CustomerId'] = daily['CIF Customer Id'].astype(str).str.strip()
-scu_universe['CustomerId'] = scu_universe['CustomerId'].astype(str).str.strip()
+# Load the file that contains the list of SCU customers we actually care about.
+df_scu = pd.read_excel("01_Raw/SCU_ActiveUniverse.xlsx")
 
-# --- Filter to SCU active customers ---
-scu_subset = daily[daily['CustomerId'].isin(scu_universe['CustomerId'])]
+# These are the column names for the CIF fields in both files.
+# If your files use slightly different names, adjust here.
+cif_rdp_col = "CIF Customer Id"
+cif_scu_col = "CIF Customer Id"
 
-# --- Save output for SharePoint ---
-scu_subset.to_excel("03_Outputs/CustomerRepository_Update.xlsx", index=False)
+# Here I'm filtering Report 2 to keep ONLY the customers that appear in the SCU list.
+df_filtered = df_rdp[df_rdp[cif_rdp_col].isin(df_scu[cif_scu_col])]
+
+# Save the filtered dataset — this is the actual SCU customer repository update.
+df_filtered.to_excel("03_Outputs/CustomerRepository_Update.xlsx", index=False)
+
+print("SCU subset created:", df_filtered.shape[0], "rows")
