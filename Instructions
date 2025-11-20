@@ -1,17 +1,1 @@
-# Now keep ONLY the columns we care about from the Daily BO tab.
-cols_keep = [
-    "CIF Customer Id",
-    "SIC Code 1",
-    "SIC Code Industry Desc",
-    "FCL FTP Fubctional Hierarchy Lvl 04",
-    "FCL FTP Fubctional Hierarchy Lvl 05",
-    "Country Name of Incorporation"
-]
 
-df_dailybo_slim = df_dailybo[cols_keep]
-
-# Rename the hierarchy columns
-df_dailybo_slim = df_dailybo_slim.rename(columns={
-    "FCL FTP Fubctional Hierarchy Lvl 04": "Business",
-    "FCL FTP Fubctional Hierarchy Lvl 05": "Legacy Business"
-})
