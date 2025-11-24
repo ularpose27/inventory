@@ -1,14 +1,23 @@
-# Cell 5 – Read FX tab into a dataframe (values only)
+# Cell 6 – Read Facility tab
 
-fx_rates = pd.read_excel(
+# Read columns F:AU, headers on row 7 (Excel)
+facility_raw = pd.read_excel(
     file_path,
-    sheet_name="FX",
-    usecols="A:E",
-    header=2    # Excel row 3
+    sheet_name="Facility",
+    usecols="F:AU",
+    header=6        # row 7 in Excel
 )
 
-# Fill blank cells downward (typical for FX tables)
-fx_rates = fx_rates.ffill()
+print("facility_raw shape (rows, columns):", facility_raw.shape)
 
-print(fx_rates.head())
-print("Rows loaded in fx_rates:", len(fx_rates))
+# Create a cleaned copy for Python processing
+facility = facility_raw.copy()
+
+# Drop columns that are completely empty (format-only columns)
+facility = facility.dropna(axis=1, how="all")
+
+# Drop rows that are completely empty (if any)
+facility = facility.dropna(how="all")
+
+print("facility shape after cleaning (rows, columns):", facility.shape)
+print(facility.head())
