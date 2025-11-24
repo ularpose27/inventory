@@ -1,20 +1,10 @@
-# Cell 3 – Read specific cells from the 'Start' tab
+# Cell 4 – Read the TOR tab into a dataframe
 
-from openpyxl import load_workbook
+exchange_rates = pd.read_excel(
+    file_path,
+    sheet_name="TOR",
+    usecols="A:C"
+)
 
-# Load workbook (data_only=True reads the *values*, not formulas)
-wb = load_workbook(filename=file_path, data_only=True)
-
-# Select the sheet
-ws = wb["Start"]
-
-# Read required cells
-template = ws["B1"].value
-date_of_impairment_review = ws["B3"].value
-group_name = ws["B5"].value
-local_currency = ws["F7"].value
-
-print("Template:", template)
-print("Date of impairment review:", date_of_impairment_review)
-print("Group name:", group_name)
-print("Local currency:", local_currency)
+print(exchange_rates.head())
+print("Rows loaded:", len(exchange_rates))
