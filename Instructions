@@ -1,10 +1,14 @@
-# Cell 4 – Read the TOR tab into a dataframe
+# Cell 5 – Read FX tab into a dataframe (values only)
 
-exchange_rates = pd.read_excel(
+fx_rates = pd.read_excel(
     file_path,
-    sheet_name="TOR",
-    usecols="A:C"
+    sheet_name="FX",
+    usecols="A:E",
+    header=2    # Excel row 3
 )
 
-print(exchange_rates.head())
-print("Rows loaded:", len(exchange_rates))
+# Fill blank cells downward (typical for FX tables)
+fx_rates = fx_rates.ffill()
+
+print(fx_rates.head())
+print("Rows loaded in fx_rates:", len(fx_rates))
