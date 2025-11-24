@@ -1,14 +1,11 @@
-# Cell – Reading Security tab (values only)
+Hi ,
 
-security = pd.read_excel(
-    file_path,
-    sheet_name="Security",
-    usecols="I:AN",   # columns I to AN
-    header=4          # row 5 in Excel (0-indexed)
-)
+Thanks for sharing the files.
 
-# Convert empty strings or whitespace-only cells to NaN
-security = security.replace(r"^\s*$", np.nan, regex=True)
+Yes — progress is being made on consolidating everything into a single report. Last week I shared with Arif the first version of our new SharePoint setup, including the list and form to track our Managed, Shadow, and Resolved accounts. I’m now incorporating his feedback and tightening the structure of those lists and forms.
 
-print("security shape (rows, columns):", security.shape)
-print(security.head())
+Once that is done, I’ll bring the probable leak reports into the same SharePoint environment so the data model sits in one place and the consolidated report can be generated consistently.
+
+I’ll do my best to have this ready for the December 25 meeting.
+
+Regards,
