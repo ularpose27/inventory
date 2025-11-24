@@ -1,15 +1,20 @@
-# Cell 2 – Ask user for path to the .xlsm file (NO pathlib)
+# Cell 3 – Read specific cells from the 'Start' tab
 
-import os
+from openpyxl import load_workbook
 
-file_path = input("Enter full path to the .xlsm file: ").strip()
+# Load workbook (data_only=True reads the *values*, not formulas)
+wb = load_workbook(filename=file_path, data_only=True)
 
-# Check correct extension
-if not file_path.lower().endswith(".xlsm"):
-    raise ValueError("The file must be an .xlsm (macro-enabled Excel) file.")
+# Select the sheet
+ws = wb["Start"]
 
-# Check file exists
-if not os.path.isfile(file_path):
-    raise FileNotFoundError(f"File not found: {file_path}")
+# Read required cells
+template = ws["B1"].value
+date_of_impairment_review = ws["B3"].value
+group_name = ws["B5"].value
+local_currency = ws["F7"].value
 
-print(f"File selected: {file_path}")
+print("Template:", template)
+print("Date of impairment review:", date_of_impairment_review)
+print("Group name:", group_name)
+print("Local currency:", local_currency)
