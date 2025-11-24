@@ -1,15 +1,15 @@
-# Cell 1 – Imports
+# Cell 2 – Ask user for path to the .xlsm file (NO pathlib)
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from datetime import datetime
-import logging
+import os
 
-# Basic logging setup
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
+file_path = input("Enter full path to the .xlsm file: ").strip()
 
-logging.info("Imports loaded.")
+# Check correct extension
+if not file_path.lower().endswith(".xlsm"):
+    raise ValueError("The file must be an .xlsm (macro-enabled Excel) file.")
+
+# Check file exists
+if not os.path.isfile(file_path):
+    raise FileNotFoundError(f"File not found: {file_path}")
+
+print(f"File selected: {file_path}")
