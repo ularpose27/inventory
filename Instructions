@@ -1,23 +1,14 @@
-# Cell 6 – Read Facility tab
+# Cell – Reading Security tab (values only)
 
-# Read columns F:AU, headers on row 7 (Excel)
-facility_raw = pd.read_excel(
+security = pd.read_excel(
     file_path,
-    sheet_name="Facility",
-    usecols="F:AU",
-    header=6        # row 7 in Excel
+    sheet_name="Security",
+    usecols="I:AN",   # columns I to AN
+    header=4          # row 5 in Excel (0-indexed)
 )
 
-print("facility_raw shape (rows, columns):", facility_raw.shape)
+# Convert empty strings or whitespace-only cells to NaN
+security = security.replace(r"^\s*$", np.nan, regex=True)
 
-# Create a cleaned copy for Python processing
-facility = facility_raw.copy()
-
-# Drop columns that are completely empty (format-only columns)
-facility = facility.dropna(axis=1, how="all")
-
-# Drop rows that are completely empty (if any)
-facility = facility.dropna(how="all")
-
-print("facility shape after cleaning (rows, columns):", facility.shape)
-print(facility.head())
+print("security shape (rows, columns):", security.shape)
+print(security.head())
