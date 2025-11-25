@@ -1,8 +1,25 @@
-ws.Range("C11").Value = "Facility name"
-ws.Range("D11").Value = "CARM ID"
-ws.Range("E11").Value = "Ranking"               ' legal ranking 1–3
-ws.Range("F11").Value = "Preference Ranking"    ' NEW column
-ws.Range("G11").Value = "Borrower"
-ws.Range("H11").Value = "CCY"
-ws.Range("I11").Value = "CCY facility Net Amount"
-ws.Range("J11").Value = "USD Equiv."
+' Build list "1,2,...,n" for Preference Ranking
+prefList = ""
+For i = 1 To n
+    If prefList = "" Then
+        prefList = CStr(i)
+    Else
+        prefList = prefList & "," & CStr(i)
+    End If
+Next i
+
+' Data validation for Preference Ranking in column F
+With ws.Range("F13:F" & (12 + n)).Validation
+    .Delete
+    .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, _
+         Operator:=xlBetween, Formula1:=prefList
+    .IgnoreBlank = True
+    .InCellDropdown = True
+    .ShowInput = True
+    .ShowError = True
+    .ErrorTitle = "Invalid Input"
+    .ErrorMessage = "Please select a number between 1 and " & n & "."
+End With
+
+' Optional: give it the same colour as the legal Ranking column
+ws.Range("F13:F" & (12 + n)).Interior.Color = ws.Range("E13").Interior.Color
