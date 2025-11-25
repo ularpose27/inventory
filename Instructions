@@ -1,11 +1,8 @@
-Hi ,
-
-Thanks for sharing the files.
-
-Yes — progress is being made on consolidating everything into a single report. Last week I shared with Arif the first version of our new SharePoint setup, including the list and form to track our Managed, Shadow, and Resolved accounts. I’m now incorporating his feedback and tightening the structure of those lists and forms.
-
-Once that is done, I’ll bring the probable leak reports into the same SharePoint environment so the data model sits in one place and the consolidated report can be generated consistently.
-
-I’ll do my best to have this ready for the December 25 meeting.
-
-Regards,
+ws.Range("D11").Value = "Facility name"
+ws.Range("E11").Value = "CARM ID"
+ws.Range("F11").Value = "Ranking"               ' legal ranking (1–3)
+ws.Range("G11").Value = "Preference Ranking"    ' new sub-ranking
+ws.Range("H11").Value = "Borrower"
+ws.Range("I11").Value = "CCY"
+ws.Range("J11").Value = "CCY facility Net Amount"
+ws.Range("K11").Value = "USD Equiv."
