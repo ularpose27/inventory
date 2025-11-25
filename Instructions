@@ -1,8 +1,23 @@
-ws.Range("D11").Value = "Facility name"
-ws.Range("E11").Value = "CARM ID"
-ws.Range("F11").Value = "Ranking"               ' legal ranking (1–3)
-ws.Range("G11").Value = "Preference Ranking"    ' new sub-ranking
-ws.Range("H11").Value = "Borrower"
-ws.Range("I11").Value = "CCY"
-ws.Range("J11").Value = "CCY facility Net Amount"
-ws.Range("K11").Value = "USD Equiv."
+' CARM ID
+Sheets("Facility").Range("M8:M" & (7 + n)).Copy
+ws.Range("E13").PasteSpecial Paste:=xlPasteValues
+
+' Facility Name
+Sheets("Facility").Range("J8:J" & (7 + n)).Copy
+ws.Range("D13").PasteSpecial Paste:=xlPasteValues
+
+' Borrower
+Sheets("Facility").Range("K8:K" & (7 + n)).Copy
+ws.Range("H13").PasteSpecial Paste:=xlPasteValues
+
+' CCY
+Sheets("Facility").Range("P8:P" & (7 + n)).Copy
+ws.Range("I13").PasteSpecial Paste:=xlPasteValues
+
+' Drawn Balance
+Sheets("Facility").Range("AF8:AF" & (7 + n)).Copy
+ws.Range("J13").PasteSpecial Paste:=xlPasteValues
+
+' USD Equiv
+Sheets("Hide - Facility").Range("L2:L" & (1 + n)).Copy
+ws.Range("K13").PasteSpecial Paste:=xlPasteValues
