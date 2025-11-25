@@ -1,23 +1,25 @@
-' CARM ID
-Sheets("Facility").Range("M8:M" & (7 + n)).Copy
-ws.Range("E13").PasteSpecial Paste:=xlPasteValues
+Dim prefList As String
 
-' Facility Name
-Sheets("Facility").Range("J8:J" & (7 + n)).Copy
-ws.Range("D13").PasteSpecial Paste:=xlPasteValues
+prefList = ""
+For i = 1 To n
+    If prefList = "" Then
+        prefList = CStr(i)
+    Else
+        prefList = prefList & "," & CStr(i)
+    End If
+Next i
 
-' Borrower
-Sheets("Facility").Range("K8:K" & (7 + n)).Copy
-ws.Range("H13").PasteSpecial Paste:=xlPasteValues
+With ws.Range("G13:G" & (12 + n)).Validation
+    .Delete
+    .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, _
+         Operator:=xlBetween, Formula1:=prefList
+    .IgnoreBlank = True
+    .InCellDropdown = True
+    .ShowInput = True
+    .ShowError = True
+    .ErrorTitle = "Invalid Input"
+    .ErrorMessage = "Please select a number between 1 and " & n & "."
+End With
 
-' CCY
-Sheets("Facility").Range("P8:P" & (7 + n)).Copy
-ws.Range("I13").PasteSpecial Paste:=xlPasteValues
-
-' Drawn Balance
-Sheets("Facility").Range("AF8:AF" & (7 + n)).Copy
-ws.Range("J13").PasteSpecial Paste:=xlPasteValues
-
-' USD Equiv
-Sheets("Hide - Facility").Range("L2:L" & (1 + n)).Copy
-ws.Range("K13").PasteSpecial Paste:=xlPasteValues
+' Copy same formatting as the legal Ranking column
+ws.Range("G13:G" & (12 + n)).Interior.Color = ws.Range("F13").Interior.Color
