@@ -1,3 +1,38 @@
-ws.Range("A12:A18,C11:J12,K7:K11,L7:W7,L12:W12").Font.Bold = True
-    ws.Range("A12:A18,B12:B18,C11:W12").HorizontalAlignment = xlCenter
-    ws.Range("A12:A18,B12:B18,C11:W12").VerticalAlignment = xlCenter
+'Situation 2 - WATERFALL WITHIN RANK
+ElseIf Security(order).MarketValue < sumosFV(currentrank) Then
+
+    'start with this security's remaining market value
+    remainingMV = Security(order).MarketValue
+
+    'loop facilities in this rank IN ORDER and pay them one by one
+    For i = 1 To Count
+        fIndex = fac_inrank(i)
+
+        'skip empty slots
+        If fIndex <> -1 Then
+
+            'if security is exhausted, stop
+            If remainingMV <= 0# Then Exit For
+
+            'how much FV this facility still needs
+            'we are working in FV terms here
+            repayFV = Facility(fIndex).RemainosFV
+
+            'cap by remaining security amount (waterfall logic)
+            If repayFV > remainingMV Then
+                repayFV = remainingMV
+            End If
+
+            'reduce facility FV by what this security pays
+            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+
+            'reduce remaining security MV
+            remainingMV = remainingMV - repayFV
+
+        End If
+    Next i
+
+    'update security's remaining market value for next rank / next loops
+    Security(order).MarketValue = remainingMV
+
+End If
