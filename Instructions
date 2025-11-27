@@ -1,38 +1,20 @@
-'Situation 2 - WATERFALL WITHIN RANK
-ElseIf Security(order).MarketValue < sumosFV(currentrank) Then
+import pandas as pd
 
-    'start with this security's remaining market value
-    remainingMV = Security(order).MarketValue
+# --- 1. Make sure Facility Grade is numeric (if it's not already) ---
+# This creates a helper numeric column; errors='coerce' turns junk into NaN.
+df_dailybo['Facility Grade_num'] = pd.to_numeric(
+    df_dailybo['Facility Grade'], 
+    errors='coerce'
+)
 
-    'loop facilities in this rank IN ORDER and pay them one by one
-    For i = 1 To Count
-        fIndex = fac_inrank(i)
+# --- 2. Group by CIF and compute best / worst facility grade ---
+grp = df_dailybo.groupby('CIF Customer Id')['Facility Grade_num']
 
-        'skip empty slots
-        If fIndex <> -1 Then
+# Best = lowest grade number
+df_dailybo['Best_Facility_Grade'] = grp.transform('min')
 
-            'if security is exhausted, stop
-            If remainingMV <= 0# Then Exit For
+# Worst = highest grade number
+df_dailybo['Worst_Facility_Grade'] = grp.transform('max')
 
-            'how much FV this facility still needs
-            'we are working in FV terms here
-            repayFV = Facility(fIndex).RemainosFV
-
-            'cap by remaining security amount (waterfall logic)
-            If repayFV > remainingMV Then
-                repayFV = remainingMV
-            End If
-
-            'reduce facility FV by what this security pays
-            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
-
-            'reduce remaining security MV
-            remainingMV = remainingMV - repayFV
-
-        End If
-    Next i
-
-    'update security's remaining market value for next rank / next loops
-    Security(order).MarketValue = remainingMV
-
-End If
+# --- 3. (Optional) drop the helper numeric column if you don't want it ---
+# df_dailybo.drop(columns=['Facility Grade_num'], inplace=True)
