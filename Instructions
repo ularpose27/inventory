@@ -1,20 +1,38 @@
-import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl.utils import get_column_letter
 
-# --- 1. Make sure Facility Grade is numeric (if it's not already) ---
-# This creates a helper numeric column; errors='coerce' turns junk into NaN.
-df_dailybo['Facility Grade_num'] = pd.to_numeric(
-    df_dailybo['Facility Grade'], 
-    errors='coerce'
-)
+def convert_sheet_to_table(
+    file_path: str,
+    sheet_name: str = "CustomerRepository",
+    table_name: str = "CustomerRepository"
+):
+    wb = load_workbook(file_path)
+    ws = wb[sheet_name]
 
-# --- 2. Group by CIF and compute best / worst facility grade ---
-grp = df_dailybo.groupby('CIF Customer Id')['Facility Grade_num']
+    # Determine range boundaries
+    last_row = ws.max_row
+    last_col = ws.max_column
 
-# Best = lowest grade number
-df_dailybo['Best_Facility_Grade'] = grp.transform('min')
+    # Example: A1:F101
+    ref = f"A1:{get_column_letter(last_col)}{last_row}"
 
-# Worst = highest grade number
-df_dailybo['Worst_Facility_Grade'] = grp.transform('max')
+    # Create the Excel table
+    table = Table(displayName=table_name, ref=ref)
 
-# --- 3. (Optional) drop the helper numeric column if you don't want it ---
-# df_dailybo.drop(columns=['Facility Grade_num'], inplace=True)
+    # Optional table styling
+    style = TableStyleInfo(
+        name="TableStyleMedium2",
+        showFirstColumn=False,
+        showLastColumn=False,
+        showRowStripes=True,
+        showColumnStripes=False,
+    )
+    table.tableStyleInfo = style
+
+    # Add and save
+    ws.add_table(table)
+    wb.save(file_path)
+
+# Call the function
+convert_sheet_to_table(file_path)
