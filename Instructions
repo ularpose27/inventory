@@ -1,38 +1,38 @@
+import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.utils import get_column_letter
 
-def convert_sheet_to_table(
-    file_path: str,
-    sheet_name: str = "CustomerRepository",
-    table_name: str = "CustomerRepository"
-):
+def save_df_as_excel_table(df, file_path, sheet_name="Sheet1", table_name="Table1"):
+    """
+    Save a DataFrame to Excel and convert the used range into an Excel Table.
+    Clean, minimal, and works for SharePoint / Power Automate.
+    """
+
+    # 1. Save DataFrame normally
+    df.to_excel(file_path, sheet_name=sheet_name, index=False)
+
+    # 2. Convert that sheet into a proper Excel Table
     wb = load_workbook(file_path)
     ws = wb[sheet_name]
 
-    # Determine range boundaries
     last_row = ws.max_row
     last_col = ws.max_column
 
-    # Example: A1:F101
+    # A1:F101 style range
     ref = f"A1:{get_column_letter(last_col)}{last_row}"
 
-    # Create the Excel table
     table = Table(displayName=table_name, ref=ref)
 
-    # Optional table styling
+    # Optional minimal styling
     style = TableStyleInfo(
         name="TableStyleMedium2",
         showFirstColumn=False,
         showLastColumn=False,
         showRowStripes=True,
-        showColumnStripes=False,
+        showColumnStripes=False
     )
     table.tableStyleInfo = style
 
-    # Add and save
     ws.add_table(table)
     wb.save(file_path)
-
-# Call the function
-convert_sheet_to_table(file_path)
