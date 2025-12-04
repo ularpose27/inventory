@@ -1,69 +1,9 @@
+Facility(i).RemainosFV = Facility(i).Compoundrate * Facility(i).RemainosPV
+Facility(i).Rank = Cell.Offset(0, 2).Value              'Ranking R (sheet)
+Facility(i).PrefRank = Cell.Offset(0, 3).Value           'Preference ranking
 
-'-------------------------------------------------
-' Build ordered facility list for this rank (waterfall)
-' Order inside a rank:
-'   1) Preference ranking (col F) ascending
-'   2) Original row order as tiebreaker
-'   3) Blanks in preference go last
-'-------------------------------------------------
-Dim pref() As Double
-Dim idx() As Long
-Dim sortCount As Long
-Dim a As Long, b As Long
-Dim tmpPref As Double
-Dim tmpIdx As Long
-
-'collect facilities in this rank
-sortCount = 0
-ReDim pref(1 To m)
-ReDim idx(1 To m)
-
-For i = 1 To m
-    pref(i) = 999999    'large default for blanks
-    idx(i) = -1
-
-    If Facility(i).Rank = currentrank Then
-        sortCount = sortCount + 1
-        idx(sortCount) = i
-
-        'Facility(i).PrefRank MUST already be filled from column F
-        If Facility(i).PrefRank > 0 Then
-            pref(sortCount) = Facility(i).PrefRank
-        Else
-            pref(sortCount) = 999999
-        End If
-    End If
-Next i
-
-'no facilities in this rank → later logic will just skip
-If sortCount = 0 Then
-    For i = 1 To m
-        fac_inrank(i) = -1
-    Next i
-Else
-    'sort by preference, then by original order (idx)
-    For a = 1 To sortCount - 1
-        For b = a + 1 To sortCount
-            If pref(b) < pref(a) Or _
-               (pref(b) = pref(a) And idx(b) < idx(a)) Then
-
-                tmpPref = pref(a)
-                pref(a) = pref(b)
-                pref(b) = tmpPref
-
-                tmpIdx = idx(a)
-                idx(a) = idx(b)
-                idx(b) = tmpIdx
-            End If
-        Next b
-    Next a
-
-    'write sorted list into fac_inrank and pad rest with -1
-    ReDim fac_inrank(1 To m)
-    For i = 1 To sortCount
-        fac_inrank(i) = idx(i)
-    Next i
-    For i = sortCount + 1 To m
-        fac_inrank(i) = -1
-    Next i
+'only accumulate for valid ranks 1–3
+If Facility(i).Rank >= 1 And Facility(i).Rank <= 3 Then
+    sumosPV(Facility(i).Rank) = sumosPV(Facility(i).Rank) + Facility(i).RemainosPV
+    sumosFV(Facility(i).Rank) = sumosFV(Facility(i).Rank) + Facility(i).RemainosFV
 End If
