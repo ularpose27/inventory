@@ -1,37 +1,69 @@
-'--------------------------------------------------------
-' SITUATION 2 – WATERFALL ALLOCATION (no pro-rata)
-'--------------------------------------------------------
-ElseIf Security(order).MarketValue < sumosFV(currentrank) Then
 
-    remainingMV = Security(order).MarketValue
+'-------------------------------------------------
+' Build ordered facility list for this rank (waterfall)
+' Order inside a rank:
+'   1) Preference ranking (col F) ascending
+'   2) Original row order as tiebreaker
+'   3) Blanks in preference go last
+'-------------------------------------------------
+Dim pref() As Double
+Dim idx() As Long
+Dim sortCount As Long
+Dim a As Long, b As Long
+Dim tmpPref As Double
+Dim tmpIdx As Long
 
-    'WATERFALL: facilities ordered by Rank R, then Preference Ranking, then row order
-    'fac_inrank() MUST be correctly filled before this loop
-    For i = 1 To Count
+'collect facilities in this rank
+sortCount = 0
+ReDim pref(1 To m)
+ReDim idx(1 To m)
 
-        fIndex = fac_inrank(i)
-        If fIndex = -1 Then GoTo NextFacility
+For i = 1 To m
+    pref(i) = 999999    'large default for blanks
+    idx(i) = -1
 
-        'Stop when no market value remains
-        If remainingMV <= 0 Then Exit For
+    If Facility(i).Rank = currentrank Then
+        sortCount = sortCount + 1
+        idx(sortCount) = i
 
-        'Current FV outstanding for facility
-        repayFV = Facility(fIndex).RemainosFV
-        If repayFV <= 0 Then GoTo NextFacility
-
-        'Apply waterfall: facility gets MIN(FV, remainingMV)
-        If repayFV > remainingMV Then
-            repayFV = remainingMV
+        'Facility(i).PrefRank MUST already be filled from column F
+        If Facility(i).PrefRank > 0 Then
+            pref(sortCount) = Facility(i).PrefRank
+        Else
+            pref(sortCount) = 999999
         End If
+    End If
+Next i
 
-        'Reduce facility FV and the remaining MV
-        Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
-        remainingMV = remainingMV - repayFV
-
-NextFacility:
+'no facilities in this rank → later logic will just skip
+If sortCount = 0 Then
+    For i = 1 To m
+        fac_inrank(i) = -1
     Next i
+Else
+    'sort by preference, then by original order (idx)
+    For a = 1 To sortCount - 1
+        For b = a + 1 To sortCount
+            If pref(b) < pref(a) Or _
+               (pref(b) = pref(a) And idx(b) < idx(a)) Then
 
-    'Update remaining security market value
-    Security(order).MarketValue = remainingMV
+                tmpPref = pref(a)
+                pref(a) = pref(b)
+                pref(b) = tmpPref
 
+                tmpIdx = idx(a)
+                idx(a) = idx(b)
+                idx(b) = tmpIdx
+            End If
+        Next b
+    Next a
+
+    'write sorted list into fac_inrank and pad rest with -1
+    ReDim fac_inrank(1 To m)
+    For i = 1 To sortCount
+        fac_inrank(i) = idx(i)
+    Next i
+    For i = sortCount + 1 To m
+        fac_inrank(i) = -1
+    Next i
 End If
