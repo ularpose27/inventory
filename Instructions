@@ -1,18 +1,37 @@
-'--- write discount factor safely (avoid division by zero) ---
-If Security(order).Paymentdate <> "12:00:00 AM" Then
+'--------------------------------------------------------
+' SITUATION 2 – WATERFALL ALLOCATION (no pro-rata)
+'--------------------------------------------------------
+ElseIf Security(order).MarketValue < sumosFV(currentrank) Then
 
-    'if rate was never set, calculate it now as a fallback
-    If Facility(i).Compoundrate = 0 Then
-        Facility(i).Compoundrate = (1 + irr(i)) ^ ((Security(order).Paymentdate - startdate) / 365)
-    End If
+    remainingMV = Security(order).MarketValue
 
-    'only divide if we have a valid rate
-    If Facility(i).Compoundrate <> 0 Then
-        Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 1 / Facility(i).Compoundrate   'discount factor
-    Else
-        Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0    'fallback, avoids crash
-    End If
+    'WATERFALL: facilities ordered by Rank R, then Preference Ranking, then row order
+    'fac_inrank() MUST be correctly filled before this loop
+    For i = 1 To Count
 
-Else
-    Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0
+        fIndex = fac_inrank(i)
+        If fIndex = -1 Then GoTo NextFacility
+
+        'Stop when no market value remains
+        If remainingMV <= 0 Then Exit For
+
+        'Current FV outstanding for facility
+        repayFV = Facility(fIndex).RemainosFV
+        If repayFV <= 0 Then GoTo NextFacility
+
+        'Apply waterfall: facility gets MIN(FV, remainingMV)
+        If repayFV > remainingMV Then
+            repayFV = remainingMV
+        End If
+
+        'Reduce facility FV and the remaining MV
+        Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+        remainingMV = remainingMV - repayFV
+
+NextFacility:
+    Next i
+
+    'Update remaining security market value
+    Security(order).MarketValue = remainingMV
+
 End If
