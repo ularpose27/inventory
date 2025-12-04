@@ -1,1 +1,17 @@
+'--- write discount factor safely (avoid division by zero) ---
+If Security(order).Paymentdate <> "12:00:00 AM" Then
 
+    'if rate was never set, calculate it now as a fallback
+    If Facility(i).Compoundrate = 0 Then
+        Facility(i).Compoundrate = (1 + irr(i)) ^ ((Security(order).Paymentdate - startdate) / 365)
+    End If
+
+    If Facility(i).Compoundrate <> 0 Then
+        Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 1 / Facility(i).Compoundrate   'discount factor
+    Else
+        Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0    'still avoid crash if something is wrong
+    End If
+
+Else
+    Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0
+End If
