@@ -1,80 +1,36 @@
-Sub CheckInputs_FirstSecurityBlock()
-
-    Dim ws As Worksheet
-    Dim issues As String
-    Dim scenCols As Variant
-    Dim scenNames As Variant
-    Dim i As Long
-    Dim r As Long
-    Dim firstRow As Long, lastRow As Long
-    Dim hasRank As Boolean
-    Dim hasRankWithPref As Boolean
-    
-    On Error GoTo ErrHandler
-    
-    Set ws = ThisWorkbook.Worksheets("Security Apportionment")
-    
-    issues = ""
-    
-    '--- 1. Check scenario inputs (Payment Date + Expected Realisation CCY) ---
-    'Assumes:
-    '  Payment Date row = 76
-    '  Expected Realisation (CCY) row = 77
-    scenCols = Array("L", "O", "R", "U")                  'Upper, Base, Lower, 2nd Strategy
-    scenNames = Array("Upper", "Base", "Lower", "2nd Strategy")
-    
-    For i = 0 To 3
-        'Payment Date
-        If IsEmpty(ws.Range(scenCols(i) & "76").Value) Then
-            issues = issues & scenNames(i) & ": Payment Date (row 76) is missing." & vbCrLf
-        End If
-        
-        'Expected Realisation (CCY)
-        If IsEmpty(ws.Range(scenCols(i) & "77").Value) Then
-            issues = issues & scenNames(i) & ": Expected Realisation (CCY) (row 77) is missing." & vbCrLf
-        End If
+'no facilities in this rank -> later logic will just skip
+If sortCount = 0 Then
+    ReDim fac_inrank(1 To m)
+    For i = 1 To m
+        fac_inrank(i) = -1
     Next i
-    
-    '--- 2. Check that there is at least one facility with Rank 1–3 in this block ---
-    'Assumes facility block = rows 82–137, Rank R in column E, Preference in column F
-    firstRow = 82
-    lastRow = 137
-    
-    hasRank = False
-    hasRankWithPref = False
-    
-    For r = firstRow To lastRow
-        If ws.Cells(r, "E").Value >= 1 And ws.Cells(r, "E").Value <= 3 Then
-            hasRank = True
-            If ws.Cells(r, "F").Value <> "" Then
-                hasRankWithPref = True
+    Count = 0                         '<<< IMPORTANT
+Else
+    'sort by preference, then by original order (idx)
+    For a = 1 To sortCount - 1
+        For b = a + 1 To sortCount
+            If pref(b) < pref(a) Or _
+               (pref(b) = pref(a) And idx(b) < idx(a)) Then
+
+                tmpPref = pref(a)
+                pref(a) = pref(b)
+                pref(b) = tmpPref
+
+                tmpIdx = idx(a)
+                idx(a) = idx(b)
+                idx(b) = tmpIdx
             End If
-        End If
-    Next r
-    
-    If Not hasRank Then
-        issues = issues & "No facility rows in E" & firstRow & ":E" & lastRow & " with Rank R = 1, 2 or 3." & vbCrLf
-    End If
-    
-    'Optional: warn if no preference ranking at all
-    If hasRank And Not hasRankWithPref Then
-        issues = issues & "Rank R is present, but no Preference ranking in column F for any Rank 1–3 row." & vbCrLf
-    End If
-    
-    '--- 3. Final message ---
-    If issues = "" Then
-        MsgBox "Input check for first security block: OK." & vbCrLf & _
-               "- Payment Dates and Expected Realisation (CCY) are filled for Upper/Base/Lower/2nd." & vbCrLf & _
-               "- At least one facility in rows " & firstRow & "–" & lastRow & " has Rank 1–3.", _
-               vbInformation, "Input Check"
-    Else
-        MsgBox "Input check for first security block found issues:" & vbCrLf & vbCrLf & issues, _
-               vbExclamation, "Input Check"
-    End If
-    
-    Exit Sub
+        Next b
+    Next a
 
-ErrHandler:
-    MsgBox "Error in CheckInputs_FirstSecurityBlock: " & Err.Description, vbCritical
+    'write sorted list into fac_inrank and pad rest with -1
+    ReDim fac_inrank(1 To m)
+    For i = 1 To sortCount
+        fac_inrank(i) = idx(i)
+    Next i
+    For i = sortCount + 1 To m
+        fac_inrank(i) = -1
+    Next i
 
-End Sub
+    Count = sortCount                 '<<< THIS IS WHAT WAS MISSING
+End If
