@@ -1,3 +1,29 @@
-Debug.Print "MATCH", "Sec order:", order, "Row:", Cell.Row, _
-            "Facility:", Facility(i).LoanName, "Rank:", Cell.Offset(0, 2).Value, _
-            "Pref:", Cell.Offset(0, 3).Value
+rangeStr = "C" & (BlankRowUpside + 9 + (Security(order).OriginalOrder - 1) * Height) _
+           & ":C" & (BlankRowUpside + 9 + m + (Security(order).OriginalOrder - 1) * Height)
+
+For Each Cell In Range(rangeStr)
+    For i = 1 To m
+        If Facility(i).LoanName = Cell.Value Then
+
+            Debug.Print "MATCH", "Sec order:", order, "Row:", Cell.Row, _
+                        "Facility:", Facility(i).LoanName, "Rank:", Cell.Offset(0, 2).Value, _
+                        "Pref:", Cell.Offset(0, 3).Value
+
+            'only do calculations when Rank cell is not empty
+            If Cell.Offset(0, 2).Value <> Empty Then
+                Facility(i).Compoundrate = (1 + irr(i)) ^ ((Security(order).Paymentdate - startdate) / 365)
+                Facility(i).RemainosFV = Facility(i).Compoundrate * Facility(i).RemainosPV
+                Facility(i).Rank = Cell.Offset(0, 2).Value             'Ranking R (sheet)
+                Facility(i).PrefRank = Cell.Offset(0, 3).Value          'Preference ranking
+
+                'only accumulate for valid ranks 1–3
+                If Facility(i).Rank >= 1 And Facility(i).Rank <= 3 Then
+                    sumosPV(Facility(i).Rank) = sumosPV(Facility(i).Rank) + Facility(i).RemainosPV
+                    sumosFV(Facility(i).Rank) = sumosFV(Facility(i).Rank) + Facility(i).RemainosFV
+                End If
+            End If
+
+            Exit For        'we handled this facility row; go to next Cell
+        End If
+    Next i
+Next Cell
