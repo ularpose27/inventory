@@ -1,9 +1,3 @@
-Facility(i).RemainosFV = Facility(i).Compoundrate * Facility(i).RemainosPV
-Facility(i).Rank = Cell.Offset(0, 2).Value              'Ranking R (sheet)
-Facility(i).PrefRank = Cell.Offset(0, 3).Value           'Preference ranking
-
-'only accumulate for valid ranks 1–3
-If Facility(i).Rank >= 1 And Facility(i).Rank <= 3 Then
-    sumosPV(Facility(i).Rank) = sumosPV(Facility(i).Rank) + Facility(i).RemainosPV
-    sumosFV(Facility(i).Rank) = sumosFV(Facility(i).Rank) + Facility(i).RemainosFV
-End If
+Debug.Print "MATCH", "Sec order:", order, "Row:", Cell.Row, _
+            "Facility:", Facility(i).LoanName, "Rank:", Cell.Offset(0, 2).Value, _
+            "Pref:", Cell.Offset(0, 3).Value
