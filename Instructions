@@ -1,13 +1,1 @@
-Dim orderMode As Integer
-Dim msg As String
 
-msg = "Choose facility ordering for Rank 2 & 3:" & vbCrLf & vbCrLf & _
-      "1 = Net Outstanding (descending)" & vbCrLf & _
-      "2 = Interest Rate (descending)"
-
-orderMode = Application.InputBox(msg, "Facility Ordering", 1, Type:=1)
-
-If orderMode <> 1 And orderMode <> 2 Then
-    MsgBox "Generation cancelled – invalid ordering option selected.", vbExclamation
-    Exit Sub
-End If
