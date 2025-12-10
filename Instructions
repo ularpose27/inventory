@@ -1,36 +1,73 @@
-'no facilities in this rank -> later logic will just skip
-If sortCount = 0 Then
-    ReDim fac_inrank(1 To m)
-    For i = 1 To m
-        fac_inrank(i) = -1
-    Next i
-    Count = 0                         '<<< IMPORTANT
-Else
-    'sort by preference, then by original order (idx)
-    For a = 1 To sortCount - 1
-        For b = a + 1 To sortCount
-            If pref(b) < pref(a) Or _
-               (pref(b) = pref(a) And idx(b) < idx(a)) Then
+'Situation 2 - Rank-dependent logic
+ElseIf Security(order).MarketValue < sumosFV(currentrank) Then
 
-                tmpPref = pref(a)
-                pref(a) = pref(b)
-                pref(b) = tmpPref
+    '-------------------------------
+    ' Rank 1 → PRO-RATA allocation
+    '-------------------------------
+    If currentrank = 1 Then
 
-                tmpIdx = idx(a)
-                idx(a) = idx(b)
-                idx(b) = tmpIdx
+        'Pro-rata on FV within Rank 1
+        Dim totalFV As Double
+        Dim factor As Double
+
+        totalFV = sumosFV(currentrank)          'sum of RemainosFV for Rank 1
+
+        If totalFV > 0 Then
+            factor = Security(order).MarketValue / totalFV
+
+            remainingMV = Security(order).MarketValue
+
+            For i = 1 To Count
+                fIndex = fac_inrank(i)
+                If fIndex = -1 Then GoTo NextFacilityRank1
+
+                'Facility gets its pro-rata share of the security MV
+                repayFV = Facility(fIndex).RemainosFV * factor
+
+                'Cap for safety (shouldn’t be needed, but avoid tiny negatives)
+                If repayFV > Facility(fIndex).RemainosFV Then
+                    repayFV = Facility(fIndex).RemainosFV
+                End If
+
+                Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+                remainingMV = remainingMV - repayFV
+
+NextFacilityRank1:
+            Next i
+
+            'Any minor rounding leftovers are ignored for Rank 1
+            Security(order).MarketValue = remainingMV
+        End If
+
+    '-------------------------------
+    ' Rank 2 & 3 → WATERFALL allocation
+    '-------------------------------
+    Else
+
+        remainingMV = Security(order).MarketValue
+
+        'WATERFALL: facilities ordered by Rank R, then PrefRank, then row
+        For i = 1 To Count
+            fIndex = fac_inrank(i)
+            If fIndex = -1 Then GoTo NextFacilityRank23
+
+            If remainingMV <= 0 Then Exit For
+
+            repayFV = Facility(fIndex).RemainosFV
+            If repayFV <= 0 Then GoTo NextFacilityRank23
+
+            If repayFV > remainingMV Then
+                repayFV = remainingMV
             End If
-        Next b
-    Next a
 
-    'write sorted list into fac_inrank and pad rest with -1
-    ReDim fac_inrank(1 To m)
-    For i = 1 To sortCount
-        fac_inrank(i) = idx(i)
-    Next i
-    For i = sortCount + 1 To m
-        fac_inrank(i) = -1
-    Next i
+            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+            remainingMV = remainingMV - repayFV
 
-    Count = sortCount                 '<<< THIS IS WHAT WAS MISSING
+NextFacilityRank23:
+        Next i
+
+        Security(order).MarketValue = remainingMV
+
+    End If
+
 End If
