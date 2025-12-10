@@ -1,73 +1,13 @@
-'Situation 2 - Rank-dependent logic
-ElseIf Security(order).MarketValue < sumosFV(currentrank) Then
+Dim orderMode As Integer
+Dim msg As String
 
-    '-------------------------------
-    ' Rank 1 → PRO-RATA allocation
-    '-------------------------------
-    If currentrank = 1 Then
+msg = "Choose facility ordering for Rank 2 & 3:" & vbCrLf & vbCrLf & _
+      "1 = Net Outstanding (descending)" & vbCrLf & _
+      "2 = Interest Rate (descending)"
 
-        'Pro-rata on FV within Rank 1
-        Dim totalFV As Double
-        Dim factor As Double
+orderMode = Application.InputBox(msg, "Facility Ordering", 1, Type:=1)
 
-        totalFV = sumosFV(currentrank)          'sum of RemainosFV for Rank 1
-
-        If totalFV > 0 Then
-            factor = Security(order).MarketValue / totalFV
-
-            remainingMV = Security(order).MarketValue
-
-            For i = 1 To Count
-                fIndex = fac_inrank(i)
-                If fIndex = -1 Then GoTo NextFacilityRank1
-
-                'Facility gets its pro-rata share of the security MV
-                repayFV = Facility(fIndex).RemainosFV * factor
-
-                'Cap for safety (shouldn’t be needed, but avoid tiny negatives)
-                If repayFV > Facility(fIndex).RemainosFV Then
-                    repayFV = Facility(fIndex).RemainosFV
-                End If
-
-                Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
-                remainingMV = remainingMV - repayFV
-
-NextFacilityRank1:
-            Next i
-
-            'Any minor rounding leftovers are ignored for Rank 1
-            Security(order).MarketValue = remainingMV
-        End If
-
-    '-------------------------------
-    ' Rank 2 & 3 → WATERFALL allocation
-    '-------------------------------
-    Else
-
-        remainingMV = Security(order).MarketValue
-
-        'WATERFALL: facilities ordered by Rank R, then PrefRank, then row
-        For i = 1 To Count
-            fIndex = fac_inrank(i)
-            If fIndex = -1 Then GoTo NextFacilityRank23
-
-            If remainingMV <= 0 Then Exit For
-
-            repayFV = Facility(fIndex).RemainosFV
-            If repayFV <= 0 Then GoTo NextFacilityRank23
-
-            If repayFV > remainingMV Then
-                repayFV = remainingMV
-            End If
-
-            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
-            remainingMV = remainingMV - repayFV
-
-NextFacilityRank23:
-        Next i
-
-        Security(order).MarketValue = remainingMV
-
-    End If
-
+If orderMode <> 1 And orderMode <> 2 Then
+    MsgBox "Generation cancelled – invalid ordering option selected.", vbExclamation
+    Exit Sub
 End If
