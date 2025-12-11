@@ -1,23 +1,4 @@
-Hi 
-
-Hope you’re doing well.
-
-Regarding your request on
-
-
-
-
-
-the current MSR report I have does not explicitly classify relationships as turnaround vs debt recovery, so I’m not able to reproduce that split directly from this dataset.
-
-What I can provide from the MSR is:
-
-the total number of customers in our managed accounts portfolio and the corresponding total exposure, and
-
-within that, the count of customers with exposure below $500k and the aggregate exposure for those customers.
-
-
-Please let me know if these figures would be helpful for your analysis, or if you’d like me to look into alternative sources for a turnaround vs. debt recovery breakdown.
-
-Best regards,
-
+If orderMode < 1 Or orderMode > 2 Then
+    MsgBox "Generation cancelled - invalid ordering option selected.", vbExclamation
+    Exit Sub
+End If
