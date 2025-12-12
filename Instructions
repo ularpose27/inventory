@@ -1,4 +1,4 @@
-If orderMode < 1 Or orderMode > 2 Then
-    MsgBox "Generation cancelled - invalid ordering option selected.", vbExclamation
-    Exit Sub
-End If
+'Interest Rate (from Facility col AK)
+Sheets("Facility").Range("AK8:AK" & 7 + n).Copy
+ws.Range("K13").PasteSpecial Paste:=xlPasteValues
+Application.CutCopyMode = False
