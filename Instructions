@@ -1,13 +1,15 @@
 
-Dim r As Long
-For r = 13 To 12 + n
-    If ws.Cells(r, "E").Value = 1 Then
-        ws.Cells(r, "F").ClearContents
-        ws.Cells(r, "F").Locked = True
-    Else
-        ws.Cells(r, "F").Locked = False
-    End If
-Next r
+With ws.Sort
+    .SortFields.Clear
 
-'Ensure protection so Locked cells behave
-ws.Protect Password:="", UserInterfaceOnly:=True
+    'Sort on the ACTUAL data range, not header cell
+    .SortFields.Add Key:=ws.Range("K2:K400"), SortOn:=xlSortOnValues, Order:=xlDescending, DataOption:=xlSortNormal
+    .SortFields.Add Key:=ws.Range("I2:I400"), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+
+    .SetRange ws.Range("A1:K400")
+    .Header = xlYes
+    .MatchCase = False
+    .Orientation = xlTopToBottom
+    .SortMethod = xlPinYin
+    .Apply
+End With
