@@ -1,13 +1,3 @@
-'Data validation for Preference Ranking in column F
-With ws.Range("F13:F" & (12 + n))
-    .UnMerge
-    .Validation.Delete
-    .Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, _
-                    Formula1:=prefList
-    .Validation.IgnoreBlank = True
-    .Validation.InCellDropdown = True
-    .Validation.ShowInput = True
-    .Validation.ShowError = True
-    .Validation.ErrorTitle = "Invalid Input"
-    .Validation.ErrorMessage = "Please select a number between 1 and " & n & "."
-End With
+On Error Resume Next
+ws.Unprotect Password:=""
+On Error GoTo 0
