@@ -1,5 +1,11 @@
-If m < 1 Then
-    MsgBox "CountSecurity() returned " & m & ". No securities detected in 'Hide - Security1'. Fix the input sheet or counting logic.", vbExclamation
-    Application.ScreenUpdating = True
-    Exit Sub
-End If
+With securityWs.Sort
+    .SortFields.Clear
+    .SortFields.Add Key:=securityWs.Range("K2:K400"), SortOn:=xlSortOnValues, Order:=xlDescending, DataOption:=xlSortNormal
+    .SortFields.Add Key:=securityWs.Range("I2:I400"), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    .SetRange securityWs.Range("A1:K400")
+    .Header = xlYes
+    .MatchCase = False
+    .Orientation = xlTopToBottom
+    .SortMethod = xlPinYin
+    .Apply
+End With
