@@ -1,15 +1,16 @@
 
-With ws.Sort
-    .SortFields.Clear
+Count = 0
+For Each Cell In ws.Range("A2:A400")
 
-    'Sort on the ACTUAL data range, not header cell
-    .SortFields.Add Key:=ws.Range("K2:K400"), SortOn:=xlSortOnValues, Order:=xlDescending, DataOption:=xlSortNormal
-    .SortFields.Add Key:=ws.Range("I2:I400"), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    'Hard stop only when the Security row itself is empty (end of list)
+    If Trim(Cell.Value & "") = "" Then Exit For
 
-    .SetRange ws.Range("A1:K400")
-    .Header = xlYes
-    .MatchCase = False
-    .Orientation = xlTopToBottom
-    .SortMethod = xlPinYin
-    .Apply
-End With
+    'Count only qualifying rows, but DO NOT EXIT on non-qualifying rows
+    If (Cell.Offset(0, 10).Value = "Tangible" And Cell.Offset(0, 8).Value = "N") _
+        Or (Cell.Offset(0, 10).Value = "Intangible with ECF") Then
+
+        Count = Count + 1
+
+    End If
+
+Next Cell
