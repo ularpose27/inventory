@@ -1,37 +1,13 @@
-'Facility order sort based on selected mode
-With ws.Sort
-    .SortFields.Clear
 
-    '1) Rank ascending (E)
-    .SortFields.Add Key:=ws.Range("E13:E" & 12 + n), _
-                    SortOn:=xlSortOnValues, Order:=xlAscending, _
-                    DataOption:=xlSortNormal
+Dim r As Long
+For r = 13 To 12 + n
+    If ws.Cells(r, "E").Value = 1 Then
+        ws.Cells(r, "F").ClearContents
+        ws.Cells(r, "F").Locked = True
+    Else
+        ws.Cells(r, "F").Locked = False
+    End If
+Next r
 
-    '2) Secondary ordering (either USD Equiv or Interest Rate)
-    Select Case orderMode
-        Case 1
-            'Net Outstanding / USD Equiv (J) descending
-            .SortFields.Add Key:=ws.Range("J13:J" & 12 + n), _
-                            SortOn:=xlSortOnValues, Order:=xlDescending, _
-                            DataOption:=xlSortNormal
-        Case 2
-            'Interest Rate (K) descending
-            .SortFields.Add Key:=ws.Range("K13:K" & 12 + n), _
-                            SortOn:=xlSortOnValues, Order:=xlDescending, _
-                            DataOption:=xlSortNormal
-    End Select
-
-    '3) Borrower as tie-breaker (G)
-    .SortFields.Add Key:=ws.Range("G13:G" & 12 + n), _
-                    SortOn:=xlSortOnValues, Order:=xlAscending, _
-                    DataOption:=xlSortNormal
-
-    'Sort range must include the key columns → extend to K now
-    .SetRange ws.Range("C13:K" & 12 + n)
-
-    .Header = xlNo
-    .MatchCase = False
-    .Orientation = xlTopToBottom
-    .SortMethod = xlPinYin
-    .Apply
-End With
+'Ensure protection so Locked cells behave
+ws.Protect Password:="", UserInterfaceOnly:=True
