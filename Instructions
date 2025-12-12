@@ -1,16 +1,11 @@
 
-Count = 0
-For Each Cell In ws.Range("A2:A400")
-
-    'Hard stop only when the Security row itself is empty (end of list)
-    If Trim(Cell.Value & "") = "" Then Exit For
-
-    'Count only qualifying rows, but DO NOT EXIT on non-qualifying rows
-    If (Cell.Offset(0, 10).Value = "Tangible" And Cell.Offset(0, 8).Value = "N") _
-        Or (Cell.Offset(0, 10).Value = "Intangible with ECF") Then
-
-        Count = Count + 1
-
-    End If
-
-Next Cell
+With ws.Sort
+    .SortFields.Clear
+    .SortFields.Add Key:=ws.Range("J2:J400"), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    .SetRange ws.Range("A1:K400")
+    .Header = xlYes
+    .MatchCase = False
+    .Orientation = xlTopToBottom
+    .SortMethod = xlPinYin
+    .Apply
+End With
