@@ -1,3 +1,16 @@
-'Interest Rate (from Facility col AK)
-ws.Range("K13:K" & (12 + n)).UnMerge
-ws.Range("K13:K" & (12 + n)).Value = Sheets("Facility").Range("AK8:AK" & (7 + n)).Value
+'Drop down (Ranking in column E)
+Dim sep As String
+sep = Application.International(xlListSeparator)   'comma or semicolon depending on Excel locale
+
+With ws.Range("E13:E" & (12 + n))
+    .UnMerge                       'IMPORTANT: avoid validation error on merged cells
+    .Validation.Delete
+    .Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, _
+                    Formula1:="1" & sep & "2" & sep & "3"
+    .Validation.IgnoreBlank = True
+    .Validation.InCellDropdown = True
+    .Validation.ShowInput = True
+    .Validation.ShowError = True
+    .Validation.ErrorTitle = "Invalid Input"
+    .Validation.ErrorMessage = "Please select a number from the list."
+End With
