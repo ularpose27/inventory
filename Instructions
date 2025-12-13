@@ -1,4 +1,9 @@
-Dim n As Long
-n = CountFacility()
-Dim m As Long
-m = CountSecurity()
+'========================
+' Ask user how to order facilities
+'========================
+Dim orderMode As Long
+orderMode = GetFacilityOrderMode()   '1=Net Outstanding, 2=Interest Rate
+
+'Build the sorted facility index list (1..n)
+Dim facOrder() As Long
+facOrder = BuildFacilityOrder(orderMode, n)
