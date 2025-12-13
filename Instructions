@@ -1,2 +1,2 @@
-facRowOrder = facRowOrder + 1
-Facility(i).Weight = facRowOrder   'store table order for fallback ordering
+If (pref(b) < pref(a)) _
+Or (pref(b) = pref(a) And Facility(idx(b)).Weight < Facility(idx(a)).Weight) Then
