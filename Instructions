@@ -1,18 +1,24 @@
-'========================
-' Fill facility rows IN THE ORDER USER CHOSE (no Excel sort, no extra columns)
-'========================
-Dim r As Long
-Dim fi As Long
+Private Function GetFacilityOrderMode() As Long
+    Dim ans As Variant
 
-For r = 1 To n
-    fi = facOrder(r)   'facility index in Facility/Hide-Facility sheets
+    Do
+        ans = Application.InputBox( _
+            Prompt:="Choose facility ordering for Generate Template Table:" & vbCrLf & vbCrLf & _
+                    "1 = Net Outstanding (descending)" & vbCrLf & _
+                    "2 = Interest Rate (descending)", _
+            Title:="Facility Ordering", Type:=1)
 
-    'Destination row in Security Apportionment table (starts at row 13)
-    'Row 13 corresponds to r=1
-    ws.Cells(12 + r, "C").Value = Sheets("Facility").Cells(7 + fi, "J").Value   'Facility name
-    ws.Cells(12 + r, "D").Value = Sheets("Facility").Cells(7 + fi, "M").Value   'CARM ID
-    ws.Cells(12 + r, "G").Value = Sheets("Facility").Cells(7 + fi, "K").Value   'Borrower
-    ws.Cells(12 + r, "H").Value = Sheets("Facility").Cells(7 + fi, "P").Value   'CCY
-    ws.Cells(12 + r, "I").Value = Sheets("Facility").Cells(7 + fi, "AF").Value  'CCY facility Net Amount / Drawn Balance
-    ws.Cells(12 + r, "J").Value = Sheets("Hide - Facility").Cells(1 + fi, "L").Value 'USD Equiv (your existing "Temp" source)
-Next r
+        If ans = False Then
+            'User pressed Cancel -> default to Net Outstanding
+            GetFacilityOrderMode = 1
+            Exit Function
+        End If
+
+        If CLng(ans) = 1 Or CLng(ans) = 2 Then
+            GetFacilityOrderMode = CLng(ans)
+            Exit Function
+        Else
+            MsgBox "Please enter 1 or 2.", vbExclamation
+        End If
+    Loop
+End Function
