@@ -1,2 +1,63 @@
-If (pref(b) < pref(a)) _
-Or (pref(b) = pref(a) And Facility(idx(b)).Weight < Facility(idx(a)).Weight) Then
+ElseIf Security(order).MarketValue < sumosFV(currentrank) Then
+
+    If currentrank = 1 Then
+        '========================
+        'RANK 1: PRO-RATA
+        '========================
+        Dim totalFV As Double
+        Dim factor As Double
+
+        totalFV = sumosFV(currentrank)
+        If totalFV > 0 Then
+            factor = Security(order).MarketValue / totalFV
+        Else
+            factor = 0
+        End If
+
+        remainingMV = Security(order).MarketValue
+
+        For i = 1 To Count
+
+            fIndex = fac_inrank(i)
+            If fIndex = -1 Then GoTo NextFacilityR1
+
+            repayFV = Facility(fIndex).RemainosFV * factor
+            If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
+            If repayFV > remainingMV Then repayFV = remainingMV
+
+            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+            remainingMV = remainingMV - repayFV
+
+NextFacilityR1:
+        Next i
+
+        Security(order).MarketValue = remainingMV
+
+    Else
+        '========================
+        'RANK 2 & 3: WATERFALL
+        '========================
+        remainingMV = Security(order).MarketValue
+
+        For i = 1 To Count
+
+            fIndex = fac_inrank(i)
+            If fIndex = -1 Then GoTo NextFacilityR23
+
+            If remainingMV <= 0 Then Exit For
+
+            repayFV = Facility(fIndex).RemainosFV
+            If repayFV <= 0 Then GoTo NextFacilityR23
+
+            If repayFV > remainingMV Then repayFV = remainingMV
+
+            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+            remainingMV = remainingMV - repayFV
+
+NextFacilityR23:
+        Next i
+
+        Security(order).MarketValue = remainingMV
+    End If
+
+End If
