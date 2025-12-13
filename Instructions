@@ -1,9 +1,18 @@
 '========================
-' Ask user how to order facilities
+' Fill facility rows IN THE ORDER USER CHOSE (no Excel sort, no extra columns)
 '========================
-Dim orderMode As Long
-orderMode = GetFacilityOrderMode()   '1=Net Outstanding, 2=Interest Rate
+Dim r As Long
+Dim fi As Long
 
-'Build the sorted facility index list (1..n)
-Dim facOrder() As Long
-facOrder = BuildFacilityOrder(orderMode, n)
+For r = 1 To n
+    fi = facOrder(r)   'facility index in Facility/Hide-Facility sheets
+
+    'Destination row in Security Apportionment table (starts at row 13)
+    'Row 13 corresponds to r=1
+    ws.Cells(12 + r, "C").Value = Sheets("Facility").Cells(7 + fi, "J").Value   'Facility name
+    ws.Cells(12 + r, "D").Value = Sheets("Facility").Cells(7 + fi, "M").Value   'CARM ID
+    ws.Cells(12 + r, "G").Value = Sheets("Facility").Cells(7 + fi, "K").Value   'Borrower
+    ws.Cells(12 + r, "H").Value = Sheets("Facility").Cells(7 + fi, "P").Value   'CCY
+    ws.Cells(12 + r, "I").Value = Sheets("Facility").Cells(7 + fi, "AF").Value  'CCY facility Net Amount / Drawn Balance
+    ws.Cells(12 + r, "J").Value = Sheets("Hide - Facility").Cells(1 + fi, "L").Value 'USD Equiv (your existing "Temp" source)
+Next r
