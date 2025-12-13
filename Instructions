@@ -1,20 +1,4 @@
-Dim rngE As Range
-Set rngE = ws.Range("E13:E" & (12 + n))
-
-'Guarantee E cells are not part of merged areas
-rngE.MergeCells = False
-
-'Clear any existing validation safely
-On Error Resume Next
-rngE.Validation.Delete
-On Error GoTo 0
-
-'Apply list validation
-rngE.Validation.Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, _
-                    Formula1:="1" & sep & "2" & sep & "3"
-rngE.Validation.IgnoreBlank = True
-rngE.Validation.InCellDropdown = True
-rngE.Validation.ShowInput = True
-rngE.Validation.ShowError = True
-rngE.Validation.ErrorTitle = "Invalid Input"
-rngE.Validation.ErrorMessage = "Please select a number from the list."
+Dim n As Long
+n = CountFacility()
+Dim m As Long
+m = CountSecurity()
