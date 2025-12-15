@@ -1,1 +1,8 @@
-
+SortByColumns(
+    Filter(
+        'Customer_Repository - List',
+        StartsWith('Customer Name', Self.SearchText)
+    ),
+    "Customer Name",
+    Ascending
+)
