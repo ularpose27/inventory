@@ -1,8 +1,7 @@
-SortByColumns(
-    Filter(
-        'Customer_Repository - List',
-        StartsWith('Customer Name', Self.SearchText)
-    ),
-    "Customer Name",
-    Ascending
+Set(
+    varCustomerRepo,
+    LookUp(
+        'SCU Customer Repository - List',
+        'Customer Name' = ComboBox1.Selected.'Customer Name'
+    )
 )
