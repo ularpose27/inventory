@@ -2,6 +2,6 @@ Set(
     varCustomerRepo,
     LookUp(
         'SCU Customer Repository - List',
-        'Customer Name' = ComboBox1.Selected.Title
+        'Customer Name' = Self.Selected.Value
     )
 )
