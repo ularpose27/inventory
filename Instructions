@@ -1,1 +1,1 @@
-"Total Relationship Name: " & Coalesce(varCustomerRepo.'Total Relationship Name', "")
+"CIF Customer ID: " & Coalesce(Text(varCustomerRepo.'CIF Customer Id'), "")
