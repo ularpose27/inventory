@@ -1,7 +1,1 @@
-Set(
-    varCustomerRepo,
-    LookUp(
-        'SCU Customer Repository - List',
-        'Customer Name' = Self.Selected.Value
-    )
-)
+"Total Relationship Name: " & Coalesce(varCustomerRepo.'Total Relationship Name', "")
