@@ -1,1 +1,6 @@
-"CIF Customer ID: " & Coalesce(Text(varCustomerRepo.'CIF Customer Id'), "")
+"Master Net Direct Balance: " &
+If(
+    IsBlank(varCustomerRepo.'Master Net Direct Balance'),
+    "",
+    Text(varCustomerRepo.'Master Net Direct Balance', "[$-en-US]$#,##0.00")
+)
