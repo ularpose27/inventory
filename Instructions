@@ -1,6 +1,1 @@
-"Master Net Direct Balance: " &
-If(
-    IsBlank(varCustomerRepo.'Master Net Direct Balance'),
-    "",
-    Text(varCustomerRepo.'Master Net Direct Balance', "[$-en-US]$#,##0.00")
-)
+If(varTab="Overview", RGBA(120,0,0,1), RGBA(80,0,0,1))
