@@ -1,7 +1,4 @@
-Set(varTab, "Overview");
 Set(varShowWarnEmpty, false);
 Set(varShowConfirmClear, false);
-
-// Create the collection once, then leave it empty
 ClearCollect(colMissing, {Field: Blank()});
 RemoveIf(colMissing, IsBlank(Field));
