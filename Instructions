@@ -1,4 +1,5 @@
-"You are leaving the following fields empty:" & Char(10) & Char(10) &
-Concat(colMissing, "• " & Field, Char(10)) &
-Char(10) & Char(10) &
-"Please verify that those empty fields are not applicable for your case."
+If(
+    varShowWarnEmpty;
+    "Missing fields";
+    "Confirm"
+)
