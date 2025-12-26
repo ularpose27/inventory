@@ -1,2 +1,8 @@
-Set(varShowWarnEmpty, false);
-Set(varShowConfirmClear, true);
+X = 20
+Width = Parent.Width - 40
+
+Y = lblModalTitle.Y + lblModalTitle.Height + 12
+Height = conModalButtons.Y - Self.Y - 12
+
+OverflowY = Overflow.Scroll
+OverflowX = Overflow.Hidden
