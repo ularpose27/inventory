@@ -1,3 +1,5 @@
-Set(varShowWarnEmpty, false);
-Set(varShowConfirmClear, false);
-Clear(colMissing);
+If(
+    varShowWarnEmpty,
+    "Send anyway",
+    If(varShowConfirmClear, "Yes, clear", "")
+)
