@@ -1,4 +1,3 @@
+
+Set(varShowConfirmClear, true);
 Set(varShowWarnEmpty, false);
-Set(varShowConfirmClear, false);
-ClearCollect(colMissing, {Field: Blank()});
-RemoveIf(colMissing, IsBlank(Field));
