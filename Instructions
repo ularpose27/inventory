@@ -1,1 +1,1 @@
-If(varTab="Overview", RGBA(120,0,0,1), RGBA(80,0,0,0.85))
+If(varShowWarnEmpty, "Review empty fields", "Confirm clear form")
