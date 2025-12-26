@@ -1,5 +1,7 @@
 If(
     varShowWarnEmpty;
-    "Missing fields";
-    "Confirm"
+    "You are leaving the following fields empty. Please verify they are not applicable." &
+    Char(10) & Char(10) &
+    Concat(colMissing; "• " & Field & Char(10));
+    ""
 )
