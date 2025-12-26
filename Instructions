@@ -1,7 +1,18 @@
 ClearCollect(
-    colMissingRight,
-    FirstN(
-        Skip(colMissing, varMaxLines),
-        varMaxLines
+    colMissing,
+    Filter(
+        Table(
+            { Field: "Customer Name", IsMissing: IsBlank(Customer_Name_DataCard2.Update) },
+            { Field: "RM Name", IsMissing: IsBlank('RM Name_DataCard1'.Update) }
+            /* keep the rest of your rows exactly like you already had them */
+        ),
+        IsMissing
     )
+);
+
+If(
+    CountRows(colMissing) > 0,
+    Set(varShowConfirmClear, false);
+    Set(varShowWarnEmpty, true),
+    SubmitForm(SharePointForm1)
 );
