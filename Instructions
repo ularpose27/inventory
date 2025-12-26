@@ -1,5 +1,1 @@
-If(
-    varShowWarnEmpty,
-    Min(720, Parent.Width * 0.75),   // wider for the missing-fields list
-    Min(560, Parent.Width * 0.60)    // smaller for the clear-confirmation
-)
+lblModalTitle.Y + lblModalTitle.Height + 12
