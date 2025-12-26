@@ -1,12 +1,12 @@
 ClearCollect(
-    colMissingLeft;
-    FirstN(colMissing; varMaxLines)
+    colMissingLeft,
+    FirstN(colMissing, varMaxLines)
 );
 
 ClearCollect(
-    colMissingRight;
+    colMissingRight,
     FirstN(
-        Skip(colMissing; varMaxLines);
+        Skip(colMissing, varMaxLines),
         varMaxLines
     )
 );
