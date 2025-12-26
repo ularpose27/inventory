@@ -1,7 +1,3 @@
-
-If(
-    varShowWarnEmpty,
-    "You are leaving the following fields empty. Please verify they are not applicable:" & Char(10) & Char(10) &
-    Concat(colMissing, "• " & Field & Char(10)),
-    "Are you sure you want to clear the form? This will remove any unsaved changes."
-)
+Set(varShowWarnEmpty, false);
+Set(varShowConfirmClear, false);
+Clear(colMissing);
