@@ -1,5 +1,12 @@
 If(
     varShowWarnEmpty,
-    "Send anyway",
-    If(varShowConfirmClear, "Yes, clear", "")
+    Set(varShowWarnEmpty, false);
+    SubmitForm(SharePointForm1),
+
+    If(
+        varShowConfirmClear,
+        ResetForm(SharePointForm1);
+        Set(varShowConfirmClear, false);
+        Clear(colMissing)
+    )
 )
