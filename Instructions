@@ -1,9 +1,12 @@
-ClearCollect(colMissingLeft; FirstN(colMissing; varMaxLines));
-ClearCollect(colMissingRight; FirstN(Skip(colMissing; varMaxLines); varMaxLines));
+ClearCollect(
+    colMissingLeft;
+    FirstN(colMissing; varMaxLines)
+);
 
-If(
-    CountRows(colMissing) > 0;
-    Set(varShowConfirmClear; false);
-    Set(varShowWarnEmpty; true);
-    SubmitForm(SharePointForm1)
+ClearCollect(
+    colMissingRight;
+    FirstN(
+        Skip(colMissing; varMaxLines);
+        varMaxLines
+    )
 );
