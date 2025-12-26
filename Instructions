@@ -1,2 +1,2 @@
-ClearCollect(colMissingLeft, FirstN(colMissing, varMaxLines));
-ClearCollect(colMissingRight, FirstN(Skip(colMissing, varMaxLines), varMaxLines));
+ClearCollect(colMissingLeft; FirstN(colMissing; varMaxLines));
+ClearCollect(colMissingRight; FirstN(Skip(colMissing; varMaxLines); varMaxLines));
