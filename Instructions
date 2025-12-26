@@ -1,12 +1,44 @@
-If(
-    varShowWarnEmpty,
-    Set(varShowWarnEmpty, false);
-    SubmitForm(SharePointForm1),
-
-    If(
-        varShowConfirmClear,
-        ResetForm(SharePointForm1);
-        Set(varShowConfirmClear, false);
-        Clear(colMissing)
+ClearCollect(
+    colMissing,
+    Filter(
+        Table(
+            { Field: "Customer Name", IsMissing: IsBlank(Customer_Name_DataCard2.Update) },
+            { Field: "RM Name", IsMissing: IsBlank(RM_Name_DataCard1.Update) },
+            { Field: "Team Lead", IsMissing: IsBlank(Team_Lead_DataCard1.Update) },
+            { Field: "Analyst Name", IsMissing: IsBlank('Analyst Name_DataCard1'.Update) },
+            { Field: "Category", IsMissing: IsBlank(Category_DataCard1.Update) },
+            { Field: "Managed Status", IsMissing: IsBlank('Managed Status_DataCard1'.Update) },
+            { Field: "Suspected Fraud", IsMissing: IsBlank('Suspected Fraud_DataCard1'.Update) },
+            { Field: "TDR", IsMissing: IsBlank(TDR_DataCard1.Update) },
+            { Field: "Strategy", IsMissing: IsBlank(Strategy_DataCard1.Update) },
+            { Field: "Month Added", IsMissing: IsBlank('Month Added_DataCard1'.Update) },
+            { Field: "Sponsor Name", IsMissing: IsBlank('Sponsor Name_DataCard1'.Update) },
+            { Field: "Forbearance Policy Designations", IsMissing: IsBlank('Forbearance Policy Designations_DataCard1'.Update) },
+            { Field: "Comments", IsMissing: IsBlank(Comments_DataCard1.Update) },
+            { Field: "Resolution Type", IsMissing: IsBlank('Resolution Type_DataCard1'.Update) },
+            { Field: "Resolution Comments", IsMissing: IsBlank('Resolution Comments_DataCard1'.Update) },
+            { Field: "Internal Balance at Resolution", IsMissing: IsBlank('Internal Balance at Resolution_DataCard1'.Update) },
+            { Field: "External Balance at Resolution", IsMissing: IsBlank('External Balance at Resolution_DataCard1'.Update) },
+            { Field: "Transfer Balance", IsMissing: IsBlank('Transfer Balance_DataCard1'.Update) },
+            { Field: "Loan System", IsMissing: IsBlank('Loan System_DataCard1'.Update) },
+            { Field: "Origination Date", IsMissing: IsBlank('Origination Date_DataCard1'.Update) },
+            { Field: "Primary Maturity", IsMissing: IsBlank('Primary Maturity_DataCard1'.Update) },
+            { Field: "FG", IsMissing: IsBlank(FG_DataCard1.Update) },
+            { Field: "Credit Policy Exceptions", IsMissing: IsBlank('Credit Policy Exceptions_DataCard1'.Update) },
+            { Field: "Other CPE", IsMissing: IsBlank('Other CPE_DataCard1'.Update) },
+            { Field: "CPE Comments", IsMissing: IsBlank('CPE Comments_DataCard1'.Update) },
+            { Field: "Amount of Limit ($MM)", IsMissing: IsBlank('Amount of Limit ($MM)_DataCard1'.Update) },
+            { Field: "Limit at transfer", IsMissing: IsBlank('Limit at transfer_DataCard1'.Update) },
+            { Field: "Loss", IsMissing: IsBlank(Loss_DataCard1.Update) },
+            { Field: "CPE Contributed to Loss", IsMissing: IsBlank('CPE Contributed to Loss_DataCard1'.Update) }
+        ),
+        IsMissing
     )
+);
+
+If(
+    CountRows(colMissing) > 0,
+    Set(varShowConfirmClear, false);
+    Set(varShowWarnEmpty, true),
+    SubmitForm(SharePointForm1)
 )
