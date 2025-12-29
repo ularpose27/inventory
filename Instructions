@@ -1,4 +1,9 @@
-Notify(
-    "Submit failed: " & Coalesce(SharePointForm1.Error, "Unknown error"),
-    NotificationType.Error
-);
+Set(varTab, "Overview");
+Set(varShowWarnEmpty, false);
+Set(varShowConfirmClear, false);
+Set(varMaxLines, 10);
+
+Clear(colMissing);
+
+ResetForm(SharePointForm1);
+NewForm(SharePointForm1);
