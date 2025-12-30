@@ -1,4 +1,9 @@
-{
-    Id: DataCardValue31.Selected.Id,
-    Value: DataCardValue31.Selected.Value
-}
+Hi ,
+I wanted to share a brief update on the SCU SharePoint project.
+Over the past weeks, I have redesigned the SCU SharePoint experience with a focus on usability and clarity for end users. The most visible change is a new, cleaner data entry form, replacing the standard SharePoint form with a customized interface that is easier to navigate, better organized, and more intuitive for the team.
+The new form clearly groups information by topic, improves how comments and narrative fields are entered, and reduces confusion around mandatory fields. From a user perspective, the process of registering and updating SCU accounts is now more structured, faster, and visually clearer than before.
+Behind the scenes, I also rebuilt the list structure to support this improved experience, ensuring the form works reliably and that data is captured consistently over time.
+At this stage, the new SharePoint list and form are complete and published, and the user-facing experience is in place.
+Next steps are to migrate historical data from the previous SharePoint into the new structure. This will require some data preparation, which I am planning to complete by the end of the week, with the goal of having the full solution ready next week.
+Before rolling it out to the full team, I recommend having 2–3 users test the new SharePoint and provide feedback. If helpful, we can also schedule a walk-through of the new SharePoint next week.
+Regards,
