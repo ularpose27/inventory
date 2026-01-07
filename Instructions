@@ -1,1 +1,1 @@
-length(body('Get_items_2')?['value'])
+first(body('Get_items_2')?['value'])?['ID']
