@@ -1,1 +1,54 @@
-first(body('Get_items_2')?['value'])?['ID']
+1. Opening (context & purpose)
+“Thank you for your time. I’d like to give you a short walkthrough of the new SCU SharePoint solution I’ve been working on.
+The goal of this project is to improve how we capture and maintain SCU-related information in SharePoint, using modern Microsoft tools that we already have available.
+The focus has been on creating a clearer data entry process, improving consistency, and supporting the use of automatically updated customer data.”
+“This is a first version of the solution, and today I would like to walk you through what has been built so far and get your feedback before moving forward.”
+2. SharePoint Homepage
+“I’ll start with the SharePoint homepage.”
+“This page is designed to be the main entry point for the team. It can be adapted over time, but for now it focuses on giving quick access to the most important actions.”
+“Below the header, I have added action buttons. At the moment, the key one is ‘Create New Entry’, which opens the form used to register a new SCU account.”
+“This page can also be used to display instructions, announcements, or short guidance for the team, for example how to complete certain fields or recent updates.”
+3. Opening the Entry Form
+“When I click on ‘Create New Entry’, a new tab opens with the entry form.”
+“This form is built using Power Apps and is directly connected to the SCU SharePoint list.”
+“The form is structured to guide the user through the information step by step, rather than showing everything at once.”
+4. Customer Selection and Customer Snapshot
+“One of the key elements is the Customer Name selection.”
+“Once a customer is selected, a Customer Snapshot appears on the right-hand side of the form.”
+“This snapshot shows relevant customer information such as balances, risk grade, and facility grades, so the user has context while entering the data.”
+“Some of this customer information is also pulled automatically into the list behind the form, while other fields are shown only for reference.”
+“Not all snapshot fields are stored. For example, some balance or exposure values are shown for context but are not necessarily saved.”
+“This is an area where I would like your feedback — to confirm whether the columns we are currently storing are the right ones, or if additional information should be captured.”
+5. User Fields and Directory Integration
+“Fields such as RM Name, Team Lead, and Analyst Name are connected to the company directory.”
+“Users can search and select names directly, which helps keep the data consistent and avoids manual typing.”
+6. Categories and Structure
+“The form is organized into four main categories.”
+“These categories control which sections are shown and help structure the information in a clearer way.”
+“I would like your feedback on whether these categories make sense from a business perspective, or if they should be adjusted or expanded.”
+7. New and Updated Fields
+“I have also added new fields, such as the Mods field, based on recent requirements.”
+“This solution is intended to evolve, so fields can be added or refined as needed.”
+8. Validation and Submission
+“At the bottom of the form, there are two main actions: Send and Cancel.”
+“When the user clicks Send, the system checks if there are any fields left empty and displays a message listing those fields.”
+“This does not block submission, but it makes the user aware of what has not been completed.”
+“Here, I would like your input on whether certain fields should be mandatory, or if this warning-based approach is sufficient.”
+9. Approval and Review Possibilities
+“Another potential enhancement is introducing an approval or review step.”
+“For example, after submission, an entry could be reviewed by a Team Lead or a peer before being finalized.”
+“This is something that can be implemented using the Microsoft tools we already have, if it adds value.”
+10. Customer Repository and Automation
+“The customer information shown in the snapshot comes from a separate SCU Customer Repository List.”
+“The plan is to keep this list updated automatically using Power Automate, based on a regularly refreshed Excel file.”
+“This means that when someone registers a new account, they are working with up-to-date customer information.”
+“I will also explore whether there is a possibility to connect directly to internal systems in the future.”
+11. Open Discussion on Improvements
+“Beyond what you see today, there are several possible enhancements.”
+“These could include notifications, reminders, approval emails, or automated outputs, depending on what would be useful for the team.”
+“At this stage, the most important thing is to confirm that the data we are capturing is the right data and that the process works well in practice.”
+12. Closing and Next Steps
+“To summarize, this solution provides a more structured way to register SCU accounts, gives users better context at the point of entry, and supports the use of updated customer data.”
+“The next step will be to import the existing information into this new SharePoint list. This will require some data preparation, and I plan to complete this by the end of the week.”
+“After that, I would suggest involving two or three people from the team to test the solution before rolling it out more widely.”
+“If helpful, we can also schedule a walkthrough session next week to review the final setup together.”
