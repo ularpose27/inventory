@@ -1,1 +1,1 @@
-CIFCustomerId eq '@{items('Apply_to_each_1')?['CIF Customer Id']}'
+length(body('Get_items_2')?['value'])
