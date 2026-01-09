@@ -1,11 +1,1 @@
-Thank you for your message and for taking the time to review the updated model — I appreciate your feedback.
-I just wanted to clarify one point to ensure we are fully aligned. The current version of the model is already designed to run the allocation fully via VBA, without requiring manual use of the Preference Ranking column.
-Specifically:
-Facilities with Legal Ranking 1 are always allocated on a pro-rata basis, regardless of any other inputs.
-Facilities with Legal Ranking 2, 3, and above are allocated using a waterfall approach, where each facility is discounted sequentially.
-The order of the waterfall is driven automatically by the option selected when generating the template (either Net Outstanding amount or Interest Rate), which addresses the two scenarios discussed previously.
-The Preference Ranking column is therefore optional and acts purely as an additional flexibility feature. It can be used if, in specific cases, there is a need to override the default ordering within the same legal rank. If left blank, the model naturally follows the automated ordering logic selected at the start.
-In other words, the allocation can run entirely without manual preference input, while still allowing for manual prioritisation if ever required as a “nice to have.”
-Please let me know if you would like me to walk through a concrete example together — happy to do so.
-Best regards,
-Armando
+
