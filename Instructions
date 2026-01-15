@@ -1,1 +1,32 @@
+# Cell 4 — Loading current period sheets (and excluding footer Total row)
+managed_sheet  = _find_sheet(xl_current, ["Managed"])
+shadows_sheet  = _find_sheet(xl_current, ["Shadows", "Shadow"])
+resolved_sheet = _find_sheet(xl_current, ["Resolved"])
 
+df_managed_raw  = pd.read_excel(CURRENT_PATH, sheet_name=managed_sheet,  header=2)
+df_shadows_raw  = pd.read_excel(CURRENT_PATH, sheet_name=shadows_sheet,  header=2)
+df_resolved_raw = pd.read_excel(CURRENT_PATH, sheet_name=resolved_sheet, header=2)
+
+def _is_total_footer_row(df: pd.DataFrame) -> pd.Series:
+    # Footer rule: Business column equals "Total" (ignore case/whitespace)
+    biz = df.get("Business", pd.Series(index=df.index, dtype="string")).astype("string")
+    return biz.str.strip().str.lower().eq("total")
+
+m_total = _is_total_footer_row(df_managed_raw)
+s_total = _is_total_footer_row(df_shadows_raw)
+r_total = _is_total_footer_row(df_resolved_raw)
+
+print("Footer 'Total' rows flagged:")
+print("Managed :", int(m_total.sum()))
+print("Shadows :", int(s_total.sum()))
+print("Resolved:", int(r_total.sum()))
+
+# Clean versions used downstream (Category tagging, objective build, exports, validations, diffs)
+df_managed  = df_managed_raw.loc[~m_total].copy()
+df_shadows  = df_shadows_raw.loc[~s_total].copy()
+df_resolved = df_resolved_raw.loc[~r_total].copy()
+
+print("Loaded sheets (after excluding Total footer row):")
+print("Managed :", df_managed.shape,  "| sheet:", managed_sheet)
+print("Shadows :", df_shadows.shape,  "| sheet:", shadows_sheet)
+print("Resolved:", df_resolved.shape, "| sheet:", resolved_sheet)
