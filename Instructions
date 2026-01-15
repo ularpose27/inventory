@@ -1,89 +1,123 @@
-# %% [markdown]
-# # SCU MSR SharePoint Extract + Smart Review Pack (Validations + MoM Diffs)
-# End goal: one Excel review pack that clearly tells you what to focus on (new/changed customers + validation issues).
+ SharePoint Extract - Review Pack Notebook
 
-# %%
-# Cell 1 — Imports
+
+Markdown Cell 1
+ MSR SharePoint Extract — Previous vs Current Comparison + Validation Review Pack
+
+This notebook:
+Loads **CURRENT** MSR workbook sheets: **Managed / Shadows / Resolved** (headers are on Excel row **3**, i.e., `header=2`)
+Adds **Category** per sheet (Managed / Shadow / Resolved)
+Aligns to the fixed **SharePoint tab** schema (**A:N = 14 columns**)
+Exports:
+`Combined_MSR_DATA_YYYY-MM-DD.xlsx` (reference)
+`Sharepoint_tab_info_YYYY-MM-DD.xlsx` (MAIN dataset for SharePoint)
+
+Enhancements:
+Loads a **PREVIOUS** period SharePoint-tab dataset (columns **A:N**, headers on Excel row **2**)
+Produces MoM/QoQ-style diffs using **LCL_CUST_ID** as primary key
+Runs **validation rules** (flag-only; no corrections)
+Writes a single Excel **Review Pack**: `SCU_MSR_ReviewPack_YYYY-MM-DD.xlsx`
+
+Cell 1 — Importing libraries
 import os
+import numpy as np
 import pandas as pd
 from datetime import datetime
+from typing import Dict, List, Tuple, Optional
 
-# %%
-# Cell 2 — Inputs (do this once, early)
-current_path = input("Enter FULL path of CURRENT MSR DoD Excel file (.xlsx/.xlsm):\n> ").strip().strip('"')
-prev_path = input("Enter FULL path of PREVIOUS MONTH SharePoint-tab file (press Enter to skip diffs):\n> ").strip().strip('"')
+
+Cell 2 — Collecting file paths (current + previous) and basic run settings
+# NOTE:
+# - Current workbook: sheets Managed / Shadows / Resolved
+# - Previous workbook: SharePoint-tab data in columns A:N, headers in row 2 (A2:N2), data begins row 3
+
+CURRENT_PATH = input("Enter FULL path of CURRENT MSR DoD Excel file (.xlsx/.xlsm):\n> ").strip().strip('"')
+PREV_PATH = input("Enter FULL path of PREVIOUS period SharePoint-tab file (press Enter to skip diffs):\n> ").strip().strip('"')
+
+OUTPUT_DIR = os.getcwd()  # change if you want outputs in a different folder
 
 def _validate_excel_path(path: str, allow_empty: bool = False) -> str:
-    if allow_empty and (path is None or path.strip() == ""):
+    if allow_empty and (path is None or str(path).strip() == ""):
         return ""
     path = (path or "").strip().strip('"')
     if not os.path.exists(path):
-        raise FileNotFoundError(f"❌ File not found: {path}")
+        raise FileNotFoundError(f"File not found: {path}")
     if not path.lower().endswith((".xlsx", ".xls", ".xlsm")):
-        raise ValueError("⚠️ File must be Excel (.xlsx, .xls, .xlsm)")
+        raise ValueError("File must be an Excel workbook (.xlsx, .xls, .xlsm)")
     return path
 
-current_path = _validate_excel_path(current_path)
-prev_path = _validate_excel_path(prev_path, allow_empty=True)
+CURRENT_PATH = _validate_excel_path(CURRENT_PATH)
+PREV_PATH = _validate_excel_path(PREV_PATH, allow_empty=True)
 
-print("✅ Current file:", current_path)
-print("✅ Previous file:", prev_path if prev_path else "(skipped)")
+print("Current file:", CURRENT_PATH)
+print("Previous file:", PREV_PATH if PREV_PATH else "(skipped)")
+print("Output dir:", OUTPUT_DIR)
 
-# %%
-# Cell 3 — Quick sheet visibility (helps if upstream changes sheet names)
-xl_current = pd.ExcelFile(current_path)
+
+Cell 3 — Confirming sheet names in the current workbook
+xl_current = pd.ExcelFile(CURRENT_PATH)
 print("Sheets in CURRENT file:")
 print(xl_current.sheet_names)
 
-# %%
-# Cell 4 — Load the three sheets (header=2 means Excel row 3 has headers)
-df_managed  = pd.read_excel(current_path, sheet_name="Managed",  header=2)
-df_shadows  = pd.read_excel(current_path, sheet_name="Shadows",  header=2)
-df_resolved = pd.read_excel(current_path, sheet_name="Resolved", header=2)
+def _find_sheet(xl: pd.ExcelFile, preferred_names: List[str]) -> str:
+    # exact match first
+    for nm in preferred_names:
+        if nm in xl.sheet_names:
+            return nm
+    # case-insensitive contains fallback
+    lowered = {s.lower(): s for s in xl.sheet_names}
+    for nm in preferred_names:
+        for s in xl.sheet_names:
+            if nm.lower() == s.lower():
+                return s
+    for nm in preferred_names:
+        for s in xl.sheet_names:
+            if nm.lower() in s.lower():
+                return s
+    raise ValueError(f"Could not locate required sheet among: {preferred_names}. Found: {xl.sheet_names}")
 
-print("✅ Loaded raw sheets.")
-print("Managed :", df_managed.shape)
-print("Shadows :", df_shadows.shape)
-print("Resolved:", df_resolved.shape)
 
-# %%
-# Cell 5 — Clean rows without Customer Name
-def _drop_blank_customer(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.dropna(subset=["Customer Name"]).copy()
-    df = df[df["Customer Name"].astype(str).str.strip() != ""].copy()
-    return df
+Cell 4 — Loading current period sheets (no row filtering / deletion)
+managed_sheet  = _find_sheet(xl_current, ["Managed"])
+shadows_sheet  = _find_sheet(xl_current, ["Shadows", "Shadow"])
+resolved_sheet = _find_sheet(xl_current, ["Resolved"])
 
-df_managed  = _drop_blank_customer(df_managed)
-df_shadows  = _drop_blank_customer(df_shadows)
-df_resolved = _drop_blank_customer(df_resolved)
+df_managed  = pd.read_excel(CURRENT_PATH, sheet_name=managed_sheet,  header=2)
+df_shadows  = pd.read_excel(CURRENT_PATH, sheet_name=shadows_sheet,  header=2)
+df_resolved = pd.read_excel(CURRENT_PATH, sheet_name=resolved_sheet, header=2)
 
-print("Shapes after cleaning Customer Name:")
-print("Managed :", df_managed.shape)
-print("Shadows :", df_shadows.shape)
-print("Resolved:", df_resolved.shape)
+print("Loaded raw sheets (no filtering):")
+print("Managed :", df_managed.shape,  "| sheet:", managed_sheet)
+print("Shadows :", df_shadows.shape,  "| sheet:", shadows_sheet)
+print("Resolved:", df_resolved.shape, "| sheet:", resolved_sheet)
 
-# %%
-# Cell 6 — Add Category (same as your original notebook)
+
+Cell 5 — Tagging each dataset with Category (Managed / Shadow / Resolved)
 df_managed["Category"]  = "Managed"
 df_shadows["Category"]  = "Shadow"
 df_resolved["Category"] = "Resolved"
 
-print("✅ Category added.")
+print("Category column added to each extract.")
 
-# %%
-# Cell 7 — (Optional) quick data feel
-print("Category counts (raw sheets):")
-print("Managed :", df_managed["Category"].value_counts().to_dict())
-print("Shadows :", df_shadows["Category"].value_counts().to_dict())
-print("Resolved:", df_resolved["Category"].value_counts().to_dict())
 
-# %%
-# Cell 8 — Define SharePoint objective schema (A:N = 14 columns)
+Cell 6 — Defining the SharePoint-tab schema (A:N) and type groups
 OBJ_COLS = [
-    "Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status",
-    "Resolution Date", "Resolution Type", "RM Name", "Business",
-    "Total Relationship Name", "LCL_CUST_ID", "CRR", "CAT AB Exposure", "DoD"
+    "Customer Name",
+    "Category",
+    "Month Added",
+    "NO OF CUST",
+    "Managed Status",
+    "Resolution Date",
+    "Resolution Type",
+    "RM Name",
+    "Business",
+    "Total Relationship Name",
+    "LCL_CUST_ID",
+    "CRR",
+    "CAT AB Exposure",
+    "DoD",
 ]
+
 DATE_COLS  = ["Month Added", "Resolution Date"]
 INT_COLS   = ["NO OF CUST", "LCL_CUST_ID"]
 FLOAT_COLS = ["CRR", "CAT AB Exposure"]
@@ -91,162 +125,136 @@ TEXT_COLS  = [c for c in OBJ_COLS if c not in DATE_COLS + INT_COLS + FLOAT_COLS]
 
 COMPARE_KEY = "LCL_CUST_ID"
 
-print("✅ Objective schema ready.")
+ALLOWED_CATEGORIES = {"Managed", "Shadow", "Resolved"}
 
-# %%
-# Cell 9 — Alignment helper (same concept as your screenshots)
-def _to_datetime_safe(s):
+
+Cell 7 — Aligning to schema (copy-based; no row deletion) + normalization helpers
+def _to_datetime_safe(s: pd.Series) -> pd.Series:
+    # Keep as datetime for analysis / comparison; invalid values become NaT
     return pd.to_datetime(s, errors="coerce")
 
-def _align_to_objective(df: pd.DataFrame) -> pd.DataFrame:
+def align_to_objective(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.copy()
+
+    # Add missing columns as NA
     for col in OBJ_COLS:
-        if col not in df.columns:
-            df[col] = pd.NA
+        if col not in out.columns:
+            out[col] = pd.NA
 
-    df = df[OBJ_COLS].copy()
+    # Reorder to objective schema
+    out = out[OBJ_COLS].copy()
 
+    # Coerce types (analysis copy)
     for c in DATE_COLS:
-        df[c] = _to_datetime_safe(df[c])
+        out[c] = _to_datetime_safe(out[c])
 
     for c in INT_COLS:
-        df[c] = pd.to_numeric(df[c], errors="coerce").astype("Int64")
+        out[c] = pd.to_numeric(out[c], errors="coerce").astype("Int64")
 
     for c in FLOAT_COLS:
-        df[c] = pd.to_numeric(df[c], errors="coerce")
+        out[c] = pd.to_numeric(out[c], errors="coerce")
 
     for c in TEXT_COLS:
-        df[c] = df[c].astype("string").str.strip()
+        out[c] = out[c].astype("string")  # keep original content; do NOT fill blanks here
 
-    return df
+    return out
 
-def _fill_text_na(df: pd.DataFrame) -> pd.DataFrame:
-    for c in TEXT_COLS:
-        df[c] = df[c].fillna("N/A")
-        df[c] = df[c].replace(r"^\s*$", "N/A", regex=True)
-    return df
+def _norm_text(s: pd.Series) -> pd.Series:
+    st = s.astype("string")
+    return st.str.strip()
 
-# %%
-# Cell 10 — Standardize and combine to df_objective
-managed_std  = _align_to_objective(df_managed)
-shadows_std  = _align_to_objective(df_shadows)
-resolved_std = _align_to_objective(df_resolved)
+def _blank_text_mask(s: pd.Series) -> pd.Series:
+    st = s.astype("string")
+    return st.isna() | (st.str.strip() == "")
 
-df_objective = pd.concat([managed_std, shadows_std, resolved_std], ignore_index=True)
-df_objective = _fill_text_na(df_objective)
+def _norm_date(s: pd.Series) -> pd.Series:
+    return pd.to_datetime(s, errors="coerce").dt.date
 
-print("✅ df_objective built:", df_objective.shape)
+def _values_equal(a: pd.Series, b: pd.Series, col: str) -> pd.Series:
+    # Returns boolean Series: True where values are considered equal (including both missing)
+    if col in DATE_COLS:
+        a2 = _norm_date(a)
+        b2 = _norm_date(b)
+        return (a2 == b2) | (pd.isna(a2) & pd.isna(b2))
 
-# %%
-# Cell 11 — Quick check (like you did originally)
-print(df_objective.info())
-print("Rows:", len(df_objective))
-print("\nCategory counts (objective):")
-display(df_objective["Category"].value_counts(dropna=False))
+    if col in INT_COLS:
+        a2 = pd.to_numeric(a, errors="coerce")
+        b2 = pd.to_numeric(b, errors="coerce")
+        return (a2 == b2) | (pd.isna(a2) & pd.isna(b2))
 
-# %%
-# Cell 12 — Choose report date (max Month Added if possible)
-max_month = pd.to_datetime(df_objective["Month Added"], errors="coerce").max()
+    if col in FLOAT_COLS:
+        a2 = pd.to_numeric(a, errors="coerce")
+        b2 = pd.to_numeric(b, errors="coerce")
+        return (a2 == b2) | (pd.isna(a2) & pd.isna(b2))
+
+    # text
+    a2 = _norm_text(a)
+    b2 = _norm_text(b)
+    return (a2 == b2) | (pd.isna(a2) & pd.isna(b2))
+
+
+Cell 8 — Building the combined SharePoint-aligned dataset (analysis copy; no filtering)
+managed_obj  = align_to_objective(df_managed)
+shadows_obj  = align_to_objective(df_shadows)
+resolved_obj = align_to_objective(df_resolved)
+
+df_current = pd.concat([managed_obj, shadows_obj, resolved_obj], ignore_index=True)
+
+print("df_current created:", df_current.shape)
+print("Missing LCL_CUST_ID rows:", int(df_current[COMPARE_KEY].isna().sum()))
+print("Category counts (including blanks):")
+print(df_current["Category"].astype("string").value_counts(dropna=False))
+
+
+Cell 9 — Selecting report date (used for time-based validation rules)
+# Preferred source: max Month Added in the current dataset; fallback to today.
+max_month = pd.to_datetime(df_current["Month Added"], errors="coerce").max()
 if pd.notna(max_month):
-    report_date = pd.Timestamp(max_month).normalize()
+    REPORT_DATE = pd.Timestamp(max_month).normalize()
 else:
     raw = input("Month Added missing. Enter report date (YYYY-MM-DD) or press Enter to use today:\n> ").strip()
-    report_date = pd.to_datetime(raw).normalize() if raw else pd.Timestamp.today().normalize()
+    REPORT_DATE = pd.to_datetime(raw).normalize() if raw else pd.Timestamp.today().normalize()
 
-print("📌 Report date used:", report_date.date())
+print("Report date used:", REPORT_DATE.date())
 
-# %%
-# Cell 13 — Write the two standard outputs (reference + SharePoint dataset)
-current_date_str = datetime.now().strftime("%Y-%m-%d")
 
-with pd.ExcelWriter(f"Combined_MSR_DATA_{current_date_str}.xlsx", engine="openpyxl") as writer:
+Cell 10 — Preparing the SharePoint export copy (fill text blanks with 'N/A' ONLY for export)
+def make_sharepoint_export(df_raw: pd.DataFrame) -> pd.DataFrame:
+    out = df_raw.copy()
+    for c in TEXT_COLS:
+        s = out[c].astype("string")
+        s = s.fillna("N/A")
+        s = s.mask(s.str.strip() == "", "N/A")
+        out[c] = s
+    return out
+
+df_sharepoint_export = make_sharepoint_export(df_current)
+print("df_sharepoint_export created:", df_sharepoint_export.shape)
+
+
+Cell 11 — Writing baseline outputs (reference workbook + SharePoint-tab export)
+run_date = datetime.now().strftime("%Y-%m-%d")
+
+combined_out = os.path.join(OUTPUT_DIR, f"Combined_MSR_DATA_{run_date}.xlsx")
+sp_out       = os.path.join(OUTPUT_DIR, f"Sharepoint_tab_info_{run_date}.xlsx")
+
+with pd.ExcelWriter(combined_out, engine="openpyxl") as writer:
     df_managed.to_excel(writer, sheet_name="Managed", index=False)
     df_shadows.to_excel(writer, sheet_name="Shadows", index=False)
     df_resolved.to_excel(writer, sheet_name="Resolved", index=False)
 
-with pd.ExcelWriter(f"Sharepoint_tab_info_{current_date_str}.xlsx", engine="openpyxl") as writer:
-    df_objective.to_excel(writer, sheet_name="Combined MSR", index=False)
+with pd.ExcelWriter(sp_out, engine="openpyxl") as writer:
+    df_sharepoint_export.to_excel(writer, sheet_name="Combined MSR", index=False)
 
-print("✅ Wrote the two standard outputs.")
+print("Wrote:")
+print(" -", combined_out)
+print(" -", sp_out)
 
-# %%
-# Cell 14 — Validations (based on your notes, designed to point the reviewer to problems)
-def run_validations(df: pd.DataFrame, report_date: pd.Timestamp) -> dict:
-    issues = {}
 
-    # Mandatory fields should never be blank/N/A
-    mandatory = ["Customer Name", "Category", "DoD", "Business", "Total Relationship Name"]
-    mand_mask = pd.Series(False, index=df.index)
-    for c in mandatory:
-        mand_mask |= df[c].isna() | (df[c].astype("string").str.strip().isin(["", "N/A"]))
-    issues["missing_mandatory"] = df.loc[mand_mask, OBJ_COLS].copy()
-
-    # Category must be one of these
-    allowed_cat = {"Managed", "Shadow", "Resolved"}
-    bad_cat = ~df["Category"].astype("string").isin(list(allowed_cat))
-    issues["invalid_category"] = df.loc[bad_cat, OBJ_COLS].copy()
-
-    # NO OF CUST must be >= 1 and not NA
-    bad_nocust = df["NO OF CUST"].isna() | (df["NO OF CUST"] < 1)
-    issues["invalid_no_of_cust"] = df.loc[bad_nocust, OBJ_COLS].copy()
-
-    # Managed Status required for Managed
-    managed = df["Category"].astype("string") == "Managed"
-    ms_bad = managed & df["Managed Status"].astype("string").isin(["", "N/A"])
-    issues["managed_status_missing"] = df.loc[ms_bad, OBJ_COLS].copy()
-
-    # Resolution Date rules
-    resolved = df["Category"].astype("string") == "Resolved"
-    res_date = df["Resolution Date"]
-    issues["resolved_missing_resolution_date"] = df.loc[resolved & res_date.isna(), OBJ_COLS].copy()
-    issues["nonresolved_has_resolution_date"] = df.loc[(~resolved) & res_date.notna(), OBJ_COLS].copy()
-
-    # Resolution Date sanity (future or very old)
-    future_res = res_date.notna() & (res_date > report_date + pd.Timedelta(days=1))
-    old_res = res_date.notna() & (res_date < report_date - pd.Timedelta(days=730))
-    issues["resolution_date_out_of_band"] = df.loc[future_res | old_res, OBJ_COLS].copy()
-
-    # RM Name can be N/A only for Resolved older than 12 months
-    rm_missing = df["RM Name"].astype("string").isin(["", "N/A"]) | df["RM Name"].isna()
-    cutoff = report_date - pd.DateOffset(months=12)
-    resolved_recent = resolved & res_date.notna() & (res_date >= cutoff)
-    suspect_rm = rm_missing & ((~resolved) | resolved_recent)
-    issues["rm_name_suspect_missing"] = df.loc[suspect_rm, OBJ_COLS].copy()
-
-    # Missing key
-    issues["missing_key_lcl_cust_id"] = df.loc[df[COMPARE_KEY].isna(), OBJ_COLS].copy()
-
-    # Duplicate key
-    dup_key = df[df[COMPARE_KEY].notna()].duplicated(subset=[COMPARE_KEY], keep=False)
-    issues["duplicates_by_key"] = df.loc[dup_key, OBJ_COLS].copy()
-
-    # Negative numeric sanity
-    neg = (df["CRR"].notna() & (df["CRR"] < 0)) | (df["CAT AB Exposure"].notna() & (df["CAT AB Exposure"] < 0))
-    issues["negative_numeric_values"] = df.loc[neg, OBJ_COLS].copy()
-
-    # Quick frequency snapshot (to spot weird entries quickly)
-    freq_rows = []
-    for c in ["Category", "Managed Status", "Resolution Type", "DoD", "Business"]:
-        vc = df[c].astype("string").value_counts(dropna=False).head(15)
-        tmp = vc.reset_index()
-        tmp.columns = ["Value", "Count"]
-        tmp.insert(0, "Column", c)
-        freq_rows.append(tmp)
-    issues["value_frequencies_top15"] = pd.concat(freq_rows, ignore_index=True) if freq_rows else pd.DataFrame()
-
-    return issues
-
-issues = run_validations(df_objective, report_date=report_date)
-
-validation_summary = pd.DataFrame(
-    [{"Check": k, "Issue Rows": len(v)} for k, v in issues.items()]
-).sort_values(["Issue Rows", "Check"], ascending=[False, True])
-
-print("✅ Validation summary:")
-display(validation_summary)
-
-# %%
-# Cell 15 — Load previous SharePoint tab (A:N, headers in row 2 => header=1)
-def _try_find_sheet(xl: pd.ExcelFile, preferred: list) -> str:
+Cell 12 — Loading previous SharePoint-tab dataset (A:N, headers in row 2) + duplicate detection
+def _try_find_prev_sheet(xl: pd.ExcelFile) -> str:
+    preferred = ["Combined MSR", "Sharepoint_tab_info", "SharePoint", "SharePoint Tab", "Sharepoint", "SP"]
+    # exact / contains match
     for name in preferred:
         if name in xl.sheet_names:
             return name
@@ -254,249 +262,492 @@ def _try_find_sheet(xl: pd.ExcelFile, preferred: list) -> str:
         for s in xl.sheet_names:
             if name.lower() in s.lower():
                 return s
+    # fallback: first sheet
     return xl.sheet_names[0]
 
-prev_df = None
-if prev_path:
-    xl_prev = pd.ExcelFile(prev_path)
-    prev_sheet = _try_find_sheet(
-        xl_prev,
-        ["Sharepoint_tab_info", "SharePoint", "SharePoint Tab", "Combined MSR", "Combined_MSR", "Sharepoint", "SP"]
-    )
-    print("Using PREVIOUS sheet:", prev_sheet)
+df_prev = None
+prev_sheet = None
 
-    prev_df = pd.read_excel(prev_path, sheet_name=prev_sheet, usecols="A:N", header=1)
-    prev_df = _align_to_objective(prev_df)
-    prev_df = _fill_text_na(prev_df)
+if PREV_PATH:
+    xl_prev = pd.ExcelFile(PREV_PATH)
+    prev_sheet = _try_find_prev_sheet(xl_prev)
+    print("Previous sheet selected:", prev_sheet)
 
-    print("✅ Previous dataset loaded:", prev_df.shape)
+    # Columns A:N, headers in row 2 => header=1 (0-indexed)
+    prev_raw = pd.read_excel(PREV_PATH, sheet_name=prev_sheet, usecols="A:N", header=1)
+    df_prev = align_to_objective(prev_raw)
+
+    print("df_prev loaded:", df_prev.shape)
 else:
-    print("ℹ️ Previous file skipped (no MoM diffs).")
+    print("Previous dataset skipped (no PREV_PATH).")
 
-# %%
-# Cell 16 — MoM diffs + category transitions (new/removed/changed + per-field detail)
-diffs = None
-if prev_df is not None:
-    prev = prev_df.copy()
-    curr = df_objective.copy()
+def _dup_keys(df: pd.DataFrame) -> pd.DataFrame:
+    k = df[COMPARE_KEY]
+    mask_notna = k.notna()
+    dup = df.loc[mask_notna].duplicated(subset=[COMPARE_KEY], keep=False)
+    out = df.loc[mask_notna].loc[dup, OBJ_COLS].copy()
+    if len(out):
+        out["_dup_count"] = out.groupby(COMPARE_KEY)[COMPARE_KEY].transform("size")
+    return out
 
-    prev[COMPARE_KEY] = pd.to_numeric(prev[COMPARE_KEY], errors="coerce").astype("Int64")
-    curr[COMPARE_KEY] = pd.to_numeric(curr[COMPARE_KEY], errors="coerce").astype("Int64")
+dups_current = _dup_keys(df_current)
+dups_prev = _dup_keys(df_prev) if df_prev is not None else pd.DataFrame(columns=OBJ_COLS + ["_dup_count"])
 
-    merged = prev.merge(curr, on=COMPARE_KEY, how="outer", suffixes=("_prev", "_curr"), indicator=True)
+print("Duplicate keys (current):", len(dups_current))
+print("Duplicate keys (previous):", len(dups_prev))
+
+
+Cell 13 — Comparing previous vs current by LCL_CUST_ID (new / removed / changed + field-level diffs)
+# Notes:
+# - Keys that are missing are not comparable; they are flagged separately.
+# - If duplicates exist, diffs use the first occurrence per key, and duplicates are flagged for review.
+
+def _dedupe_first(df: pd.DataFrame) -> pd.DataFrame:
+    # For diffing only: select first row per key (does not modify the original dataset)
+    out = df.copy()
+    out = out.sort_index()
+    out = out.dropna(subset=[COMPARE_KEY]).copy()  # diffing requires a key; missing keys are handled as validation
+    return out.drop_duplicates(subset=[COMPARE_KEY], keep="first").copy()
+
+diffs = {
+    "new_customers": pd.DataFrame(columns=OBJ_COLS),
+    "removed_customers": pd.DataFrame(columns=OBJ_COLS),
+    "changed_summary": pd.DataFrame(columns=[COMPARE_KEY, "Changed Fields"]),
+    "changed_detail": pd.DataFrame(columns=[COMPARE_KEY, "Field", "Previous Value", "Current Value"]),
+    "category_transition_matrix": pd.DataFrame(),
+    "category_moved_rows": pd.DataFrame(columns=[COMPARE_KEY, "Category_prev", "Category_curr"]),
+    "comparison_warnings": pd.DataFrame(columns=["Warning", "Count"]),
+}
+
+if df_prev is not None:
+    prev_d = _dedupe_first(df_prev)
+    curr_d = _dedupe_first(df_current)
+
+    # Build outer join by key
+    merged = prev_d.merge(
+        curr_d,
+        on=COMPARE_KEY,
+        how="outer",
+        suffixes=("_prev", "_curr"),
+        indicator=True
+    )
 
     compare_cols = [c for c in OBJ_COLS if c != COMPARE_KEY]
 
-    new_records = merged[merged["_merge"] == "right_only"][ [COMPARE_KEY] + [f"{c}_curr" for c in compare_cols] ].copy()
-    new_records.columns = [COMPARE_KEY] + compare_cols
+    # New / removed
+    new_df = merged.loc[merged["_merge"] == "right_only", [COMPARE_KEY] + [f"{c}_curr" for c in compare_cols]].copy()
+    new_df.columns = [COMPARE_KEY] + compare_cols
+    diffs["new_customers"] = new_df[OBJ_COLS].copy()
 
-    removed_records = merged[merged["_merge"] == "left_only"][ [COMPARE_KEY] + [f"{c}_prev" for c in compare_cols] ].copy()
-    removed_records.columns = [COMPARE_KEY] + compare_cols
+    rem_df = merged.loc[merged["_merge"] == "left_only", [COMPARE_KEY] + [f"{c}_prev" for c in compare_cols]].copy()
+    rem_df.columns = [COMPARE_KEY] + compare_cols
+    diffs["removed_customers"] = rem_df[OBJ_COLS].copy()
 
-    common = merged[merged["_merge"] == "both"].copy()
+    # Changed (common keys)
+    common = merged.loc[merged["_merge"] == "both"].copy()
 
     change_rows = []
     for col in compare_cols:
-        a = common[f"{col}_prev"]
-        b = common[f"{col}_curr"]
-
-        if col in DATE_COLS:
-            a_cmp = pd.to_datetime(a, errors="coerce").dt.date
-            b_cmp = pd.to_datetime(b, errors="coerce").dt.date
-        else:
-            a_cmp = a.astype("string")
-            b_cmp = b.astype("string")
-
-        mask = (a_cmp != b_cmp) & ~(a_cmp.isna() & b_cmp.isna())
+        eq = _values_equal(common[f"{col}_prev"], common[f"{col}_curr"], col=col)
+        mask = ~eq
         if mask.any():
             tmp = common.loc[mask, [COMPARE_KEY, f"{col}_prev", f"{col}_curr"]].copy()
             tmp["Field"] = col
-            tmp.rename(columns={f"{col}_prev": "Previous", f"{col}_curr": "Current"}, inplace=True)
-            change_rows.append(tmp[[COMPARE_KEY, "Field", "Previous", "Current"]])
+            tmp.rename(columns={
+                f"{col}_prev": "Previous Value",
+                f"{col}_curr": "Current Value"
+            }, inplace=True)
+            change_rows.append(tmp[[COMPARE_KEY, "Field", "Previous Value", "Current Value"]])
 
-    changed_detail = pd.concat(change_rows, ignore_index=True) if change_rows else pd.DataFrame(
-        columns=[COMPARE_KEY, "Field", "Previous", "Current"]
-    )
+    changed_detail = pd.concat(change_rows, ignore_index=True) if change_rows else diffs["changed_detail"].copy()
 
-    changed_summary = (
-        changed_detail.groupby(COMPARE_KEY)["Field"]
-        .apply(lambda s: ", ".join(sorted(set(s))))
-        .reset_index()
-        .rename(columns={"Field": "Changed Fields"})
-        if len(changed_detail) else pd.DataFrame(columns=[COMPARE_KEY, "Changed Fields"])
-    )
+    # Summary per key
+    if len(changed_detail):
+        changed_summary = (
+            changed_detail.groupby(COMPARE_KEY)["Field"]
+            .apply(lambda s: ", ".join(sorted(set(s))))
+            .reset_index()
+            .rename(columns={"Field": "Changed Fields"})
+        )
+    else:
+        changed_summary = diffs["changed_summary"].copy()
+
+    diffs["changed_detail"] = changed_detail.sort_values([COMPARE_KEY, "Field"]).reset_index(drop=True)
+    diffs["changed_summary"] = changed_summary.sort_values([COMPARE_KEY]).reset_index(drop=True)
 
     # Category transitions
     trans = common[[COMPARE_KEY, "Category_prev", "Category_curr"]].copy()
-    trans["Category_prev"] = trans["Category_prev"].astype("string")
-    trans["Category_curr"] = trans["Category_curr"].astype("string")
+    trans["Category_prev"] = trans["Category_prev"].astype("string").fillna("(Blank)").str.strip()
+    trans["Category_curr"] = trans["Category_curr"].astype("string").fillna("(Blank)").str.strip()
 
-    category_transition_pivot = (
+    mat = (
         trans.pivot_table(index="Category_prev", columns="Category_curr", values=COMPARE_KEY, aggfunc="count", fill_value=0)
         .reset_index()
     )
-    category_moved_records = trans[trans["Category_prev"] != trans["Category_curr"]].copy()
+    diffs["category_transition_matrix"] = mat
 
-    diffs = {
-        "new_records": new_records,
-        "removed_records": removed_records,
-        "changed_summary": changed_summary,
-        "changed_detail": changed_detail,
-        "category_transition_pivot": category_transition_pivot,
-        "category_moved_records": category_moved_records,
-    }
+    moved = trans.loc[trans["Category_prev"] != trans["Category_curr"]].copy()
+    diffs["category_moved_rows"] = moved.sort_values([COMPARE_KEY]).reset_index(drop=True)
 
-    print("✅ MoM diffs ready:")
-    print("New:", len(new_records), "| Removed:", len(removed_records), "| Changed keys:", len(changed_summary))
-    print("Category moves:", len(category_moved_records))
+    # Comparison warnings
+    warnings = []
+    warnings.append({"Warning": "Duplicate keys in current (rows)", "Count": int(len(dups_current))})
+    warnings.append({"Warning": "Duplicate keys in previous (rows)", "Count": int(len(dups_prev))})
+    warnings.append({"Warning": "Missing keys in current (rows)", "Count": int(df_current[COMPARE_KEY].isna().sum())})
+    warnings.append({"Warning": "Missing keys in previous (rows)", "Count": int(df_prev[COMPARE_KEY].isna().sum())})
+    diffs["comparison_warnings"] = pd.DataFrame(warnings)
 
-# %%
-# Cell 17 — Build the SMART “Customers To Focus” list (this is the key upgrade)
-# Idea:
-# - One row per customer (key = LCL_CUST_ID)
-# - Shows: New? Removed? Category moved? Which fields changed? Which validation checks hit?
-# - Sort by "Priority Score" so you know where to look first
+    print("Diff summary:")
+    print(" - New customers:", len(diffs["new_customers"]))
+    print(" - Removed customers:", len(diffs["removed_customers"]))
+    print(" - Changed customers:", len(diffs["changed_summary"]))
+    print(" - Category moves:", len(diffs["category_moved_rows"]))
+else:
+    print("Diffs skipped (no previous dataset).")
 
-def _issues_by_key(issues: dict) -> pd.DataFrame:
+
+Cell 14 — Running validation rules (flag-only; no corrections)
+# Validation rules (flag only):
+# 1) NO OF CUST must be numeric and >= 1 and not missing
+# 2) Category must exist and be one of: Managed, Shadow, Resolved
+# 3) If Category == Managed -> Managed Status must not be blank/N/A
+# 4) Resolution Date: if Resolved -> must exist; else -> should be blank
+# 5) Resolution Type missing/NA -> flagged (for churn reporting bucket)
+# 6) Required fields not blank: Customer Name, Category, DoD, Business, Total Relationship Name
+# 7) RM Name may be NA only if Resolved and Resolution Date older than 12 months (relative to REPORT_DATE)
+# 8) LCL_CUST_ID missing flagged
+# 9) Duplicate LCL_CUST_ID flagged
+# 10) Distinct-values scan produced separately
+
+def run_validations(df: pd.DataFrame, report_date: pd.Timestamp) -> Dict[str, pd.DataFrame]:
+    issues: Dict[str, pd.DataFrame] = {}
+
+    # R01 Mandatory fields not blank
+    mandatory = ["Customer Name", "Category", "DoD", "Business", "Total Relationship Name"]
+    mask = pd.Series(False, index=df.index)
+    for c in mandatory:
+        mask |= _blank_text_mask(df[c])
+    issues["R01_Missing_Required_Fields"] = df.loc[mask, OBJ_COLS].copy()
+
+    # R02 Category validity
+    cat = df["Category"].astype("string")
+    issues["R02_Invalid_Category"] = df.loc[~cat.isin(list(ALLOWED_CATEGORIES)), OBJ_COLS].copy()
+
+    # R03 NO OF CUST numeric >= 1 and not missing
+    noc = pd.to_numeric(df["NO OF CUST"], errors="coerce")
+    issues["R03_Invalid_NO_OF_CUST"] = df.loc[noc.isna() | (noc < 1), OBJ_COLS].copy()
+
+    # R04 Managed status required for Managed category
+    managed = (df["Category"].astype("string") == "Managed")
+    ms_blank = _blank_text_mask(df["Managed Status"]) | (df["Managed Status"].astype("string").str.strip().str.upper() == "N/A")
+    issues["R04_Managed_Status_Missing"] = df.loc[managed & ms_blank, OBJ_COLS].copy()
+
+    # R05 Resolution Date logic
+    resolved = (df["Category"].astype("string") == "Resolved")
+    res_date = df["Resolution Date"]
+    issues["R05A_Resolved_Missing_Resolution_Date"] = df.loc[resolved & res_date.isna(), OBJ_COLS].copy()
+    issues["R05B_NonResolved_Has_Resolution_Date"] = df.loc[(~resolved) & res_date.notna(), OBJ_COLS].copy()
+
+    # R06 Resolution Type missing (churn bucket)
+    rt_blank = _blank_text_mask(df["Resolution Type"]) | (df["Resolution Type"].astype("string").str.strip().str.upper() == "N/A")
+    issues["R06_Resolution_Type_Missing_For_Churn"] = df.loc[rt_blank, OBJ_COLS].copy()
+
+    # R07 RM Name logic (allowed missing only if resolved AND resolution date older than 12 months)
+    rm_blank = _blank_text_mask(df["RM Name"]) | (df["RM Name"].astype("string").str.strip().str.upper() == "N/A")
+    cutoff = report_date - pd.DateOffset(months=12)
+    # Missing RM is allowed only when resolved & res_date < cutoff
+    allowed_missing_rm = resolved & res_date.notna() & (res_date < cutoff)
+    issues["R07_RM_Name_Suspect_Missing"] = df.loc[rm_blank & ~allowed_missing_rm, OBJ_COLS].copy()
+
+    # R08 Missing key
+    issues["R08_Missing_LCL_CUST_ID"] = df.loc[df[COMPARE_KEY].isna(), OBJ_COLS].copy()
+
+    # R09 Duplicate key
+    k_notna = df[COMPARE_KEY].notna()
+    dup = df.loc[k_notna].duplicated(subset=[COMPARE_KEY], keep=False)
+    issues["R09_Duplicate_LCL_CUST_ID"] = df.loc[k_notna].loc[dup, OBJ_COLS].copy()
+
+    return issues
+
+issues = run_validations(df_current, report_date=REPORT_DATE)
+
+validation_summary = (
+    pd.DataFrame([{"Rule": k, "Issue Rows": int(len(v))} for k, v in issues.items()])
+    .sort_values(["Issue Rows", "Rule"], ascending=[False, True])
+    .reset_index(drop=True)
+)
+
+print("Validation summary (rows flagged):")
+print(validation_summary)
+
+
+Cell 15 — Distinct-values scans (key categorical fields)
+def distinct_values_scan(df: pd.DataFrame, fields: List[str], top_n: int = 200) -> pd.DataFrame:
     rows = []
-    for check_name, df_issue in issues.items():
+    for f in fields:
+        s = df[f].astype("string").fillna("(Blank)").str.strip()
+        vc = s.value_counts(dropna=False).head(top_n)
+        for val, cnt in vc.items():
+            rows.append({"Field": f, "Value": val, "Count": int(cnt)})
+    return pd.DataFrame(rows)
+
+distinct_scan = distinct_values_scan(
+    df_current,
+    fields=["Category", "Managed Status", "Resolution Type", "DoD", "Business"],
+    top_n=200
+)
+
+print("Distinct-values scan rows:", len(distinct_scan))
+
+
+Cell 16 — Building the customer-focused review list (one row per LCL_CUST_ID; union of keys)
+def _aggregate_validation_flags_by_key(issues_dict: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+    rows = []
+    for rule_name, df_issue in issues_dict.items():
         if df_issue is None or len(df_issue) == 0:
             continue
-        if COMPARE_KEY in df_issue.columns:
-            tmp = df_issue[[COMPARE_KEY]].copy()
-            tmp["Check"] = check_name
-            rows.append(tmp)
+        tmp = df_issue[[COMPARE_KEY]].copy()
+        tmp["Rule"] = rule_name
+        rows.append(tmp)
+
     if not rows:
-        return pd.DataFrame(columns=[COMPARE_KEY, "Check"])
+        return pd.DataFrame(columns=[COMPARE_KEY, "Validation Flags"])
 
     out = pd.concat(rows, ignore_index=True)
     out = out.dropna(subset=[COMPARE_KEY]).copy()
     out[COMPARE_KEY] = pd.to_numeric(out[COMPARE_KEY], errors="coerce").astype("Int64")
-    return out
 
-issue_map = _issues_by_key(issues)
+    return (
+        out.groupby(COMPARE_KEY)["Rule"]
+        .apply(lambda s: ", ".join(sorted(set(s))))
+        .reset_index()
+        .rename(columns={"Rule": "Validation Flags"})
+    )
 
-# Aggregate checks per key
-issue_agg = (
-    issue_map.groupby(COMPARE_KEY)["Check"]
-    .apply(lambda s: ", ".join(sorted(set(s))))
-    .reset_index()
-    .rename(columns={"Check": "Validation Flags"})
-) if len(issue_map) else pd.DataFrame(columns=[COMPARE_KEY, "Validation Flags"])
+flags_by_key = _aggregate_validation_flags_by_key(issues)
 
-# Build focus base from current dataset (unique keys)
-focus_base = df_objective[[COMPARE_KEY, "Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status"]].copy()
-focus_base = focus_base.dropna(subset=[COMPARE_KEY]).copy()
-focus_base = focus_base.drop_duplicates(subset=[COMPARE_KEY], keep="first").copy()
+# Base rows for current and previous (deduped first for a single-row representation)
+curr_first = _dedupe_first(df_current) if len(df_current) else df_current.copy()
+prev_first = _dedupe_first(df_prev) if df_prev is not None and len(df_prev) else (df_prev.copy() if df_prev is not None else None)
 
-focus = focus_base.merge(issue_agg, on=COMPARE_KEY, how="left")
+# Universe of keys (exclude NA; those are handled via validation tabs)
+keys_curr = set(curr_first[COMPARE_KEY].dropna().astype("Int64").tolist())
+keys_prev = set(prev_first[COMPARE_KEY].dropna().astype("Int64").tolist()) if prev_first is not None else set()
+all_keys = sorted(keys_curr.union(keys_prev))
+
+focus = pd.DataFrame({COMPARE_KEY: pd.Series(all_keys, dtype="Int64")})
+
+# Bring forward representative attributes (current preferred; fallback to previous for removed)
+focus = focus.merge(
+    curr_first[[COMPARE_KEY, "Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status", "DoD", "Business"]].copy(),
+    on=COMPARE_KEY, how="left"
+)
+
+if prev_first is not None:
+    focus = focus.merge(
+        prev_first[[COMPARE_KEY, "Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status", "DoD", "Business"]].copy(),
+        on=COMPARE_KEY, how="left", suffixes=("", "_prev_fallback")
+    )
+    # Fill missing current attributes with previous (for removed customers)
+    for col in ["Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status", "DoD", "Business"]:
+        focus[col] = focus[col].combine_first(focus[f"{col}_prev_fallback"])
+        focus.drop(columns=[f"{col}_prev_fallback"], inplace=True)
+
+# Flags + diffs
+focus = focus.merge(flags_by_key, on=COMPARE_KEY, how="left")
 focus["Validation Flags"] = focus["Validation Flags"].fillna("")
 
-# If diffs exist, merge in change intelligence
-if diffs is not None:
+if df_prev is not None:
     focus = focus.merge(diffs["changed_summary"], on=COMPARE_KEY, how="left")
     focus["Changed Fields"] = focus["Changed Fields"].fillna("")
 
-    moved_keys = set(diffs["category_moved_records"][COMPARE_KEY].dropna().astype("Int64").tolist())
-    focus["Category Moved?"] = focus[COMPARE_KEY].apply(lambda k: "YES" if k in moved_keys else "NO")
+    moved_keys = set(diffs["category_moved_rows"][COMPARE_KEY].dropna().astype("Int64").tolist())
+    focus["Category Moved (Y/N)"] = focus[COMPARE_KEY].apply(lambda k: "Y" if k in moved_keys else "N")
 
-    new_keys = set(diffs["new_records"][COMPARE_KEY].dropna().astype("Int64").tolist())
-    focus["New Customer?"] = focus[COMPARE_KEY].apply(lambda k: "YES" if k in new_keys else "NO")
+    new_keys = set(diffs["new_customers"][COMPARE_KEY].dropna().astype("Int64").tolist())
+    removed_keys = set(diffs["removed_customers"][COMPARE_KEY].dropna().astype("Int64").tolist())
+    focus["New (Y/N)"] = focus[COMPARE_KEY].apply(lambda k: "Y" if k in new_keys else "N")
+    focus["Removed (Y/N)"] = focus[COMPARE_KEY].apply(lambda k: "Y" if k in removed_keys else "N")
 else:
     focus["Changed Fields"] = ""
-    focus["Category Moved?"] = "N/A"
-    focus["New Customer?"] = "N/A"
+    focus["Category Moved (Y/N)"] = "N/A"
+    focus["New (Y/N)"] = "N/A"
+    focus["Removed (Y/N)"] = "N/A"
 
-# Priority scoring: validations > category move > other changes > new
-def _score_row(r):
+# Priority score: validation > category move > other changes > new > removed
+def _priority_score(r) -> int:
     score = 0
-    if r.get("Validation Flags", ""):
+    if str(r.get("Validation Flags", "")).strip():
         score += 100
-    if r.get("Category Moved?", "") == "YES":
+    if str(r.get("Category Moved (Y/N)", "")).strip() == "Y":
         score += 50
-    if r.get("Changed Fields", ""):
+    if str(r.get("Changed Fields", "")).strip():
         score += 20
-    if r.get("New Customer?", "") == "YES":
+    if str(r.get("New (Y/N)", "")).strip() == "Y":
         score += 10
+    if str(r.get("Removed (Y/N)", "")).strip() == "Y":
+        score += 30
     return score
 
-focus["Priority Score"] = focus.apply(_score_row, axis=1)
+focus["Priority Score"] = focus.apply(_priority_score, axis=1)
 
-# Sort: highest priority first, then by name
-focus = focus.sort_values(["Priority Score", "Customer Name"], ascending=[False, True]).reset_index(drop=True)
+# Ordering and final column selection per requirements
+focus = focus.sort_values(["Priority Score", "Customer Name"], ascending=[False, True], na_position="last").reset_index(drop=True)
 
-print("✅ Customers_To_Focus built. Top 15:")
-display(focus.head(15))
+FOCUS_COLS = [
+    "LCL_CUST_ID",
+    "Customer Name",
+    "Category",
+    "Month Added",
+    "NO OF CUST",
+    "Managed Status",
+    "DoD",
+    "Business",
+    "Validation Flags",
+    "Changed Fields",
+    "Category Moved (Y/N)",
+    "New (Y/N)",
+    "Removed (Y/N)",
+    "Priority Score",
+]
 
-# %%
-# Cell 18 — Build “At a Glance” summary table (counts that matter)
-at_a_glance_rows = []
+focus = focus[FOCUS_COLS].copy()
 
-at_a_glance_rows.append({"Metric": "Current rows (df_objective)", "Value": len(df_objective)})
+print("Focus list rows:", len(focus))
+print(focus.head(10))
 
-# Validation totals
-top_val = validation_summary.copy()
-for _, row in top_val.iterrows():
-    if row["Issue Rows"] > 0:
-        at_a_glance_rows.append({"Metric": f"Validation issue rows: {row['Check']}", "Value": int(row["Issue Rows"])})
 
-if diffs is not None:
-    at_a_glance_rows.append({"Metric": "New customers (by key)", "Value": len(diffs["new_records"])})
-    at_a_glance_rows.append({"Metric": "Removed customers (by key)", "Value": len(diffs["removed_records"])})
-    at_a_glance_rows.append({"Metric": "Customers with any field change (by key)", "Value": len(diffs["changed_summary"])})
-    at_a_glance_rows.append({"Metric": "Category moves (prev != curr)", "Value": len(diffs["category_moved_records"])})
+Cell 17 — Building 'At a Glance' metrics (front page of review pack)
+at_a_glance_rows = [
+    {"Metric": "Current rows", "Value": int(len(df_current))},
+    {"Metric": "Previous rows", "Value": int(len(df_prev)) if df_prev is not None else 0},
+    {"Metric": "Current missing LCL_CUST_ID rows", "Value": int(df_current[COMPARE_KEY].isna().sum())},
+    {"Metric": "Current duplicate LCL_CUST_ID rows", "Value": int(len(dups_current))},
+    {"Metric": "Previous duplicate LCL_CUST_ID rows", "Value": int(len(dups_prev)) if df_prev is not None else 0},
+]
 
-    # Count customers that appear in focus list as high attention
-    at_a_glance_rows.append({"Metric": "Customers flagged by validations (unique keys)", "Value": int((focus["Validation Flags"] != "").sum())})
-    at_a_glance_rows.append({"Metric": "Customers with Priority Score >= 100", "Value": int((focus["Priority Score"] >= 100).sum())})
+# Validation hits by rule (row counts)
+for _, r in validation_summary.iterrows():
+    if int(r["Issue Rows"]) > 0:
+        at_a_glance_rows.append({"Metric": f"Validation rows: {r['Rule']}", "Value": int(r["Issue Rows"])})
+
+# Diff counts
+if df_prev is not None:
+    at_a_glance_rows += [
+        {"Metric": "New customers (by key)", "Value": int(len(diffs["new_customers"]))},
+        {"Metric": "Removed customers (by key)", "Value": int(len(diffs["removed_customers"]))},
+        {"Metric": "Changed customers (by key)", "Value": int(len(diffs["changed_summary"]))},
+        {"Metric": "Category moves (prev != curr)", "Value": int(len(diffs["category_moved_rows"]))},
+    ]
 
 at_a_glance = pd.DataFrame(at_a_glance_rows)
+at_a_glance
 
-print("✅ At-a-glance summary:")
-display(at_a_glance)
 
-# %%
-# Cell 19 — Write the SMART review pack Excel file (the main thing you’ll use)
-review_pack_name = f"SCU_MSR_ReviewPack_{current_date_str}.xlsx"
+Cell 18 — Finalizing review-pack tables (ensure required tabs exist even when diffs are skipped)
+# 02_New_Customers
+tab_new = diffs["new_customers"].copy() if df_prev is not None else pd.DataFrame(columns=OBJ_COLS)
 
-with pd.ExcelWriter(review_pack_name, engine="openpyxl") as writer:
+# 03_Removed_Customers
+tab_removed = diffs["removed_customers"].copy() if df_prev is not None else pd.DataFrame(columns=OBJ_COLS)
+
+# 04_Changed_Summary
+tab_changed_summary = diffs["changed_summary"].copy() if df_prev is not None else pd.DataFrame(columns=[COMPARE_KEY, "Changed Fields"])
+
+# 05_Changed_Detail
+tab_changed_detail = diffs["changed_detail"].copy() if df_prev is not None else pd.DataFrame(columns=[COMPARE_KEY, "Field", "Previous Value", "Current Value"])
+
+# 06_Category_Transitions
+tab_cat_trans = diffs["category_transition_matrix"].copy() if df_prev is not None else pd.DataFrame()
+
+# 07_Category_Moved_Rows — expand with customer names (prev/current) when available
+if df_prev is not None and len(diffs["category_moved_rows"]):
+    prev_first = _dedupe_first(df_prev)
+    curr_first = _dedupe_first(df_current)
+    cat_moved = diffs["category_moved_rows"].merge(
+        prev_first[[COMPARE_KEY, "Customer Name"]].rename(columns={"Customer Name": "Customer Name (Prev)"}),
+        on=COMPARE_KEY, how="left"
+    ).merge(
+        curr_first[[COMPARE_KEY, "Customer Name"]].rename(columns={"Customer Name": "Customer Name (Curr)"}),
+        on=COMPARE_KEY, how="left"
+    )
+    tab_cat_moved = cat_moved[[COMPARE_KEY, "Customer Name (Prev)", "Customer Name (Curr)", "Category_prev", "Category_curr"]].copy()
+else:
+    tab_cat_moved = pd.DataFrame(columns=[COMPARE_KEY, "Customer Name (Prev)", "Customer Name (Curr)", "Category_prev", "Category_curr"])
+
+# 08_Validation_Summary
+tab_val_summary = validation_summary.copy()
+
+# Validation drill-down tabs
+validation_tabs = issues.copy()
+
+# Distinct scan
+tab_distinct = distinct_scan.copy()
+
+# Comparison warnings
+tab_compare_warn = diffs["comparison_warnings"].copy() if df_prev is not None else pd.DataFrame(columns=["Warning", "Count"])
+
+
+Cell 19 — Writing the Excel review pack (single workbook)
+review_pack_path = os.path.join(OUTPUT_DIR, f"SCU_MSR_ReviewPack_{run_date}.xlsx")
+
+def _safe_sheet_name(name: str) -> str:
+    # Excel sheet max length: 31
+    # Remove invalid chars: : \ / ? * [ ]
+    name = re.sub(r"[:\\/\?\*\[\]]", "_", name)
+    return name[:31]
+
+with pd.ExcelWriter(review_pack_path, engine="openpyxl") as writer:
     at_a_glance.to_excel(writer, sheet_name="00_At_A_Glance", index=False)
     focus.to_excel(writer, sheet_name="01_Customers_To_Focus", index=False)
 
-    # Helpful tabs if previous file exists
-    if diffs is not None:
-        diffs["new_records"].to_excel(writer, sheet_name="02_New_Customers", index=False)
-        diffs["removed_records"].to_excel(writer, sheet_name="03_Removed_Customers", index=False)
-        diffs["changed_summary"].to_excel(writer, sheet_name="04_Changed_Customers_Summary", index=False)
-        diffs["changed_detail"].to_excel(writer, sheet_name="05_Field_Changes_Detail", index=False)
-        diffs["category_transition_pivot"].to_excel(writer, sheet_name="06_Category_Transitions", index=False)
+    tab_new.to_excel(writer, sheet_name="02_New_Customers", index=False)
+    tab_removed.to_excel(writer, sheet_name="03_Removed_Customers", index=False)
+    tab_changed_summary.to_excel(writer, sheet_name="04_Changed_Summary", index=False)
+    tab_changed_detail.to_excel(writer, sheet_name="05_Changed_Detail", index=False)
 
-    # Validation tabs (drill-down)
-    validation_summary.to_excel(writer, sheet_name="07_Validation_Summary", index=False)
-    for name, df_issue in issues.items():
-        sheet = ("VAL_" + name)[:31]  # Excel sheet name limit
+    # Category transitions / moved rows
+    if isinstance(tab_cat_trans, pd.DataFrame) and len(tab_cat_trans):
+        tab_cat_trans.to_excel(writer, sheet_name="06_Category_Transitions", index=False)
+    else:
+        pd.DataFrame().to_excel(writer, sheet_name="06_Category_Transitions", index=False)
+
+    tab_cat_moved.to_excel(writer, sheet_name="07_Category_Moved_Rows", index=False)
+
+    # Validation summary
+    tab_val_summary.to_excel(writer, sheet_name="08_Validation_Summary", index=False)
+
+    # Distinct scan + comparison warnings
+    tab_distinct.to_excel(writer, sheet_name="09_Distinct_Values", index=False)
+    tab_compare_warn.to_excel(writer, sheet_name="10_Comparison_Warnings", index=False)
+
+    # One tab per validation rule
+    for rule, df_issue in validation_tabs.items():
+        sheet = _safe_sheet_name(f"VAL_{rule}")
         df_issue.to_excel(writer, sheet_name=sheet, index=False)
 
     # Meta
     meta = pd.DataFrame([
-        {"Item": "Current global report file", "Value": current_path},
-        {"Item": "Previous SharePoint-tab file", "Value": prev_path if prev_path else "N/A"},
-        {"Item": "Report date used", "Value": str(report_date.date())},
-        {"Item": "Generated on", "Value": current_date_str},
+        {"Item": "Run date", "Value": run_date},
+        {"Item": "Run timestamp", "Value": datetime.now().isoformat(timespec="seconds")},
+        {"Item": "Current file", "Value": CURRENT_PATH},
+        {"Item": "Previous file", "Value": PREV_PATH if PREV_PATH else "N/A"},
+        {"Item": "Previous sheet selected", "Value": prev_sheet if prev_sheet else "N/A"},
+        {"Item": "Report date used", "Value": str(REPORT_DATE.date())},
+        {"Item": "Current rows", "Value": int(len(df_current))},
+        {"Item": "Previous rows", "Value": int(len(df_prev)) if df_prev is not None else 0},
+        {"Item": "Schema version", "Value": "SharePoint_A_N_14cols_v1"},
     ])
     meta.to_excel(writer, sheet_name="99_Meta", index=False)
 
-print("✅ Review pack written:", review_pack_name)
+print("Review pack written:", review_pack_path)
 
-# %%
-# Cell 20 — Final quick guidance printed to screen (so you don’t even need to open Excel immediately)
-print("\n=== Recommended workflow ===")
-print("1) Open:", review_pack_name)
-print("2) Go to tab: 00_At_A_Glance (see counts)")
-print("3) Then tab: 01_Customers_To_Focus (sorted by Priority Score)")
-print("   - Priority >= 100 usually means validation flags exist (fix these first).")
-print("4) If MoM was loaded, check tabs 02–06 for new/removed/changed and category moves.\n")
 
-top_focus = focus.head(10)[["LCL_CUST_ID", "Customer Name", "Category", "Priority Score", "Validation Flags", "Changed Fields", "Category Moved?", "New Customer?"]]
-print("Top 10 customers to focus:")
-display(top_focus)
+Cell 20 — Preview: highest priority items
+preview_cols = [
+    "LCL_CUST_ID", "Customer Name", "Category", "Priority Score",
+    "Validation Flags", "Changed Fields", "Category Moved (Y/N)", "New (Y/N)", "Removed (Y/N)"
+]
+focus[preview_cols].head(15)
+
+
