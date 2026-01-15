@@ -1,1 +1,46 @@
+def _row_has_any_data(df: pd.DataFrame) -> pd.Series:
+    masks = []
+    for c in OBJ_COLS:
+        if c == COMPARE_KEY:
+            continue
+        if c in DATE_COLS:
+            masks.append(df[c].notna())
+        elif c in INT_COLS + FLOAT_COLS:
+            masks.append(df[c].notna())
+        else:
+            masks.append(~_is_blank_text(df[c]))
+    out = masks[0]
+    for m in masks[1:]:
+        out |= m
+    return out
 
+key_missing = df[COMPARE_KEY].isna()
+has_data = _row_has_any_data(df)
+
+issues["R10_Row_Has_Data_But_LCL_CUST_ID_Missing"] = df.loc[key_missing & has_data, OBJ_COLS].copy()
+
+
+
+
+
+
+
+
+
+at_a_glance.append({
+    "Metric": "Rows with data but missing LCL_CUST_ID",
+    "Value": len(issues.get("R10_Row_Has_Data_But_LCL_CUST_ID_Missing", pd.DataFrame()))
+})
+
+
+
+
+
+
+
+
+
+
+issues.get("R10_Row_Has_Data_But_LCL_CUST_ID_Missing", pd.DataFrame()).to_excel(
+    writer, sheet_name="11_Missing_Key_Rows", index=False
+)
