@@ -1,124 +1,60 @@
-# Running validation rules (flag-only; no corrections)
-# Validation rules (flag only):
-# 1) NO OF CUST must be numeric and >= 1 and not missing
-# 2) Category must exist and be one of: Managed, Shadow, Resolved
-# 3) If Category == Managed -> Managed Status must not be blank/N/A
-# 4) Resolution Date: if Resolved -> must exist; else -> should be blank
-# 5) Resolution Type missing/NA -> flagged
-# 6) Required fields not blank: Customer Name, Category, DoD, Business, Total Relationship Name
-# 7) RM Name may be NA only if Resolved and Resolution Date older than 12 months (relative to REPORT_DATE)
-# 8) LCL_CUST_ID missing flagged
-# 9) Duplicate LCL_CUST_ID flagged
-# 10) Row has data but LCL_CUST_ID is missing flagged
-# 11) Distinct-values scan produced separately
+# Cell X — Exploring CURRENT Shadows sheet (structure + row-level checks)
 
-def run_validations(df: pd.DataFrame, report_date: pd.Timestamp) -> Dict[str, pd.DataFrame]:
-    issues: Dict[str, pd.DataFrame] = {}
+xl_current = pd.ExcelFile(CURRENT_PATH)
+print("Sheets in CURRENT file:", xl_current.sheet_names)
 
-    # R01 Mandatory fields not blank
-    mandatory = ["Customer Name", "Category", "DoD", "Business", "Total Relationship Name"]
-    mask = pd.Series(False, index=df.index)
-    for c in mandatory:
-        mask |= _blank_text_mask(df[c])
-    issues["R01_Missing_Required_Fields"] = df.loc[mask, OBJ_COLS].copy()
+def _find_sheet(xl: pd.ExcelFile, preferred_names: list) -> str:
+    for name in preferred_names:
+        if name in xl.sheet_names:
+            return name
+    for name in preferred_names:
+        for s in xl.sheet_names:
+            if name.lower() in s.lower():
+                return s
+    raise ValueError(f"Could not locate required sheet among: {preferred_names}. Found: {xl.sheet_names}")
 
-    # R02 Category validity
-    cat = df["Category"].astype("string")
-    issues["R02_Invalid_Category"] = df.loc[~cat.isin(list(ALLOWED_CATEGORIES)), OBJ_COLS].copy()
+shadows_sheet = _find_sheet(xl_current, ["Shadows", "Shadow"])
+print("Shadows sheet selected:", shadows_sheet)
 
-    # R03 NO OF CUST numeric >= 1 and not missing
-    noc = pd.to_numeric(df["NO OF CUST"], errors="coerce")
-    issues["R03_Invalid_NO_OF_CUST"] = df.loc[noc.isna() | (noc < 1), OBJ_COLS].copy()
+df_shadows_probe = pd.read_excel(CURRENT_PATH, sheet_name=shadows_sheet, header=2)
 
-    # R04 Managed status required for Managed category
-    managed = (df["Category"].astype("string") == "Managed")
-    ms_blank = _blank_text_mask(df["Managed Status"]) | (df["Managed Status"].astype("string").str.strip().str.upper() == "N/A")
-    issues["R04_Managed_Status_Missing"] = df.loc[managed & ms_blank, OBJ_COLS].copy()
+print("df_shadows_probe shape:", df_shadows_probe.shape)
+print("Columns:", list(df_shadows_probe.columns))
 
-    # R05 Resolution Date logic
-    resolved = (df["Category"].astype("string") == "Resolved")
-    res_date = df["Resolution Date"]
-    issues["R05A_Resolved_Missing_Resolution_Date"] = df.loc[resolved & res_date.isna(), OBJ_COLS].copy()
-    issues["R05B_NonResolved_Has_Resolution_Date"] = df.loc[(~resolved) & res_date.notna(), OBJ_COLS].copy()
+cust = df_shadows_probe.get("Customer Name", pd.Series(index=df_shadows_probe.index, dtype="string")).astype("string")
+dod  = df_shadows_probe.get("DoD", pd.Series(index=df_shadows_probe.index, dtype="string")).astype("string")
+lcl  = df_shadows_probe.get("LCL_CUST_ID", pd.Series(index=df_shadows_probe.index, dtype="string"))
 
-    # R06 Resolution Type missing
-    rt_blank = _blank_text_mask(df["Resolution Type"]) | (df["Resolution Type"].astype("string").str.strip().str.upper() == "N/A")
-    issues["R06_Resolution_Type_Missing"] = df.loc[rt_blank, OBJ_COLS].copy()
+cust_nonblank = cust.notna() & (cust.str.strip() != "")
+dod_nonblank  = dod.notna() & (dod.str.strip() != "")
+lcl_missing   = pd.to_numeric(lcl, errors="coerce").isna()
 
-    # R07 RM Name logic (allowed missing only if resolved AND resolution date older than 12 months)
-    rm_blank = _blank_text_mask(df["RM Name"]) | (df["RM Name"].astype("string").str.strip().str.upper() == "N/A")
-    cutoff = report_date - pd.DateOffset(months=12)
-    allowed_missing_rm = resolved & res_date.notna() & (res_date < cutoff)
-    issues["R07_RM_Name_Suspect_Missing"] = df.loc[rm_blank & ~allowed_missing_rm, OBJ_COLS].copy()
+print("Nonblank Customer Name:", int(cust_nonblank.sum()))
+print("Nonblank DoD:", int(dod_nonblank.sum()))
+print("Rows with Customer Name but missing LCL_CUST_ID:", int((cust_nonblank & lcl_missing).sum()))
 
-    # R08 Missing key
-    issues["R08_Missing_LCL_CUST_ID"] = df.loc[df[COMPARE_KEY].isna(), OBJ_COLS].copy()
+biz = df_shadows_probe.get("Business", pd.Series(index=df_shadows_probe.index, dtype="string")).astype("string")
+is_total = biz.str.strip().str.lower().eq("total")
+print("Rows where Business == 'Total':", int(is_total.sum()))
 
-    def _row_has_any_data(df_: pd.DataFrame) -> pd.Series:
-        masks = []
-        for c in OBJ_COLS:
-            if c == COMPARE_KEY:
-                continue
-            if c in DATE_COLS:
-                masks.append(df_[c].notna())
-            elif c in INT_COLS + FLOAT_COLS:
-                masks.append(df_[c].notna())
-            else:
-                s = df_[c].astype("string")
-                masks.append(~(_blank_text_mask(s) | (s.str.strip().str.upper() == "N/A")))
-        if not masks:
-            return pd.Series(False, index=df_.index)
-        out = masks[0]
-        for m in masks[1:]:
-            out |= m
-        return out
+mask_name_dod_only = cust_nonblank & dod_nonblank
+for col in df_shadows_probe.columns:
+    if col in ["Customer Name", "DoD"]:
+        continue
+    s = df_shadows_probe[col]
+    if pd.api.types.is_datetime64_any_dtype(s) or col in ["Month Added", "Resolution Date"]:
+        mask_name_dod_only &= s.isna()
+    elif pd.api.types.is_numeric_dtype(s):
+        mask_name_dod_only &= s.isna()
+    else:
+        st = s.astype("string")
+        mask_name_dod_only &= (st.isna() | (st.str.strip() == ""))
 
-    key_missing = df[COMPARE_KEY].isna()
-    has_data = _row_has_any_data(df)
-    issues["R10_Row_Has_Data_But_LCL_CUST_ID_Missing"] = df.loc[key_missing & has_data, OBJ_COLS].copy()
+print("Rows with ONLY Customer Name + DoD populated (others blank):", int(mask_name_dod_only.sum()))
 
-    # R09 Duplicate key
-    k_notna = df[COMPARE_KEY].notna()
-    dup = df.loc[k_notna].duplicated(subset=[COMPARE_KEY], keep=False)
-    issues["R09_Duplicate_LCL_CUST_ID"] = df.loc[k_notna].loc[dup, OBJ_COLS].copy()
+preview_cols = [c for c in ["Customer Name", "DoD", "LCL_CUST_ID", "Business", "Category"] if c in df_shadows_probe.columns]
+print("\nLast 15 rows (to see if there is a footer/blank region):")
+display(df_shadows_probe[preview_cols].tail(15))
 
-    return issues
-
-
-issues = run_validations(df_current, report_date=REPORT_DATE)
-
-validation_summary = (
-    pd.DataFrame([{"Rule": k, "Issue Rows": int(len(v))} for k, v in issues.items()])
-    .sort_values(["Issue Rows", "Rule"], ascending=[False, True])
-    .reset_index(drop=True)
-)
-
-print("Validation summary (rows flagged):")
-print(validation_summary)
-
-
-
-
-
-
-
-
-
-
-at_a_glance.append({
-    "Metric": "Rows with data but missing LCL_CUST_ID",
-    "Value": len(issues.get("R10_Row_Has_Data_But_LCL_CUST_ID_Missing", pd.DataFrame()))
-})
-
-
-
-
-
-
-
-
-
-
-issues.get("R10_Row_Has_Data_But_LCL_CUST_ID_Missing", pd.DataFrame()).to_excel(
-    writer, sheet_name="11_Missing_Key_Rows", index=False
-)
+print("\nRows that are ONLY Customer Name + DoD populated (sample):")
+display(df_shadows_probe.loc[mask_name_dod_only, preview_cols].head(20))
