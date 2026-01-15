@@ -1,60 +1,8 @@
-# Cell X — Exploring CURRENT Shadows sheet (structure + row-level checks)
+def _is_total_row(df: pd.DataFrame) -> pd.Series:
+    biz = df.get("Business", pd.Series(index=df.index, dtype="string")).astype("string")
+    biz_norm = biz.fillna("").str.strip().str.lower()   # <-- prevents <NA> in the mask
+    return biz_norm.eq("total")
 
-xl_current = pd.ExcelFile(CURRENT_PATH)
-print("Sheets in CURRENT file:", xl_current.sheet_names)
-
-def _find_sheet(xl: pd.ExcelFile, preferred_names: list) -> str:
-    for name in preferred_names:
-        if name in xl.sheet_names:
-            return name
-    for name in preferred_names:
-        for s in xl.sheet_names:
-            if name.lower() in s.lower():
-                return s
-    raise ValueError(f"Could not locate required sheet among: {preferred_names}. Found: {xl.sheet_names}")
-
-shadows_sheet = _find_sheet(xl_current, ["Shadows", "Shadow"])
-print("Shadows sheet selected:", shadows_sheet)
-
-df_shadows_probe = pd.read_excel(CURRENT_PATH, sheet_name=shadows_sheet, header=2)
-
-print("df_shadows_probe shape:", df_shadows_probe.shape)
-print("Columns:", list(df_shadows_probe.columns))
-
-cust = df_shadows_probe.get("Customer Name", pd.Series(index=df_shadows_probe.index, dtype="string")).astype("string")
-dod  = df_shadows_probe.get("DoD", pd.Series(index=df_shadows_probe.index, dtype="string")).astype("string")
-lcl  = df_shadows_probe.get("LCL_CUST_ID", pd.Series(index=df_shadows_probe.index, dtype="string"))
-
-cust_nonblank = cust.notna() & (cust.str.strip() != "")
-dod_nonblank  = dod.notna() & (dod.str.strip() != "")
-lcl_missing   = pd.to_numeric(lcl, errors="coerce").isna()
-
-print("Nonblank Customer Name:", int(cust_nonblank.sum()))
-print("Nonblank DoD:", int(dod_nonblank.sum()))
-print("Rows with Customer Name but missing LCL_CUST_ID:", int((cust_nonblank & lcl_missing).sum()))
-
-biz = df_shadows_probe.get("Business", pd.Series(index=df_shadows_probe.index, dtype="string")).astype("string")
-is_total = biz.str.strip().str.lower().eq("total")
-print("Rows where Business == 'Total':", int(is_total.sum()))
-
-mask_name_dod_only = cust_nonblank & dod_nonblank
-for col in df_shadows_probe.columns:
-    if col in ["Customer Name", "DoD"]:
-        continue
-    s = df_shadows_probe[col]
-    if pd.api.types.is_datetime64_any_dtype(s) or col in ["Month Added", "Resolution Date"]:
-        mask_name_dod_only &= s.isna()
-    elif pd.api.types.is_numeric_dtype(s):
-        mask_name_dod_only &= s.isna()
-    else:
-        st = s.astype("string")
-        mask_name_dod_only &= (st.isna() | (st.str.strip() == ""))
-
-print("Rows with ONLY Customer Name + DoD populated (others blank):", int(mask_name_dod_only.sum()))
-
-preview_cols = [c for c in ["Customer Name", "DoD", "LCL_CUST_ID", "Business", "Category"] if c in df_shadows_probe.columns]
-print("\nLast 15 rows (to see if there is a footer/blank region):")
-display(df_shadows_probe[preview_cols].tail(15))
-
-print("\nRows that are ONLY Customer Name + DoD populated (sample):")
-display(df_shadows_probe.loc[mask_name_dod_only, preview_cols].head(20))
+m_total = _is_total_row(df_managed_raw).fillna(False)
+s_total = _is_total_row(df_shadows_raw).fillna(False)
+r_total = _is_total_row(df_resolved_raw).fillna(False)
