@@ -1,1 +1,502 @@
+# %% [markdown]
+# # SCU MSR SharePoint Extract + Smart Review Pack (Validations + MoM Diffs)
+# End goal: one Excel review pack that clearly tells you what to focus on (new/changed customers + validation issues).
 
+# %%
+# Cell 1 — Imports
+import os
+import pandas as pd
+from datetime import datetime
+
+# %%
+# Cell 2 — Inputs (do this once, early)
+current_path = input("Enter FULL path of CURRENT MSR DoD Excel file (.xlsx/.xlsm):\n> ").strip().strip('"')
+prev_path = input("Enter FULL path of PREVIOUS MONTH SharePoint-tab file (press Enter to skip diffs):\n> ").strip().strip('"')
+
+def _validate_excel_path(path: str, allow_empty: bool = False) -> str:
+    if allow_empty and (path is None or path.strip() == ""):
+        return ""
+    path = (path or "").strip().strip('"')
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"❌ File not found: {path}")
+    if not path.lower().endswith((".xlsx", ".xls", ".xlsm")):
+        raise ValueError("⚠️ File must be Excel (.xlsx, .xls, .xlsm)")
+    return path
+
+current_path = _validate_excel_path(current_path)
+prev_path = _validate_excel_path(prev_path, allow_empty=True)
+
+print("✅ Current file:", current_path)
+print("✅ Previous file:", prev_path if prev_path else "(skipped)")
+
+# %%
+# Cell 3 — Quick sheet visibility (helps if upstream changes sheet names)
+xl_current = pd.ExcelFile(current_path)
+print("Sheets in CURRENT file:")
+print(xl_current.sheet_names)
+
+# %%
+# Cell 4 — Load the three sheets (header=2 means Excel row 3 has headers)
+df_managed  = pd.read_excel(current_path, sheet_name="Managed",  header=2)
+df_shadows  = pd.read_excel(current_path, sheet_name="Shadows",  header=2)
+df_resolved = pd.read_excel(current_path, sheet_name="Resolved", header=2)
+
+print("✅ Loaded raw sheets.")
+print("Managed :", df_managed.shape)
+print("Shadows :", df_shadows.shape)
+print("Resolved:", df_resolved.shape)
+
+# %%
+# Cell 5 — Clean rows without Customer Name
+def _drop_blank_customer(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.dropna(subset=["Customer Name"]).copy()
+    df = df[df["Customer Name"].astype(str).str.strip() != ""].copy()
+    return df
+
+df_managed  = _drop_blank_customer(df_managed)
+df_shadows  = _drop_blank_customer(df_shadows)
+df_resolved = _drop_blank_customer(df_resolved)
+
+print("Shapes after cleaning Customer Name:")
+print("Managed :", df_managed.shape)
+print("Shadows :", df_shadows.shape)
+print("Resolved:", df_resolved.shape)
+
+# %%
+# Cell 6 — Add Category (same as your original notebook)
+df_managed["Category"]  = "Managed"
+df_shadows["Category"]  = "Shadow"
+df_resolved["Category"] = "Resolved"
+
+print("✅ Category added.")
+
+# %%
+# Cell 7 — (Optional) quick data feel
+print("Category counts (raw sheets):")
+print("Managed :", df_managed["Category"].value_counts().to_dict())
+print("Shadows :", df_shadows["Category"].value_counts().to_dict())
+print("Resolved:", df_resolved["Category"].value_counts().to_dict())
+
+# %%
+# Cell 8 — Define SharePoint objective schema (A:N = 14 columns)
+OBJ_COLS = [
+    "Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status",
+    "Resolution Date", "Resolution Type", "RM Name", "Business",
+    "Total Relationship Name", "LCL_CUST_ID", "CRR", "CAT AB Exposure", "DoD"
+]
+DATE_COLS  = ["Month Added", "Resolution Date"]
+INT_COLS   = ["NO OF CUST", "LCL_CUST_ID"]
+FLOAT_COLS = ["CRR", "CAT AB Exposure"]
+TEXT_COLS  = [c for c in OBJ_COLS if c not in DATE_COLS + INT_COLS + FLOAT_COLS]
+
+COMPARE_KEY = "LCL_CUST_ID"
+
+print("✅ Objective schema ready.")
+
+# %%
+# Cell 9 — Alignment helper (same concept as your screenshots)
+def _to_datetime_safe(s):
+    return pd.to_datetime(s, errors="coerce")
+
+def _align_to_objective(df: pd.DataFrame) -> pd.DataFrame:
+    for col in OBJ_COLS:
+        if col not in df.columns:
+            df[col] = pd.NA
+
+    df = df[OBJ_COLS].copy()
+
+    for c in DATE_COLS:
+        df[c] = _to_datetime_safe(df[c])
+
+    for c in INT_COLS:
+        df[c] = pd.to_numeric(df[c], errors="coerce").astype("Int64")
+
+    for c in FLOAT_COLS:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    for c in TEXT_COLS:
+        df[c] = df[c].astype("string").str.strip()
+
+    return df
+
+def _fill_text_na(df: pd.DataFrame) -> pd.DataFrame:
+    for c in TEXT_COLS:
+        df[c] = df[c].fillna("N/A")
+        df[c] = df[c].replace(r"^\s*$", "N/A", regex=True)
+    return df
+
+# %%
+# Cell 10 — Standardize and combine to df_objective
+managed_std  = _align_to_objective(df_managed)
+shadows_std  = _align_to_objective(df_shadows)
+resolved_std = _align_to_objective(df_resolved)
+
+df_objective = pd.concat([managed_std, shadows_std, resolved_std], ignore_index=True)
+df_objective = _fill_text_na(df_objective)
+
+print("✅ df_objective built:", df_objective.shape)
+
+# %%
+# Cell 11 — Quick check (like you did originally)
+print(df_objective.info())
+print("Rows:", len(df_objective))
+print("\nCategory counts (objective):")
+display(df_objective["Category"].value_counts(dropna=False))
+
+# %%
+# Cell 12 — Choose report date (max Month Added if possible)
+max_month = pd.to_datetime(df_objective["Month Added"], errors="coerce").max()
+if pd.notna(max_month):
+    report_date = pd.Timestamp(max_month).normalize()
+else:
+    raw = input("Month Added missing. Enter report date (YYYY-MM-DD) or press Enter to use today:\n> ").strip()
+    report_date = pd.to_datetime(raw).normalize() if raw else pd.Timestamp.today().normalize()
+
+print("📌 Report date used:", report_date.date())
+
+# %%
+# Cell 13 — Write the two standard outputs (reference + SharePoint dataset)
+current_date_str = datetime.now().strftime("%Y-%m-%d")
+
+with pd.ExcelWriter(f"Combined_MSR_DATA_{current_date_str}.xlsx", engine="openpyxl") as writer:
+    df_managed.to_excel(writer, sheet_name="Managed", index=False)
+    df_shadows.to_excel(writer, sheet_name="Shadows", index=False)
+    df_resolved.to_excel(writer, sheet_name="Resolved", index=False)
+
+with pd.ExcelWriter(f"Sharepoint_tab_info_{current_date_str}.xlsx", engine="openpyxl") as writer:
+    df_objective.to_excel(writer, sheet_name="Combined MSR", index=False)
+
+print("✅ Wrote the two standard outputs.")
+
+# %%
+# Cell 14 — Validations (based on your notes, designed to point the reviewer to problems)
+def run_validations(df: pd.DataFrame, report_date: pd.Timestamp) -> dict:
+    issues = {}
+
+    # Mandatory fields should never be blank/N/A
+    mandatory = ["Customer Name", "Category", "DoD", "Business", "Total Relationship Name"]
+    mand_mask = pd.Series(False, index=df.index)
+    for c in mandatory:
+        mand_mask |= df[c].isna() | (df[c].astype("string").str.strip().isin(["", "N/A"]))
+    issues["missing_mandatory"] = df.loc[mand_mask, OBJ_COLS].copy()
+
+    # Category must be one of these
+    allowed_cat = {"Managed", "Shadow", "Resolved"}
+    bad_cat = ~df["Category"].astype("string").isin(list(allowed_cat))
+    issues["invalid_category"] = df.loc[bad_cat, OBJ_COLS].copy()
+
+    # NO OF CUST must be >= 1 and not NA
+    bad_nocust = df["NO OF CUST"].isna() | (df["NO OF CUST"] < 1)
+    issues["invalid_no_of_cust"] = df.loc[bad_nocust, OBJ_COLS].copy()
+
+    # Managed Status required for Managed
+    managed = df["Category"].astype("string") == "Managed"
+    ms_bad = managed & df["Managed Status"].astype("string").isin(["", "N/A"])
+    issues["managed_status_missing"] = df.loc[ms_bad, OBJ_COLS].copy()
+
+    # Resolution Date rules
+    resolved = df["Category"].astype("string") == "Resolved"
+    res_date = df["Resolution Date"]
+    issues["resolved_missing_resolution_date"] = df.loc[resolved & res_date.isna(), OBJ_COLS].copy()
+    issues["nonresolved_has_resolution_date"] = df.loc[(~resolved) & res_date.notna(), OBJ_COLS].copy()
+
+    # Resolution Date sanity (future or very old)
+    future_res = res_date.notna() & (res_date > report_date + pd.Timedelta(days=1))
+    old_res = res_date.notna() & (res_date < report_date - pd.Timedelta(days=730))
+    issues["resolution_date_out_of_band"] = df.loc[future_res | old_res, OBJ_COLS].copy()
+
+    # RM Name can be N/A only for Resolved older than 12 months
+    rm_missing = df["RM Name"].astype("string").isin(["", "N/A"]) | df["RM Name"].isna()
+    cutoff = report_date - pd.DateOffset(months=12)
+    resolved_recent = resolved & res_date.notna() & (res_date >= cutoff)
+    suspect_rm = rm_missing & ((~resolved) | resolved_recent)
+    issues["rm_name_suspect_missing"] = df.loc[suspect_rm, OBJ_COLS].copy()
+
+    # Missing key
+    issues["missing_key_lcl_cust_id"] = df.loc[df[COMPARE_KEY].isna(), OBJ_COLS].copy()
+
+    # Duplicate key
+    dup_key = df[df[COMPARE_KEY].notna()].duplicated(subset=[COMPARE_KEY], keep=False)
+    issues["duplicates_by_key"] = df.loc[dup_key, OBJ_COLS].copy()
+
+    # Negative numeric sanity
+    neg = (df["CRR"].notna() & (df["CRR"] < 0)) | (df["CAT AB Exposure"].notna() & (df["CAT AB Exposure"] < 0))
+    issues["negative_numeric_values"] = df.loc[neg, OBJ_COLS].copy()
+
+    # Quick frequency snapshot (to spot weird entries quickly)
+    freq_rows = []
+    for c in ["Category", "Managed Status", "Resolution Type", "DoD", "Business"]:
+        vc = df[c].astype("string").value_counts(dropna=False).head(15)
+        tmp = vc.reset_index()
+        tmp.columns = ["Value", "Count"]
+        tmp.insert(0, "Column", c)
+        freq_rows.append(tmp)
+    issues["value_frequencies_top15"] = pd.concat(freq_rows, ignore_index=True) if freq_rows else pd.DataFrame()
+
+    return issues
+
+issues = run_validations(df_objective, report_date=report_date)
+
+validation_summary = pd.DataFrame(
+    [{"Check": k, "Issue Rows": len(v)} for k, v in issues.items()]
+).sort_values(["Issue Rows", "Check"], ascending=[False, True])
+
+print("✅ Validation summary:")
+display(validation_summary)
+
+# %%
+# Cell 15 — Load previous SharePoint tab (A:N, headers in row 2 => header=1)
+def _try_find_sheet(xl: pd.ExcelFile, preferred: list) -> str:
+    for name in preferred:
+        if name in xl.sheet_names:
+            return name
+    for name in preferred:
+        for s in xl.sheet_names:
+            if name.lower() in s.lower():
+                return s
+    return xl.sheet_names[0]
+
+prev_df = None
+if prev_path:
+    xl_prev = pd.ExcelFile(prev_path)
+    prev_sheet = _try_find_sheet(
+        xl_prev,
+        ["Sharepoint_tab_info", "SharePoint", "SharePoint Tab", "Combined MSR", "Combined_MSR", "Sharepoint", "SP"]
+    )
+    print("Using PREVIOUS sheet:", prev_sheet)
+
+    prev_df = pd.read_excel(prev_path, sheet_name=prev_sheet, usecols="A:N", header=1)
+    prev_df = _align_to_objective(prev_df)
+    prev_df = _fill_text_na(prev_df)
+
+    print("✅ Previous dataset loaded:", prev_df.shape)
+else:
+    print("ℹ️ Previous file skipped (no MoM diffs).")
+
+# %%
+# Cell 16 — MoM diffs + category transitions (new/removed/changed + per-field detail)
+diffs = None
+if prev_df is not None:
+    prev = prev_df.copy()
+    curr = df_objective.copy()
+
+    prev[COMPARE_KEY] = pd.to_numeric(prev[COMPARE_KEY], errors="coerce").astype("Int64")
+    curr[COMPARE_KEY] = pd.to_numeric(curr[COMPARE_KEY], errors="coerce").astype("Int64")
+
+    merged = prev.merge(curr, on=COMPARE_KEY, how="outer", suffixes=("_prev", "_curr"), indicator=True)
+
+    compare_cols = [c for c in OBJ_COLS if c != COMPARE_KEY]
+
+    new_records = merged[merged["_merge"] == "right_only"][ [COMPARE_KEY] + [f"{c}_curr" for c in compare_cols] ].copy()
+    new_records.columns = [COMPARE_KEY] + compare_cols
+
+    removed_records = merged[merged["_merge"] == "left_only"][ [COMPARE_KEY] + [f"{c}_prev" for c in compare_cols] ].copy()
+    removed_records.columns = [COMPARE_KEY] + compare_cols
+
+    common = merged[merged["_merge"] == "both"].copy()
+
+    change_rows = []
+    for col in compare_cols:
+        a = common[f"{col}_prev"]
+        b = common[f"{col}_curr"]
+
+        if col in DATE_COLS:
+            a_cmp = pd.to_datetime(a, errors="coerce").dt.date
+            b_cmp = pd.to_datetime(b, errors="coerce").dt.date
+        else:
+            a_cmp = a.astype("string")
+            b_cmp = b.astype("string")
+
+        mask = (a_cmp != b_cmp) & ~(a_cmp.isna() & b_cmp.isna())
+        if mask.any():
+            tmp = common.loc[mask, [COMPARE_KEY, f"{col}_prev", f"{col}_curr"]].copy()
+            tmp["Field"] = col
+            tmp.rename(columns={f"{col}_prev": "Previous", f"{col}_curr": "Current"}, inplace=True)
+            change_rows.append(tmp[[COMPARE_KEY, "Field", "Previous", "Current"]])
+
+    changed_detail = pd.concat(change_rows, ignore_index=True) if change_rows else pd.DataFrame(
+        columns=[COMPARE_KEY, "Field", "Previous", "Current"]
+    )
+
+    changed_summary = (
+        changed_detail.groupby(COMPARE_KEY)["Field"]
+        .apply(lambda s: ", ".join(sorted(set(s))))
+        .reset_index()
+        .rename(columns={"Field": "Changed Fields"})
+        if len(changed_detail) else pd.DataFrame(columns=[COMPARE_KEY, "Changed Fields"])
+    )
+
+    # Category transitions
+    trans = common[[COMPARE_KEY, "Category_prev", "Category_curr"]].copy()
+    trans["Category_prev"] = trans["Category_prev"].astype("string")
+    trans["Category_curr"] = trans["Category_curr"].astype("string")
+
+    category_transition_pivot = (
+        trans.pivot_table(index="Category_prev", columns="Category_curr", values=COMPARE_KEY, aggfunc="count", fill_value=0)
+        .reset_index()
+    )
+    category_moved_records = trans[trans["Category_prev"] != trans["Category_curr"]].copy()
+
+    diffs = {
+        "new_records": new_records,
+        "removed_records": removed_records,
+        "changed_summary": changed_summary,
+        "changed_detail": changed_detail,
+        "category_transition_pivot": category_transition_pivot,
+        "category_moved_records": category_moved_records,
+    }
+
+    print("✅ MoM diffs ready:")
+    print("New:", len(new_records), "| Removed:", len(removed_records), "| Changed keys:", len(changed_summary))
+    print("Category moves:", len(category_moved_records))
+
+# %%
+# Cell 17 — Build the SMART “Customers To Focus” list (this is the key upgrade)
+# Idea:
+# - One row per customer (key = LCL_CUST_ID)
+# - Shows: New? Removed? Category moved? Which fields changed? Which validation checks hit?
+# - Sort by "Priority Score" so you know where to look first
+
+def _issues_by_key(issues: dict) -> pd.DataFrame:
+    rows = []
+    for check_name, df_issue in issues.items():
+        if df_issue is None or len(df_issue) == 0:
+            continue
+        if COMPARE_KEY in df_issue.columns:
+            tmp = df_issue[[COMPARE_KEY]].copy()
+            tmp["Check"] = check_name
+            rows.append(tmp)
+    if not rows:
+        return pd.DataFrame(columns=[COMPARE_KEY, "Check"])
+
+    out = pd.concat(rows, ignore_index=True)
+    out = out.dropna(subset=[COMPARE_KEY]).copy()
+    out[COMPARE_KEY] = pd.to_numeric(out[COMPARE_KEY], errors="coerce").astype("Int64")
+    return out
+
+issue_map = _issues_by_key(issues)
+
+# Aggregate checks per key
+issue_agg = (
+    issue_map.groupby(COMPARE_KEY)["Check"]
+    .apply(lambda s: ", ".join(sorted(set(s))))
+    .reset_index()
+    .rename(columns={"Check": "Validation Flags"})
+) if len(issue_map) else pd.DataFrame(columns=[COMPARE_KEY, "Validation Flags"])
+
+# Build focus base from current dataset (unique keys)
+focus_base = df_objective[[COMPARE_KEY, "Customer Name", "Category", "Month Added", "NO OF CUST", "Managed Status"]].copy()
+focus_base = focus_base.dropna(subset=[COMPARE_KEY]).copy()
+focus_base = focus_base.drop_duplicates(subset=[COMPARE_KEY], keep="first").copy()
+
+focus = focus_base.merge(issue_agg, on=COMPARE_KEY, how="left")
+focus["Validation Flags"] = focus["Validation Flags"].fillna("")
+
+# If diffs exist, merge in change intelligence
+if diffs is not None:
+    focus = focus.merge(diffs["changed_summary"], on=COMPARE_KEY, how="left")
+    focus["Changed Fields"] = focus["Changed Fields"].fillna("")
+
+    moved_keys = set(diffs["category_moved_records"][COMPARE_KEY].dropna().astype("Int64").tolist())
+    focus["Category Moved?"] = focus[COMPARE_KEY].apply(lambda k: "YES" if k in moved_keys else "NO")
+
+    new_keys = set(diffs["new_records"][COMPARE_KEY].dropna().astype("Int64").tolist())
+    focus["New Customer?"] = focus[COMPARE_KEY].apply(lambda k: "YES" if k in new_keys else "NO")
+else:
+    focus["Changed Fields"] = ""
+    focus["Category Moved?"] = "N/A"
+    focus["New Customer?"] = "N/A"
+
+# Priority scoring: validations > category move > other changes > new
+def _score_row(r):
+    score = 0
+    if r.get("Validation Flags", ""):
+        score += 100
+    if r.get("Category Moved?", "") == "YES":
+        score += 50
+    if r.get("Changed Fields", ""):
+        score += 20
+    if r.get("New Customer?", "") == "YES":
+        score += 10
+    return score
+
+focus["Priority Score"] = focus.apply(_score_row, axis=1)
+
+# Sort: highest priority first, then by name
+focus = focus.sort_values(["Priority Score", "Customer Name"], ascending=[False, True]).reset_index(drop=True)
+
+print("✅ Customers_To_Focus built. Top 15:")
+display(focus.head(15))
+
+# %%
+# Cell 18 — Build “At a Glance” summary table (counts that matter)
+at_a_glance_rows = []
+
+at_a_glance_rows.append({"Metric": "Current rows (df_objective)", "Value": len(df_objective)})
+
+# Validation totals
+top_val = validation_summary.copy()
+for _, row in top_val.iterrows():
+    if row["Issue Rows"] > 0:
+        at_a_glance_rows.append({"Metric": f"Validation issue rows: {row['Check']}", "Value": int(row["Issue Rows"])})
+
+if diffs is not None:
+    at_a_glance_rows.append({"Metric": "New customers (by key)", "Value": len(diffs["new_records"])})
+    at_a_glance_rows.append({"Metric": "Removed customers (by key)", "Value": len(diffs["removed_records"])})
+    at_a_glance_rows.append({"Metric": "Customers with any field change (by key)", "Value": len(diffs["changed_summary"])})
+    at_a_glance_rows.append({"Metric": "Category moves (prev != curr)", "Value": len(diffs["category_moved_records"])})
+
+    # Count customers that appear in focus list as high attention
+    at_a_glance_rows.append({"Metric": "Customers flagged by validations (unique keys)", "Value": int((focus["Validation Flags"] != "").sum())})
+    at_a_glance_rows.append({"Metric": "Customers with Priority Score >= 100", "Value": int((focus["Priority Score"] >= 100).sum())})
+
+at_a_glance = pd.DataFrame(at_a_glance_rows)
+
+print("✅ At-a-glance summary:")
+display(at_a_glance)
+
+# %%
+# Cell 19 — Write the SMART review pack Excel file (the main thing you’ll use)
+review_pack_name = f"SCU_MSR_ReviewPack_{current_date_str}.xlsx"
+
+with pd.ExcelWriter(review_pack_name, engine="openpyxl") as writer:
+    at_a_glance.to_excel(writer, sheet_name="00_At_A_Glance", index=False)
+    focus.to_excel(writer, sheet_name="01_Customers_To_Focus", index=False)
+
+    # Helpful tabs if previous file exists
+    if diffs is not None:
+        diffs["new_records"].to_excel(writer, sheet_name="02_New_Customers", index=False)
+        diffs["removed_records"].to_excel(writer, sheet_name="03_Removed_Customers", index=False)
+        diffs["changed_summary"].to_excel(writer, sheet_name="04_Changed_Customers_Summary", index=False)
+        diffs["changed_detail"].to_excel(writer, sheet_name="05_Field_Changes_Detail", index=False)
+        diffs["category_transition_pivot"].to_excel(writer, sheet_name="06_Category_Transitions", index=False)
+
+    # Validation tabs (drill-down)
+    validation_summary.to_excel(writer, sheet_name="07_Validation_Summary", index=False)
+    for name, df_issue in issues.items():
+        sheet = ("VAL_" + name)[:31]  # Excel sheet name limit
+        df_issue.to_excel(writer, sheet_name=sheet, index=False)
+
+    # Meta
+    meta = pd.DataFrame([
+        {"Item": "Current global report file", "Value": current_path},
+        {"Item": "Previous SharePoint-tab file", "Value": prev_path if prev_path else "N/A"},
+        {"Item": "Report date used", "Value": str(report_date.date())},
+        {"Item": "Generated on", "Value": current_date_str},
+    ])
+    meta.to_excel(writer, sheet_name="99_Meta", index=False)
+
+print("✅ Review pack written:", review_pack_name)
+
+# %%
+# Cell 20 — Final quick guidance printed to screen (so you don’t even need to open Excel immediately)
+print("\n=== Recommended workflow ===")
+print("1) Open:", review_pack_name)
+print("2) Go to tab: 00_At_A_Glance (see counts)")
+print("3) Then tab: 01_Customers_To_Focus (sorted by Priority Score)")
+print("   - Priority >= 100 usually means validation flags exist (fix these first).")
+print("4) If MoM was loaded, check tabs 02–06 for new/removed/changed and category moves.\n")
+
+top_focus = focus.head(10)[["LCL_CUST_ID", "Customer Name", "Category", "Priority Score", "Validation Flags", "Changed Fields", "Category Moved?", "New Customer?"]]
+print("Top 10 customers to focus:")
+display(top_focus)
