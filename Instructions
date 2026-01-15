@@ -1,23 +1,101 @@
-def _row_has_any_data(df: pd.DataFrame) -> pd.Series:
-    masks = []
-    for c in OBJ_COLS:
-        if c == COMPARE_KEY:
-            continue
-        if c in DATE_COLS:
-            masks.append(df[c].notna())
-        elif c in INT_COLS + FLOAT_COLS:
-            masks.append(df[c].notna())
-        else:
-            masks.append(~_is_blank_text(df[c]))
-    out = masks[0]
-    for m in masks[1:]:
-        out |= m
-    return out
+# Running validation rules (flag-only; no corrections)
+# Validation rules (flag only):
+# 1) NO OF CUST must be numeric and >= 1 and not missing
+# 2) Category must exist and be one of: Managed, Shadow, Resolved
+# 3) If Category == Managed -> Managed Status must not be blank/N/A
+# 4) Resolution Date: if Resolved -> must exist; else -> should be blank
+# 5) Resolution Type missing/NA -> flagged
+# 6) Required fields not blank: Customer Name, Category, DoD, Business, Total Relationship Name
+# 7) RM Name may be NA only if Resolved and Resolution Date older than 12 months (relative to REPORT_DATE)
+# 8) LCL_CUST_ID missing flagged
+# 9) Duplicate LCL_CUST_ID flagged
+# 10) Row has data but LCL_CUST_ID is missing flagged
+# 11) Distinct-values scan produced separately
 
-key_missing = df[COMPARE_KEY].isna()
-has_data = _row_has_any_data(df)
+def run_validations(df: pd.DataFrame, report_date: pd.Timestamp) -> Dict[str, pd.DataFrame]:
+    issues: Dict[str, pd.DataFrame] = {}
 
-issues["R10_Row_Has_Data_But_LCL_CUST_ID_Missing"] = df.loc[key_missing & has_data, OBJ_COLS].copy()
+    # R01 Mandatory fields not blank
+    mandatory = ["Customer Name", "Category", "DoD", "Business", "Total Relationship Name"]
+    mask = pd.Series(False, index=df.index)
+    for c in mandatory:
+        mask |= _blank_text_mask(df[c])
+    issues["R01_Missing_Required_Fields"] = df.loc[mask, OBJ_COLS].copy()
+
+    # R02 Category validity
+    cat = df["Category"].astype("string")
+    issues["R02_Invalid_Category"] = df.loc[~cat.isin(list(ALLOWED_CATEGORIES)), OBJ_COLS].copy()
+
+    # R03 NO OF CUST numeric >= 1 and not missing
+    noc = pd.to_numeric(df["NO OF CUST"], errors="coerce")
+    issues["R03_Invalid_NO_OF_CUST"] = df.loc[noc.isna() | (noc < 1), OBJ_COLS].copy()
+
+    # R04 Managed status required for Managed category
+    managed = (df["Category"].astype("string") == "Managed")
+    ms_blank = _blank_text_mask(df["Managed Status"]) | (df["Managed Status"].astype("string").str.strip().str.upper() == "N/A")
+    issues["R04_Managed_Status_Missing"] = df.loc[managed & ms_blank, OBJ_COLS].copy()
+
+    # R05 Resolution Date logic
+    resolved = (df["Category"].astype("string") == "Resolved")
+    res_date = df["Resolution Date"]
+    issues["R05A_Resolved_Missing_Resolution_Date"] = df.loc[resolved & res_date.isna(), OBJ_COLS].copy()
+    issues["R05B_NonResolved_Has_Resolution_Date"] = df.loc[(~resolved) & res_date.notna(), OBJ_COLS].copy()
+
+    # R06 Resolution Type missing
+    rt_blank = _blank_text_mask(df["Resolution Type"]) | (df["Resolution Type"].astype("string").str.strip().str.upper() == "N/A")
+    issues["R06_Resolution_Type_Missing"] = df.loc[rt_blank, OBJ_COLS].copy()
+
+    # R07 RM Name logic (allowed missing only if resolved AND resolution date older than 12 months)
+    rm_blank = _blank_text_mask(df["RM Name"]) | (df["RM Name"].astype("string").str.strip().str.upper() == "N/A")
+    cutoff = report_date - pd.DateOffset(months=12)
+    allowed_missing_rm = resolved & res_date.notna() & (res_date < cutoff)
+    issues["R07_RM_Name_Suspect_Missing"] = df.loc[rm_blank & ~allowed_missing_rm, OBJ_COLS].copy()
+
+    # R08 Missing key
+    issues["R08_Missing_LCL_CUST_ID"] = df.loc[df[COMPARE_KEY].isna(), OBJ_COLS].copy()
+
+    def _row_has_any_data(df_: pd.DataFrame) -> pd.Series:
+        masks = []
+        for c in OBJ_COLS:
+            if c == COMPARE_KEY:
+                continue
+            if c in DATE_COLS:
+                masks.append(df_[c].notna())
+            elif c in INT_COLS + FLOAT_COLS:
+                masks.append(df_[c].notna())
+            else:
+                s = df_[c].astype("string")
+                masks.append(~(_blank_text_mask(s) | (s.str.strip().str.upper() == "N/A")))
+        if not masks:
+            return pd.Series(False, index=df_.index)
+        out = masks[0]
+        for m in masks[1:]:
+            out |= m
+        return out
+
+    key_missing = df[COMPARE_KEY].isna()
+    has_data = _row_has_any_data(df)
+    issues["R10_Row_Has_Data_But_LCL_CUST_ID_Missing"] = df.loc[key_missing & has_data, OBJ_COLS].copy()
+
+    # R09 Duplicate key
+    k_notna = df[COMPARE_KEY].notna()
+    dup = df.loc[k_notna].duplicated(subset=[COMPARE_KEY], keep=False)
+    issues["R09_Duplicate_LCL_CUST_ID"] = df.loc[k_notna].loc[dup, OBJ_COLS].copy()
+
+    return issues
+
+
+issues = run_validations(df_current, report_date=REPORT_DATE)
+
+validation_summary = (
+    pd.DataFrame([{"Rule": k, "Issue Rows": int(len(v))} for k, v in issues.items()])
+    .sort_values(["Issue Rows", "Rule"], ascending=[False, True])
+    .reset_index(drop=True)
+)
+
+print("Validation summary (rows flagged):")
+print(validation_summary)
+
 
 
 
