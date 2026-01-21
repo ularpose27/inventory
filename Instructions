@@ -1,27 +1,35 @@
-Private Function BuildFacilityOrder(ByVal m As Long) As Long()
+' Building ordered facility list (NO Preference Ranking)
+' Order inside a rank is by Facility(i).Weight (template row order)
+Dim idx() As Long
+Dim sortCount As Long
+Dim a As Long, b As Long
+Dim tmpIdx As Long
 
-    Dim idx() As Long
-    Dim key() As Double
-    Dim i As Long, a As Long, b As Long
-    Dim tmpIdx As Long, tmpKey As Double
+' Collect facilities in this rank
+sortCount = 0
+ReDim idx(1 To m)
 
-    ReDim idx(1 To m)
-    ReDim key(1 To m)
+For i = 1 To m
+    idx(i) = -1
 
+    If Facility(i).Rank = currentrank Then
+        sortCount = sortCount + 1
+        idx(sortCount) = i
+    End If
+Next i
+
+If sortCount = 0 Then
+    ReDim fac_inrank(1 To m)
     For i = 1 To m
-        idx(i) = i
-        ' Interest Rate only
-        key(i) = NzDbl(Sheets("Facility").Range("AK" & (7 + i)).Value)
+        fac_inrank(i) = -1
     Next i
-
-    ' Bubble sort (descending)
-    For a = 1 To m - 1
-        For b = a + 1 To m
-            If (key(b) > key(a)) Or ((key(b) = key(a)) And idx(b) < idx(a)) Then
-
-                tmpKey = key(a)
-                key(a) = key(b)
-                key(b) = tmpKey
+    Count = 0
+Else
+    ' Sort idx(1..sortCount) by Weight ascending (lower weight first)
+    For a = 1 To sortCount - 1
+        For b = a + 1 To sortCount
+            If (Facility(idx(b)).Weight < Facility(idx(a)).Weight) Or _
+               ((Facility(idx(b)).Weight = Facility(idx(a)).Weight) And (idx(b) < idx(a))) Then
 
                 tmpIdx = idx(a)
                 idx(a) = idx(b)
@@ -31,6 +39,14 @@ Private Function BuildFacilityOrder(ByVal m As Long) As Long()
         Next b
     Next a
 
-    BuildFacilityOrder = idx
+    ' Build fac_inrank list
+    ReDim fac_inrank(1 To m)
+    For i = 1 To sortCount
+        fac_inrank(i) = idx(i)
+    Next i
+    For i = sortCount + 1 To m
+        fac_inrank(i) = -1
+    Next i
 
-End Function
+    Count = sortCount
+End If
