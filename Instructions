@@ -1,8 +1,36 @@
-def _is_total_row(df: pd.DataFrame) -> pd.Series:
-    biz = df.get("Business", pd.Series(index=df.index, dtype="string")).astype("string")
-    biz_norm = biz.fillna("").str.strip().str.lower()   # <-- prevents <NA> in the mask
-    return biz_norm.eq("total")
+Private Function BuildFacilityOrder(ByVal m As Long) As Long()
 
-m_total = _is_total_row(df_managed_raw).fillna(False)
-s_total = _is_total_row(df_shadows_raw).fillna(False)
-r_total = _is_total_row(df_resolved_raw).fillna(False)
+    Dim idx() As Long
+    Dim key() As Double
+    Dim i As Long, a As Long, b As Long
+    Dim tmpIdx As Long, tmpKey As Double
+
+    ReDim idx(1 To m)
+    ReDim key(1 To m)
+
+    For i = 1 To m
+        idx(i) = i
+        ' Interest Rate only
+        key(i) = NzDbl(Sheets("Facility").Range("AK" & (7 + i)).Value)
+    Next i
+
+    ' Bubble sort (descending)
+    For a = 1 To m - 1
+        For b = a + 1 To m
+            If (key(b) > key(a)) Or ((key(b) = key(a)) And idx(b) < idx(a)) Then
+
+                tmpKey = key(a)
+                key(a) = key(b)
+                key(b) = tmpKey
+
+                tmpIdx = idx(a)
+                idx(a) = idx(b)
+                idx(b) = tmpIdx
+
+            End If
+        Next b
+    Next a
+
+    BuildFacilityOrder = idx
+
+End Function
