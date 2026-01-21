@@ -1,39 +1,3 @@
-' Building ordered facility list (NO Preference Ranking)
-' Order inside a rank is by Facility(i).Weight (template row order)
-Dim idx() As Long
-Dim sortCount As Long
-Dim a As Long, b As Long
-Dim tmpIdx As Long
-
-' Collect facilities in this rank
-sortCount = 0
-ReDim idx(1 To m)
-
-For i = 1 To m
-    idx(i) = -1
-
-    If Facility(i).Rank = currentrank Then
-        sortCount = sortCount + 1
-        idx(sortCount) = i
-    End If
-Next i
-
-If sortCount = 0 Then
-    ReDim fac_inrank(1 To m)
-    For i = 1 To m
-        fac_inrank(i) = -1
-    Next i
-    Count = 0
-Else
-    ' Sort idx(1..sortCount) by Weight ascending (lower weight first)
-    For a = 1 To sortCount - 1
-        For b = a + 1 To sortCount
-            If (Facility(idx(b)).Weight < Facility(idx(a)).Weight) Or _
-               ((Facility(idx(b)).Weight = Facility(idx(a)).Weight) And (idx(b) < idx(a))) Then
-
-                tmpIdx = idx(a)
-                idx(a) = idx(b)
-                idx(b) = tmpIdx
 
             End If
         Next b
