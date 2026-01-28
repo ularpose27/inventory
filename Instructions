@@ -1,16 +1,15 @@
+Private Sub SortFacInRankByIRRDesc(ByRef fac_inrank() As Long, ByVal Count As Long, ByRef irr() As Double)
+    Dim a As Long, b As Long, tmp As Long
 
+    If Count <= 1 Then Exit Sub
+
+    For a = 1 To Count - 1
+        For b = a + 1 To Count
+            If irr(fac_inrank(b)) > irr(fac_inrank(a)) Then
+                tmp = fac_inrank(a)
+                fac_inrank(a) = fac_inrank(b)
+                fac_inrank(b) = tmp
             End If
         Next b
     Next a
-
-    ' Build fac_inrank list
-    ReDim fac_inrank(1 To m)
-    For i = 1 To sortCount
-        fac_inrank(i) = idx(i)
-    Next i
-    For i = sortCount + 1 To m
-        fac_inrank(i) = -1
-    Next i
-
-    Count = sortCount
-End If
+End Sub
