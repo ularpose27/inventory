@@ -1,48 +1,52 @@
-'--- PASTE THIS NEW BLOCK ---
-    If currentrank = 1 Then
-        'RANK 1: PRO-RATA (PV Based to match Manual Formula)
-        Dim totalPV As Double
-        Dim factor As Double
-        
-        '1. Use Total PV (sumosPV) instead of Total FV
-        totalPV = sumosPV(currentrank)
-        
-        If totalPV > 0 Then
-            '2. Calculate factor based on PV: (Security Market Value / Total PV)
-            factor = Security(order).MarketValue / totalPV
-        Else
-            factor = 0
-        End If
-        
-        remainingMV = Security(order).MarketValue
-        
-        For i = 1 To Count
-            fIndex = fac_inrank(i)
-            If fIndex = -1 Then GoTo NextFacilityR1
-            
-            '3. Calculate the share in PV terms
-            Dim sharePV As Double
-            sharePV = Facility(fIndex).RemainosPV * factor
-            
-            '4. Convert that share to FV to deduct from the debt
-            '   (We multiply by the rate to ensure the PV drop in Col L matches the sharePV)
-            If Facility(fIndex).Compoundrate <> 0 Then
-                repayFV = sharePV * Facility(fIndex).Compoundrate
-            Else
-                repayFV = sharePV
-            End If
-            
-            'Safety Checks
-            If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
-            
-            'Deduct the Calculated FV from the Debt
-            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
-            
-            'Subtract the used PV from the available Market Value
-            remainingMV = remainingMV - sharePV
-            
+If currentrank = 1 Then
+    'RANK 1: PRO-RATA (PV-based, keeps PV/FV consistent)
+
+    Dim totalPV As Double
+    Dim factor As Double
+    Dim sharePV As Double
+
+    'Use total PV for rank 1 weighting
+    totalPV = sumosPV(currentrank)
+
+    If totalPV > 0 Then
+        factor = Security(order).MarketValue / totalPV
+    Else
+        factor = 0
+    End If
+
+    remainingMV = Security(order).MarketValue
+
+    For i = 1 To Count
+
+        fIndex = fac_inrank(i)
+        If fIndex = -1 Then GoTo NextFacilityR1
+
+        'PV share allocated to this facility
+        sharePV = Facility(fIndex).RemainosPV * factor
+
+        'Cap by facility PV and remaining MV
+        If sharePV > Facility(fIndex).RemainosPV Then sharePV = Facility(fIndex).RemainosPV
+        If sharePV > remainingMV Then sharePV = remainingMV
+        If sharePV < 0 Then sharePV = 0
+
+        'Convert PV share to FV reduction
+        repayFV = sharePV * Facility(fIndex).Compoundrate
+        If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
+
+        'Update BOTH PV and FV (critical for consistency)
+        Facility(fIndex).RemainosPV = Facility(fIndex).RemainosPV - sharePV
+        If Facility(fIndex).RemainosPV < 0 Then Facility(fIndex).RemainosPV = 0
+
+        Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+        If Facility(fIndex).RemainosFV < 0 Then Facility(fIndex).RemainosFV = 0
+
+        remainingMV = remainingMV - sharePV
+
 NextFacilityR1:
-        Next i
-        
-        'Set to 0 as Pro-Rata distributes the full amount available
-        Security(order).MarketValue = 0
+    Next i
+
+    'Keep the leftover (if any) instead of forcing to 0
+    Security(order).MarketValue = remainingMV
+
+Else
+    'RANK 2 & 3: WATERFALL
