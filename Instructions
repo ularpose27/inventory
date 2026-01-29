@@ -1,16 +1,48 @@
-Dim rankTxt2 As String
-rankTxt2 = Trim$(CStr(Cell.Offset(0, 2).Value))
-
-If Not IsNumeric(rankTxt2) Then
-    Cell.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = 0
-    Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0
-    Cell.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = 0
-    Exit For
-End If
-
-If CLng(rankTxt2) < 1 Or CLng(rankTxt2) > 3 Then
-    Cell.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = 0
-    Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0
-    Cell.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = 0
-    Exit For
-End If
+'--- PASTE THIS NEW BLOCK ---
+    If currentrank = 1 Then
+        'RANK 1: PRO-RATA (PV Based to match Manual Formula)
+        Dim totalPV As Double
+        Dim factor As Double
+        
+        '1. Use Total PV (sumosPV) instead of Total FV
+        totalPV = sumosPV(currentrank)
+        
+        If totalPV > 0 Then
+            '2. Calculate factor based on PV: (Security Market Value / Total PV)
+            factor = Security(order).MarketValue / totalPV
+        Else
+            factor = 0
+        End If
+        
+        remainingMV = Security(order).MarketValue
+        
+        For i = 1 To Count
+            fIndex = fac_inrank(i)
+            If fIndex = -1 Then GoTo NextFacilityR1
+            
+            '3. Calculate the share in PV terms
+            Dim sharePV As Double
+            sharePV = Facility(fIndex).RemainosPV * factor
+            
+            '4. Convert that share to FV to deduct from the debt
+            '   (We multiply by the rate to ensure the PV drop in Col L matches the sharePV)
+            If Facility(fIndex).Compoundrate <> 0 Then
+                repayFV = sharePV * Facility(fIndex).Compoundrate
+            Else
+                repayFV = sharePV
+            End If
+            
+            'Safety Checks
+            If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
+            
+            'Deduct the Calculated FV from the Debt
+            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+            
+            'Subtract the used PV from the available Market Value
+            remainingMV = remainingMV - sharePV
+            
+NextFacilityR1:
+        Next i
+        
+        'Set to 0 as Pro-Rata distributes the full amount available
+        Security(order).MarketValue = 0
