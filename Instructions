@@ -1,1 +1,119 @@
+currentrank = rankStage
 
+If sumosPV(currentrank) = 0 Then GoTo SkipToNextIteration
+
+'Building ordered facility list within this rank
+'Ordering by the row order in the table, ascending
+
+Dim idx() As Long
+Dim sortCount As Long
+Dim a As Long, b As Long
+Dim tmpIdx As Long
+
+sortCount = 0
+ReDim idx(1 To m)
+
+'Collect facilities in this rank
+For i = 1 To m
+    If Facility(i).Rank = currentrank Then
+        sortCount = sortCount + 1
+        idx(sortCount) = i
+    End If
+Next i
+
+If sortCount = 0 Then
+    ReDim fac_inrank(1 To m)
+    For i = 1 To m
+        fac_inrank(i) = -1
+    Next i
+    Count = 0
+    GoTo SkipToNextIteration
+Else
+    'Sort by row order
+    If sortCount > 1 Then
+        For a = 1 To sortCount - 1
+            For b = a + 1 To sortCount
+                If Facility(idx(b)).Weight < Facility(idx(a)).Weight Then
+                    tmpIdx = idx(a)
+                    idx(a) = idx(b)
+                    idx(b) = tmpIdx
+                End If
+            Next b
+        Next a
+    End If
+
+    ReDim fac_inrank(1 To m)
+    For i = 1 To sortCount
+        fac_inrank(i) = idx(i)
+    Next i
+    For i = sortCount + 1 To m
+        fac_inrank(i) = -1
+    Next i
+
+    Count = sortCount
+End If
+
+'Allocation for this rank only (same as your existing logic)
+If Security(order).MarketValue >= sumosFV(currentrank) Then
+    For i = 1 To Count
+        Security(order).MarketValue = Security(order).MarketValue - Facility(fac_inrank(i)).RemainosFV
+        Facility(fac_inrank(i)).RemainosFV = 0
+    Next i
+
+Else
+    If currentrank = 1 Then
+        'RANK 1: PRO-RATA
+        Dim totalFV As Double
+        Dim factor As Double
+
+        totalFV = sumosFV(currentrank)
+        If totalFV > 0 Then
+            factor = Security(order).MarketValue / totalFV
+        Else
+            factor = 0
+        End If
+
+        remainingMV = Security(order).MarketValue
+
+        For i = 1 To Count
+            fIndex = fac_inrank(i)
+            If fIndex = -1 Then GoTo NextFacilityR1
+
+            repayFV = Facility(fIndex).RemainosFV * factor
+            If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
+            If repayFV > remainingMV Then repayFV = remainingMV
+
+            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+            remainingMV = remainingMV - repayFV
+
+NextFacilityR1:
+        Next i
+
+        Security(order).MarketValue = remainingMV
+
+    Else
+        'RANK 2 & 3: WATERFALL
+        remainingMV = Security(order).MarketValue
+
+        For i = 1 To Count
+            fIndex = fac_inrank(i)
+            If fIndex = -1 Then GoTo NextFacilityR23
+
+            If remainingMV <= 0 Then Exit For
+
+            repayFV = Facility(fIndex).RemainosFV
+            If repayFV <= 0 Then GoTo NextFacilityR23
+
+            If repayFV > remainingMV Then repayFV = remainingMV
+
+            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+            remainingMV = remainingMV - repayFV
+
+NextFacilityR23:
+        Next i
+
+        Security(order).MarketValue = remainingMV
+    End If
+End If
+
+SkipToNextIteration:
