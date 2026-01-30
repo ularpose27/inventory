@@ -1,65 +1,74 @@
-'=============================
-' RANK 1: PRO-RATA (PV WEIGHTED USING ORIGINAL PV)
-' Matches Excel validation:
-'   AllocPV_i = TotalPVAllocated * (OrigPV_i / SumOrigPV_rank1)
-'   AllocExpected_i = AllocPV_i / DiscountRate_i
-'=============================
-If currentrank = 1 Then
+Dim sumos2 As Double
+Dim repayedvalue As Double
+Dim pvOutstanding As Double
+Dim allocPV As Double
 
-    Dim totalOrigPV As Double
-    Dim allocPV As Double
-    Dim repayFV As Double
-    Dim fIndex As Long
-    Dim remainingMV As Double
 
-    'MarketValue is PV available to distribute (this is what you want to allocate)
-    remainingMV = Security(order).MarketValue
+'=========================================================
+' RANK 1: PRO-RATA (OLD BEHAVIOUR - PV weighted, iterative)
+'=========================================================
 
-    '1) Sum ORIGINAL PV weights for rank=1 facilities in this security
-    totalOrigPV = 0#
+'We treat Security(order).MarketValue as PV available to allocate
+Do While Security(order).MarketValue > 0.000001
+
+    '1) Build the PV base for pro-rata (sum of PV outstanding)
+    sumos2 = 0#
     For i = 1 To Count
         fIndex = fac_inrank(i)
         If fIndex <> -1 Then
-            'IMPORTANT: use PVStore (original PV), NOT the updated PV
-            totalOrigPV = totalOrigPV + Facility(fIndex).RemainosPVStore
+            If Facility(fIndex).Compoundrate <> 0 Then
+                sumos2 = sumos2 + (Facility(fIndex).RemainosFV / Facility(fIndex).Compoundrate)
+            Else
+                sumos2 = sumos2 + Facility(fIndex).RemainosFV
+            End If
         End If
     Next i
 
-    '2) Allocate PV pro-rata using ORIGINAL PV weights
-    If totalOrigPV > 0# And remainingMV > 0# Then
+    If sumos2 <= 0# Then Exit Do
 
-        For i = 1 To Count
-            fIndex = fac_inrank(i)
-            If fIndex = -1 Then GoTo NextFacilityR1
+    '2) Allocate PV pro-rata, then convert to FV and deduct both
+    repayedvalue = 0#
 
-            'PV allocated to this facility
-            allocPV = remainingMV * (Facility(fIndex).RemainosPVStore / totalOrigPV)
+    For i = 1 To Count
+        fIndex = fac_inrank(i)
+        If fIndex = -1 Then GoTo NextFacilityR1
 
-            'Safety: cannot allocate more PV than remaining PV outstanding
-            If allocPV > Facility(fIndex).RemainosPV Then allocPV = Facility(fIndex).RemainosPV
+        'PV outstanding for this facility (same basis as old model)
+        If Facility(fIndex).Compoundrate <> 0 Then
+            pvOutstanding = Facility(fIndex).RemainosFV / Facility(fIndex).Compoundrate
+        Else
+            pvOutstanding = Facility(fIndex).RemainosFV
+        End If
 
-            '3) Reduce PV outstanding by allocPV (this drives PV column output correctly)
-            Facility(fIndex).RemainosPV = Facility(fIndex).RemainosPV - allocPV
+        'PV allocation share
+        allocPV = Security(order).MarketValue * (pvOutstanding / sumos2)
 
-            '4) Convert PV reduction to FV reduction for the debt balance
-            '   PV = FV / Compoundrate  => FV = PV * Compoundrate
-            If Facility(fIndex).Compoundrate <> 0 Then
-                repayFV = allocPV * Facility(fIndex).Compoundrate
-            Else
-                repayFV = allocPV
-            End If
+        'Cap PV allocation so we never allocate more PV than outstanding
+        If allocPV > pvOutstanding Then allocPV = pvOutstanding
 
-            If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
-            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+        'Deduct PV
+        Facility(fIndex).RemainosPV = Facility(fIndex).RemainosPV - allocPV
+
+        'Convert PV allocation to FV deduction
+        If Facility(fIndex).Compoundrate <> 0 Then
+            repayFV = allocPV * Facility(fIndex).Compoundrate
+        Else
+            repayFV = allocPV
+        End If
+
+        'Cap FV deduction
+        If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
+
+        'Deduct FV
+        Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+
+        'Track PV used in this iteration
+        repayedvalue = repayedvalue + allocPV
 
 NextFacilityR1:
-        Next i
+    Next i
 
-    End If
+    '3) Reduce remaining PV market value (iterative to avoid rounding drift)
+    Security(order).MarketValue = Security(order).MarketValue - repayedvalue
 
-    '5) Rank 1 consumes the entire PV available by design
-    Security(order).MarketValue = 0#
-
-Else
-    'Rank 2 & 3 handled by waterfall (your existing code below)
-End If
+Loop
