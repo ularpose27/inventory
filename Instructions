@@ -1,15 +1,14 @@
 If currentrank = 1 Then
-    'RANK 1: PRO-RATA (PV-based, keeps PV/FV consistent)
+    'RANK 1: PRO-RATA (FV/Cash-based so Expected Realization sums match MarketValue)
 
-    Dim totalPV As Double
+    Dim totalFV As Double
     Dim factor As Double
-    Dim sharePV As Double
+    Dim repayPV As Double
 
-    'Use total PV for rank 1 weighting
-    totalPV = sumosPV(currentrank)
+    totalFV = sumosFV(currentrank)
 
-    If totalPV > 0 Then
-        factor = Security(order).MarketValue / totalPV
+    If totalFV > 0 Then
+        factor = Security(order).MarketValue / totalFV
     Else
         factor = 0
     End If
@@ -21,31 +20,36 @@ If currentrank = 1 Then
         fIndex = fac_inrank(i)
         If fIndex = -1 Then GoTo NextFacilityR1
 
-        'PV share allocated to this facility
-        sharePV = Facility(fIndex).RemainosPV * factor
+        'Allocate CASH (FV) pro-rata
+        repayFV = Facility(fIndex).RemainosFV * factor
 
-        'Cap by facility PV and remaining MV
-        If sharePV > Facility(fIndex).RemainosPV Then sharePV = Facility(fIndex).RemainosPV
-        If sharePV > remainingMV Then sharePV = remainingMV
-        If sharePV < 0 Then sharePV = 0
-
-        'Convert PV share to FV reduction
-        repayFV = sharePV * Facility(fIndex).Compoundrate
+        'Cap by remaining facility FV and remaining security MV
         If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
+        If repayFV > remainingMV Then repayFV = remainingMV
+        If repayFV < 0 Then repayFV = 0
 
-        'Update BOTH PV and FV (critical for consistency)
-        Facility(fIndex).RemainosPV = Facility(fIndex).RemainosPV - sharePV
-        If Facility(fIndex).RemainosPV < 0 Then Facility(fIndex).RemainosPV = 0
-
+        'Reduce facility FV
         Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
         If Facility(fIndex).RemainosFV < 0 Then Facility(fIndex).RemainosFV = 0
 
-        remainingMV = remainingMV - sharePV
+        'Reduce facility PV consistently (PV = FV / Compoundrate)
+        If Facility(fIndex).Compoundrate <> 0 Then
+            repayPV = repayFV / Facility(fIndex).Compoundrate
+        Else
+            repayPV = repayFV
+        End If
+
+        Facility(fIndex).RemainosPV = Facility(fIndex).RemainosPV - repayPV
+        If Facility(fIndex).RemainosPV < 0 Then Facility(fIndex).RemainosPV = 0
+
+        remainingMV = remainingMV - repayFV
 
 NextFacilityR1:
     Next i
 
-    'Keep the leftover (if any) instead of forcing to 0
+    'After pro-rata, leftover should be ~0 (rounding may leave tiny residual)
+    If Abs(remainingMV) < 0.000001 Then remainingMV = 0
+
     Security(order).MarketValue = remainingMV
 
 Else
