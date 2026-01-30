@@ -1,1 +1,65 @@
-=SUMPRODUCT(($F$75:$F$83=1)*$J$75:$J$83*$M$75:$M$83)
+'=============================
+' RANK 1: PRO-RATA (PV WEIGHTED USING ORIGINAL PV)
+' Matches Excel validation:
+'   AllocPV_i = TotalPVAllocated * (OrigPV_i / SumOrigPV_rank1)
+'   AllocExpected_i = AllocPV_i / DiscountRate_i
+'=============================
+If currentrank = 1 Then
+
+    Dim totalOrigPV As Double
+    Dim allocPV As Double
+    Dim repayFV As Double
+    Dim fIndex As Long
+    Dim remainingMV As Double
+
+    'MarketValue is PV available to distribute (this is what you want to allocate)
+    remainingMV = Security(order).MarketValue
+
+    '1) Sum ORIGINAL PV weights for rank=1 facilities in this security
+    totalOrigPV = 0#
+    For i = 1 To Count
+        fIndex = fac_inrank(i)
+        If fIndex <> -1 Then
+            'IMPORTANT: use PVStore (original PV), NOT the updated PV
+            totalOrigPV = totalOrigPV + Facility(fIndex).RemainosPVStore
+        End If
+    Next i
+
+    '2) Allocate PV pro-rata using ORIGINAL PV weights
+    If totalOrigPV > 0# And remainingMV > 0# Then
+
+        For i = 1 To Count
+            fIndex = fac_inrank(i)
+            If fIndex = -1 Then GoTo NextFacilityR1
+
+            'PV allocated to this facility
+            allocPV = remainingMV * (Facility(fIndex).RemainosPVStore / totalOrigPV)
+
+            'Safety: cannot allocate more PV than remaining PV outstanding
+            If allocPV > Facility(fIndex).RemainosPV Then allocPV = Facility(fIndex).RemainosPV
+
+            '3) Reduce PV outstanding by allocPV (this drives PV column output correctly)
+            Facility(fIndex).RemainosPV = Facility(fIndex).RemainosPV - allocPV
+
+            '4) Convert PV reduction to FV reduction for the debt balance
+            '   PV = FV / Compoundrate  => FV = PV * Compoundrate
+            If Facility(fIndex).Compoundrate <> 0 Then
+                repayFV = allocPV * Facility(fIndex).Compoundrate
+            Else
+                repayFV = allocPV
+            End If
+
+            If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
+            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+
+NextFacilityR1:
+        Next i
+
+    End If
+
+    '5) Rank 1 consumes the entire PV available by design
+    Security(order).MarketValue = 0#
+
+Else
+    'Rank 2 & 3 handled by waterfall (your existing code below)
+End If
