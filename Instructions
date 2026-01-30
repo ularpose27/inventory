@@ -1,17 +1,12 @@
-Dim sumos2 As Double
-Dim repayedvalue As Double
-Dim pvOutstanding As Double
-Dim allocPV As Double
-
-
 '=========================================================
-' RANK 1: PRO-RATA (OLD BEHAVIOUR - PV weighted, iterative)
+' RANK 1: PRO-RATA (OLD MODEL BEHAVIOUR)
+' - Security(order).MarketValue is FV available (Expected Realization USD)
+' - We allocate FV pro-rata using PV weights (FV/Compoundrate)
 '=========================================================
 
-'We treat Security(order).MarketValue as PV available to allocate
-Do While Security(order).MarketValue > 0.000001
+Do While Security(order).MarketValue > 0.1  'same style as old code to avoid rounding drift
 
-    '1) Build the PV base for pro-rata (sum of PV outstanding)
+    '1) Build PV base used for weighting (sum of PV outstanding)
     sumos2 = 0#
     For i = 1 To Count
         fIndex = fac_inrank(i)
@@ -26,49 +21,42 @@ Do While Security(order).MarketValue > 0.000001
 
     If sumos2 <= 0# Then Exit Do
 
-    '2) Allocate PV pro-rata, then convert to FV and deduct both
-    repayedvalue = 0#
+    repayedvalue = 0#   'this iteration’s FV allocated
 
+    '2) Allocate FV pro-rata using PV weights
     For i = 1 To Count
         fIndex = fac_inrank(i)
         If fIndex = -1 Then GoTo NextFacilityR1
 
-        'PV outstanding for this facility (same basis as old model)
+        'PV outstanding for weighting
         If Facility(fIndex).Compoundrate <> 0 Then
             pvOutstanding = Facility(fIndex).RemainosFV / Facility(fIndex).Compoundrate
         Else
             pvOutstanding = Facility(fIndex).RemainosFV
         End If
 
-        'PV allocation share
-        allocPV = Security(order).MarketValue * (pvOutstanding / sumos2)
+        'FV allocation share (IMPORTANT: allocate FV, not PV)
+        repayFV = Security(order).MarketValue * (pvOutstanding / sumos2)
 
-        'Cap PV allocation so we never allocate more PV than outstanding
-        If allocPV > pvOutstanding Then allocPV = pvOutstanding
-
-        'Deduct PV
-        Facility(fIndex).RemainosPV = Facility(fIndex).RemainosPV - allocPV
-
-        'Convert PV allocation to FV deduction
-        If Facility(fIndex).Compoundrate <> 0 Then
-            repayFV = allocPV * Facility(fIndex).Compoundrate
-        Else
-            repayFV = allocPV
-        End If
-
-        'Cap FV deduction
+        'Cap at remaining FV
         If repayFV > Facility(fIndex).RemainosFV Then repayFV = Facility(fIndex).RemainosFV
 
-        'Deduct FV
+        'Deduct FV from debt
         Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
 
-        'Track PV used in this iteration
-        repayedvalue = repayedvalue + allocPV
+        'Track FV used
+        repayedvalue = repayedvalue + repayFV
+
+        'If facility fully repaid, remove from next loop base (matches old behaviour)
+        If Facility(fIndex).RemainosFV <= 0.000001 Then
+            Facility(fIndex).RemainosFV = 0#
+            fac_inrank(i) = -1
+        End If
 
 NextFacilityR1:
     Next i
 
-    '3) Reduce remaining PV market value (iterative to avoid rounding drift)
+    '3) Reduce remaining FV market value
     Security(order).MarketValue = Security(order).MarketValue - repayedvalue
 
 Loop
