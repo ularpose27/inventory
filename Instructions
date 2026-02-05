@@ -1,20 +1,2 @@
-Dim firstOrder As Long, lastOrder As Long
-Dim payDate As Date
-Dim o As Long
-
-order = 1
-Do While order <= n
-
-    payDate = Security(order).Paymentdate
-    firstOrder = order
-    lastOrder = order
-
-    Do While lastOrder < n
-        If Security(lastOrder + 1).Paymentdate = payDate Then
-            lastOrder = lastOrder + 1
-        Else
-            Exit Do
-        End If
-    Loop
-
-    For o = firstOrder To lastOrder
+rangeStr = "D" & (BlankRowUpside + 9 + (Security(o).OriginalOrder - 1) * Height) & _
+           ":D" & (BlankRowUpside + 9 + m + (Security(o).OriginalOrder - 1) * Height)
