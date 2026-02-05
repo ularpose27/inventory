@@ -1,2 +1,10 @@
-rangeStr = "D" & (BlankRowUpside + 9 + (Security(o).OriginalOrder - 1) * Height) & _
-           ":D" & (BlankRowUpside + 9 + m + (Security(o).OriginalOrder - 1) * Height)
+Next o
+
+    Call AllocateRank1SameDay(firstOrder, lastOrder, m, Facility, Security, RankBySecurity)
+
+    For o = firstOrder To lastOrder
+        Call AllocateRank23Waterfall(o, m, Facility, Security, RankBySecurity)
+    Next o
+
+    order = lastOrder + 1
+Loop
