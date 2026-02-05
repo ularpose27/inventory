@@ -1,10 +1,118 @@
-Next o
+Private Sub AllocateRank1SameDay(ByVal firstOrder As Long, ByVal lastOrder As Long, ByVal m As Long, _
+                                 ByRef Facility() As FacilityInfo, ByRef Security() As SecurityInfo, _
+                                 ByRef RankBySecurity() As Integer)
 
-    Call AllocateRank1SameDay(firstOrder, lastOrder, m, Facility, Security, RankBySecurity)
+    Dim o As Long, i As Long
+    Dim totalMV As Double
+    Dim totalPV As Double
+    Dim payPV As Double
+    Dim totalPaid As Double
+    Dim remainingMV As Double
+    Dim sumOrigMV As Double
+    Dim origMV() As Double
+
+    ReDim origMV(firstOrder To lastOrder)
+
+    totalMV = 0#
+    sumOrigMV = 0#
 
     For o = firstOrder To lastOrder
-        Call AllocateRank23Waterfall(o, m, Facility, Security, RankBySecurity)
+        origMV(o) = Security(o).MarketValue
+        totalMV = totalMV + Security(o).MarketValue
+        sumOrigMV = sumOrigMV + origMV(o)
     Next o
 
-    order = lastOrder + 1
-Loop
+    If totalMV <= 0# Then Exit Sub
+
+    totalPV = 0#
+    For i = 1 To m
+        Dim isR1 As Boolean
+        isR1 = False
+        For o = firstOrder To lastOrder
+            If RankBySecurity(o, i) = 1 Then
+                isR1 = True
+                Exit For
+            End If
+        Next o
+        If isR1 Then
+            If Facility(i).RemainosPV > 0# Then
+                totalPV = totalPV + Facility(i).RemainosPV
+            End If
+        End If
+    Next i
+
+    If totalPV <= 0# Then Exit Sub
+
+    totalPaid = 0#
+
+    For i = 1 To m
+        Dim isR1b As Boolean
+        isR1b = False
+        For o = firstOrder To lastOrder
+            If RankBySecurity(o, i) = 1 Then
+                isR1b = True
+                Exit For
+            End If
+        Next o
+
+        If isR1b Then
+            If Facility(i).RemainosPV > 0# Then
+                payPV = totalMV * (Facility(i).RemainosPV / totalPV)
+                If payPV > Facility(i).RemainosPV Then payPV = Facility(i).RemainosPV
+                Facility(i).RemainosPV = Facility(i).RemainosPV - payPV
+                If Facility(i).Compoundrate <> 0# Then
+                    Facility(i).RemainosFV = Facility(i).RemainosPV * Facility(i).Compoundrate
+                End If
+                totalPaid = totalPaid + payPV
+            End If
+        End If
+    Next i
+
+    remainingMV = totalMV - totalPaid
+    If remainingMV < 0# Then remainingMV = 0#
+
+    If sumOrigMV > 0# Then
+        For o = firstOrder To lastOrder
+            Security(o).MarketValue = remainingMV * (origMV(o) / sumOrigMV)
+        Next o
+    End If
+
+End Sub
+
+
+
+Private Sub AllocateRank23Waterfall(ByVal order As Long, ByVal m As Long, _
+                                    ByRef Facility() As FacilityInfo, ByRef Security() As SecurityInfo, _
+                                    ByRef RankBySecurity() As Integer)
+
+    Dim remainingMV As Double
+    Dim i As Long
+    Dim repayFV As Double
+
+    remainingMV = Security(order).MarketValue
+
+    For i = 1 To m
+
+        If RankBySecurity(order, i) = 2 Or RankBySecurity(order, i) = 3 Then
+
+            repayFV = Facility(i).RemainosFV
+            If repayFV > remainingMV Then repayFV = remainingMV
+            If repayFV < 0# Then repayFV = 0#
+
+            Facility(i).RemainosFV = Facility(i).RemainosFV - repayFV
+            remainingMV = remainingMV - repayFV
+
+            If Facility(i).Compoundrate <> 0# Then
+                Facility(i).RemainosPV = Facility(i).RemainosFV / Facility(i).Compoundrate
+            End If
+
+            If remainingMV <= 0# Then Exit For
+
+        End If
+
+    Next i
+
+    If remainingMV < 0# Then remainingMV = 0#
+    Security(order).MarketValue = remainingMV
+
+End Sub
