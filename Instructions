@@ -148,22 +148,16 @@ Sub CalSharingofPV()
                 Facility(i).RemainosPVStore = Facility(i).RemainosPV
             Next i
 
-            Call AllocateRank1SameDay(firstOrder, lastOrder, m, Facility, Security, RankBySecurity, irr, startdate)
+            Call AllocateRank1SameDayPV(firstOrder, lastOrder, m, Facility, Security, RankBySecurity, irr, startdate)
 
             Dim o As Long
             For o = firstOrder To lastOrder
-                Call AllocateRank23Waterfall(o, m, Facility, Security, RankBySecurity, WeightBySecurity)
+                Call AllocateRank23WaterfallPV(o, m, Facility, Security, RankBySecurity, WeightBySecurity, irr, startdate)
             Next o
 
             order = lastOrder + 1
 
         Loop
-
-        For i = 1 To m
-            If Facility(i).Compoundrate <> 0 Then
-                Facility(i).RemainosPV = Facility(i).RemainosFV / Facility(i).Compoundrate
-            End If
-        Next i
 
         'PRINT in Security Apportionment
         For order = 1 To n
@@ -188,36 +182,32 @@ Sub CalSharingofPV()
 
                         CellP.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = Facility(i).RemainosPVStore - Facility(i).RemainosPV
 
+                        Dim thisComp As Double
                         If Security(order).Paymentdate <> "12:00:00 AM" Then
-
-                            If Facility(i).Compoundrate = 0 Then
-                                Facility(i).Compoundrate = (1 + irr(i)) ^ ((Security(order).Paymentdate - startdate) / 365)
-                            End If
-
-                            'only dividing if we have a valid date
-                            If Facility(i).Compoundrate <> 0 Then
-                                CellP.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 1 / Facility(i).Compoundrate
+                            thisComp = (1 + irr(i)) ^ ((Security(order).Paymentdate - startdate) / 365)
+                            If thisComp <> 0 Then
+                                CellP.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 1 / thisComp
                             Else
                                 CellP.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0
                             End If
-
                         Else
+                            thisComp = 0
                             CellP.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0
                         End If
 
-                        CellP.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = (Facility(i).RemainosPVStore - Facility(i).RemainosPV) * Facility(i).Compoundrate
+                        CellP.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = (Facility(i).RemainosPVStore - Facility(i).RemainosPV) * thisComp
 
                         'Print in ECF Report 1
                         wsPrint.Range("B" & PrintRow).Value = Facility(i).LoanName
                         wsPrint.Range("L" & PrintRow).Value = Facility(i).RemainosPVStore - Facility(i).RemainosPV
 
-                        If Facility(i).Compoundrate <> 0 Then
-                            wsPrint.Range("J" & PrintRow).Value = 1 / Facility(i).Compoundrate
+                        If thisComp <> 0 Then
+                            wsPrint.Range("J" & PrintRow).Value = 1 / thisComp
                         Else
                             wsPrint.Range("J" & PrintRow).Value = 0
                         End If
 
-                        wsPrint.Range("F" & PrintRow).Value = (Facility(i).RemainosPVStore - Facility(i).RemainosPV) * Facility(i).Compoundrate
+                        wsPrint.Range("F" & PrintRow).Value = (Facility(i).RemainosPVStore - Facility(i).RemainosPV) * thisComp
                         wsPrint.Range("H" & PrintRow).Value = Security(order).Paymentdate
                         wsPrint.Range("M" & PrintRow).Value = Security(order).SecurityName
 
@@ -278,10 +268,10 @@ Sub CalSharingofPV()
 End Sub
 
 
-Private Sub AllocateRank1SameDay(ByVal firstOrder As Long, ByVal lastOrder As Long, ByVal m As Long, _
-                                 ByRef Facility() As FacilityInfo, ByRef Security() As SecurityInfo, _
-                                 ByRef RankBySecurity() As Integer, _
-                                 ByRef irr() As Double, ByVal startdate As Date)
+Private Sub AllocateRank1SameDayPV(ByVal firstOrder As Long, ByVal lastOrder As Long, ByVal m As Long, _
+                                   ByRef Facility() As FacilityInfo, ByRef Security() As SecurityInfo, _
+                                   ByRef RankBySecurity() As Integer, _
+                                   ByRef irr() As Double, ByVal startdate As Date)
 
     Dim i As Long, o As Long
 
@@ -301,9 +291,14 @@ Private Sub AllocateRank1SameDay(ByVal firstOrder As Long, ByVal lastOrder As Lo
     Dim payDate As Date
     payDate = Security(firstOrder).Paymentdate
 
+    Dim comp() As Double
+    Dim FV() As Double
+    ReDim comp(1 To m) As Double
+    ReDim FV(1 To m) As Double
+
     For i = 1 To m
-        Facility(i).Compoundrate = (1 + irr(i)) ^ ((payDate - startdate) / 365)
-        Facility(i).RemainosFV = Facility(i).Compoundrate * Facility(i).RemainosPV
+        comp(i) = (1 + irr(i)) ^ ((payDate - startdate) / 365)
+        FV(i) = Facility(i).RemainosPV * comp(i)
     Next i
 
     Dim inRank1() As Boolean
@@ -320,6 +315,7 @@ Private Sub AllocateRank1SameDay(ByVal firstOrder As Long, ByVal lastOrder As Lo
     Dim remainingPoolMV As Double
     remainingPoolMV = totalMV
 
+    'RANK 1: PRO-RATA
     Do While remainingPoolMV > 0.1
 
         Dim sumos2 As Double
@@ -327,11 +323,11 @@ Private Sub AllocateRank1SameDay(ByVal firstOrder As Long, ByVal lastOrder As Lo
 
         For i = 1 To m
             If inRank1(i) Then
-                If Facility(i).RemainosFV > 0# Then
-                    If Facility(i).Compoundrate <> 0 Then
-                        sumos2 = sumos2 + (Facility(i).RemainosFV / Facility(i).Compoundrate)
+                If FV(i) > 0# Then
+                    If comp(i) <> 0 Then
+                        sumos2 = sumos2 + (FV(i) / comp(i))
                     Else
-                        sumos2 = sumos2 + Facility(i).RemainosFV
+                        sumos2 = sumos2 + FV(i)
                     End If
                 End If
             End If
@@ -346,25 +342,25 @@ Private Sub AllocateRank1SameDay(ByVal firstOrder As Long, ByVal lastOrder As Lo
 
             If inRank1(i) Then
 
-                If Facility(i).RemainosFV > 0# Then
+                If FV(i) > 0# Then
 
                     Dim pvOutstanding As Double
-                    If Facility(i).Compoundrate <> 0 Then
-                        pvOutstanding = Facility(i).RemainosFV / Facility(i).Compoundrate
+                    If comp(i) <> 0 Then
+                        pvOutstanding = FV(i) / comp(i)
                     Else
-                        pvOutstanding = Facility(i).RemainosFV
+                        pvOutstanding = FV(i)
                     End If
 
                     Dim repayFV As Double
                     repayFV = remainingPoolMV * (pvOutstanding / sumos2)
 
-                    If repayFV > Facility(i).RemainosFV Then repayFV = Facility(i).RemainosFV
+                    If repayFV > FV(i) Then repayFV = FV(i)
 
-                    Facility(i).RemainosFV = Facility(i).RemainosFV - repayFV
+                    FV(i) = FV(i) - repayFV
                     repayedvalue = repayedvalue + repayFV
 
-                    If Facility(i).RemainosFV <= 0.000001 Then
-                        Facility(i).RemainosFV = 0#
+                    If FV(i) <= 0.000001 Then
+                        FV(i) = 0#
                     End If
 
                 End If
@@ -381,6 +377,14 @@ Private Sub AllocateRank1SameDay(ByVal firstOrder As Long, ByVal lastOrder As Lo
 
     If remainingPoolMV < 0# Then remainingPoolMV = 0#
 
+    For i = 1 To m
+        If comp(i) <> 0 Then
+            Facility(i).RemainosPV = FV(i) / comp(i)
+        Else
+            Facility(i).RemainosPV = FV(i)
+        End If
+    Next i
+
     If remainingPoolMV <= 0# Then
         For o = firstOrder To lastOrder
             Security(o).MarketValue = 0#
@@ -389,25 +393,37 @@ Private Sub AllocateRank1SameDay(ByVal firstOrder As Long, ByVal lastOrder As Lo
     End If
 
     For o = firstOrder To lastOrder
-        If totalMV > 0# Then
-            Security(o).MarketValue = remainingPoolMV * (origMV(o) / totalMV)
-        Else
-            Security(o).MarketValue = 0#
-        End If
+        Security(o).MarketValue = remainingPoolMV * (origMV(o) / totalMV)
     Next o
 
 End Sub
 
 
-Private Sub AllocateRank23Waterfall(ByVal order As Long, ByVal m As Long, _
-                                    ByRef Facility() As FacilityInfo, ByRef Security() As SecurityInfo, _
-                                    ByRef RankBySecurity() As Integer, ByRef WeightBySecurity() As Long)
+Private Sub AllocateRank23WaterfallPV(ByVal order As Long, ByVal m As Long, _
+                                      ByRef Facility() As FacilityInfo, ByRef Security() As SecurityInfo, _
+                                      ByRef RankBySecurity() As Integer, ByRef WeightBySecurity() As Long, _
+                                      ByRef irr() As Double, ByVal startdate As Date)
 
     Dim remainingMV As Double
     remainingMV = Security(order).MarketValue
     If remainingMV <= 0# Then Exit Sub
 
-    Dim i As Long, a As Long, b As Long
+    Dim payDate As Date
+    payDate = Security(order).Paymentdate
+
+    Dim comp() As Double
+    Dim FV() As Double
+    ReDim comp(1 To m) As Double
+    ReDim FV(1 To m) As Double
+
+    Dim i As Long
+    For i = 1 To m
+        comp(i) = (1 + irr(i)) ^ ((payDate - startdate) / 365)
+        FV(i) = Facility(i).RemainosPV * comp(i)
+    Next i
+
+    'RANK 2 & 3: WATERFALL
+    Dim a As Long, b As Long
     Dim idx() As Long
     Dim sortCount As Long
     Dim tmpIdx As Long
@@ -447,26 +463,31 @@ Private Sub AllocateRank23Waterfall(ByVal order As Long, ByVal m As Long, _
 
         If remainingMV <= 0# Then Exit For
 
-        If Facility(fIndex).RemainosFV > 0# Then
+        If FV(fIndex) > 0# Then
 
             Dim repayFV As Double
-            repayFV = Facility(fIndex).RemainosFV
+            repayFV = FV(fIndex)
             If repayFV > remainingMV Then repayFV = remainingMV
 
-            Facility(fIndex).RemainosFV = Facility(fIndex).RemainosFV - repayFV
+            FV(fIndex) = FV(fIndex) - repayFV
             remainingMV = remainingMV - repayFV
 
-            If Facility(fIndex).RemainosFV <= 0.000001 Then
-                Facility(fIndex).RemainosFV = 0#
+            If FV(fIndex) <= 0.000001 Then
+                FV(fIndex) = 0#
             End If
 
         End If
 
     Next i
 
+    For i = 1 To m
+        If comp(i) <> 0 Then
+            Facility(i).RemainosPV = FV(i) / comp(i)
+        Else
+            Facility(i).RemainosPV = FV(i)
+        End If
+    Next i
+
     Security(order).MarketValue = remainingMV
 
 End Sub
-
-
-
