@@ -1,6 +1,2 @@
-Dim m, n As Long
-m = CountFacility()
-n = CountSecurity()
-
-Dim RankBySecurity() As Integer
-ReDim RankBySecurity(1 To n, 1 To m)
+Facility(i).Rank = Cell.Offset(0, 2).Value
+RankBySecurity(order, i) = Facility(i).Rank
