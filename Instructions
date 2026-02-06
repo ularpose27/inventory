@@ -14,7 +14,7 @@ Sub CalSharingofPV()
     wsPrint.Range("A3:N1048576").ClearContents
     wsPrint.Range("B2, E2, F2, J2, H2, L2, M2").ClearContents
 
-    Dim i As Long, j As Long, k As Long
+    Dim i As Long, j As Long
     Dim m As Long, n As Long
     m = CountFacility()
     n = CountSecurity()
@@ -25,7 +25,7 @@ Sub CalSharingofPV()
     Dim Height As Long
     If m >= 5 Then
         Height = 11 + m
-    ElseIf m < 5 Then
+    Else
         Height = 11 + 5
     End If
 
@@ -83,15 +83,16 @@ Sub CalSharingofPV()
         Next i
 
         Dim temp As SecurityInfo
-        For i = 1 To UBound(Security) - 1
-            For j = 1 To UBound(Security) - i
-                If Security(j).Paymentdate > Security(j + 1).Paymentdate Then
-                    temp = Security(j)
-                    Security(j) = Security(j + 1)
-                    Security(j + 1) = temp
+        Dim a As Long, b As Long
+        For a = 1 To UBound(Security) - 1
+            For b = 1 To UBound(Security) - a
+                If Security(b).Paymentdate > Security(b + 1).Paymentdate Then
+                    temp = Security(b)
+                    Security(b) = Security(b + 1)
+                    Security(b + 1) = temp
                 End If
-            Next j
-        Next i
+            Next b
+        Next a
 
         Dim HasFacility() As Boolean
         Dim RankBySec() As Long
@@ -196,90 +197,74 @@ Sub CalSharingofPV()
                 Next j
             Next i
 
-            Dim groupMV0 As Double
-            groupMV0 = 0#
+            Dim sumPV As Double
+            Dim pvOut As Double
+            Dim comp As Double
+            Dim repayFV As Double
+            Dim repayPV As Double
+            Dim allocatedFV As Double
+
             For i = firstOrder To lastOrder
-                groupMV0 = groupMV0 + Security(i).MarketValue
-            Next i
+                Do While Security(i).MarketValue > 0.1
 
-            Dim groupMV As Double
-            groupMV = groupMV0
-
-            Dim sumPV As Double, allocatedFV As Double
-            Dim pvOut As Double, comp As Double, repayFV As Double, repayPV As Double
-            Dim iterAlloc As Double
-
-            Do While groupMV > 0.1
-                sumPV = 0#
-                For j = 1 To m
-                    If PrimaryRank(j) = 1 Then
-                        If Facility(j).RemainosPV > 0# Then
-                            If PrimaryOrder(j) >= firstOrder And PrimaryOrder(j) <= lastOrder Then
-                                comp = CompBySec(PrimaryOrder(j), j)
-                                If comp > 0# Then
+                    sumPV = 0#
+                    For j = 1 To m
+                        If PrimaryRank(j) = 1 And PrimaryOrder(j) = i Then
+                            comp = CompBySec(i, j)
+                            If comp > 0# Then
+                                If Facility(j).RemainosPV > 0# Then
                                     sumPV = sumPV + Facility(j).RemainosPV
                                 End If
                             End If
                         End If
-                    End If
-                Next j
+                    Next j
 
-                If sumPV <= 0# Then Exit Do
+                    If sumPV <= 0# Then Exit Do
 
-                iterAlloc = 0#
-                For j = 1 To m
-                    If PrimaryRank(j) = 1 Then
-                        If Facility(j).RemainosPV > 0# Then
-                            If PrimaryOrder(j) >= firstOrder And PrimaryOrder(j) <= lastOrder Then
-                                comp = CompBySec(PrimaryOrder(j), j)
-                                If comp > 0# Then
+                    allocatedFV = 0#
+                    For j = 1 To m
+                        If PrimaryRank(j) = 1 And PrimaryOrder(j) = i Then
+                            comp = CompBySec(i, j)
+                            If comp > 0# Then
+                                If Facility(j).RemainosPV > 0# Then
+
                                     pvOut = Facility(j).RemainosPV
-                                    repayFV = groupMV * (pvOut / sumPV)
+                                    repayFV = Security(i).MarketValue * (pvOut / sumPV)
+
                                     If repayFV > (Facility(j).RemainosPV * comp) Then repayFV = Facility(j).RemainosPV * comp
                                     repayPV = repayFV / comp
                                     If repayPV > Facility(j).RemainosPV Then repayPV = Facility(j).RemainosPV
+
                                     Facility(j).RemainosPV = Facility(j).RemainosPV - repayPV
-                                    PaidPV(PrimaryOrder(j), j) = PaidPV(PrimaryOrder(j), j) + repayPV
-                                    iterAlloc = iterAlloc + repayFV
+                                    PaidPV(i, j) = PaidPV(i, j) + repayPV
+                                    allocatedFV = allocatedFV + repayFV
+
                                 End If
                             End If
                         End If
-                    End If
-                Next j
+                    Next j
 
-                If iterAlloc <= 0.000001 Then Exit Do
-                groupMV = groupMV - iterAlloc
-                If groupMV < 0# Then groupMV = 0#
-            Loop
-
-            Dim consumedFV As Double
-            consumedFV = groupMV0 - groupMV
-            If consumedFV < 0# Then consumedFV = 0#
-
-            If groupMV0 > 0# And consumedFV > 0# Then
-                For i = firstOrder To lastOrder
-                    Security(i).MarketValue = Security(i).MarketValue - consumedFV * (Security(i).MarketValue / groupMV0)
+                    If allocatedFV <= 0.000001 Then Exit Do
+                    Security(i).MarketValue = Security(i).MarketValue - allocatedFV
                     If Security(i).MarketValue < 0# Then Security(i).MarketValue = 0#
-                Next i
-            End If
+
+                Loop
+            Next i
 
             Dim orderList() As Long
-            Dim idxOrd() As Long
-            Dim cOrd As Long, a As Long, b As Long, tmpL As Long
-
+            Dim cOrd As Long
             cOrd = lastOrder - firstOrder + 1
             ReDim orderList(1 To cOrd)
-            ReDim idxOrd(1 To cOrd)
 
             For a = 1 To cOrd
                 orderList(a) = firstOrder + (a - 1)
-                idxOrd(a) = a
             Next a
 
             If cOrd > 1 Then
                 For a = 1 To cOrd - 1
                     For b = a + 1 To cOrd
                         If Security(orderList(b)).OriginalOrder < Security(orderList(a)).OriginalOrder Then
+                            Dim tmpL As Long
                             tmpL = orderList(a)
                             orderList(a) = orderList(b)
                             orderList(b) = tmpL
@@ -294,7 +279,6 @@ Sub CalSharingofPV()
                     i = orderList(a)
                     If Security(i).MarketValue > 0.1 Then
                         Call AllocateRankWaterfall(i, m, Facility, RankBySec, WeightBySec, CompBySec, HasFacility, PaidPV, currentrank, Security(i).MarketValue)
-                        Security(i).MarketValue = Security(i).MarketValue
                     End If
                 Next a
             Next currentrank
@@ -319,12 +303,12 @@ Sub CalSharingofPV()
                         End If
 
                         comp = CompBySec(i, j)
+                        Cell.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = PaidPV(i, j)
+
                         If comp > 0# Then
-                            Cell.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = PaidPV(i, j)
                             Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 1# / comp
                             Cell.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = PaidPV(i, j) * comp
                         Else
-                            Cell.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = PaidPV(i, j)
                             Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0#
                             Cell.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = 0#
                         End If
