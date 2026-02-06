@@ -159,7 +159,7 @@ Sub CalSharingofPV()
 
                 Call UpdatePVFromFV_NoTypes(m, Facility)
 
-                Call PrintSecurityResult_NoTypes(order, scen, m, Facility, Security, RankBySecurity, irr, startdate, BlankRowUpside, Height, wsPrint, PrintRow)
+                Call PrintSecurityResult_NoTypes(order, scen, m, Facility, Security, RankBySecurity, BlankRowUpside, Height, wsPrint, PrintRow)
 
             Next order
 
@@ -200,21 +200,15 @@ Private Sub EnsureFacilityFVForDate_NoTypes(ByVal m As Long, ByRef Facility() As
 
     If dt = 0 Then
         For f = 1 To m
-            Facility(f)("Compoundrate") = 1#
+            Facility(f)("Compoundrate") = 0#
             Facility(f)("RemainosFV") = CDbl(Facility(f)("RemainosPV"))
         Next f
         Exit Sub
     End If
 
     For f = 1 To m
-        If CDbl(Facility(f)("Compoundrate")) = 0# Then
-            Facility(f)("Compoundrate") = (1 + irr(f)) ^ ((dt - startdate) / 365#)
-        End If
-        If CDbl(Facility(f)("Compoundrate")) <> 0# Then
-            Facility(f)("RemainosFV") = CDbl(Facility(f)("RemainosPV")) * CDbl(Facility(f)("Compoundrate"))
-        Else
-            Facility(f)("RemainosFV") = CDbl(Facility(f)("RemainosPV"))
-        End If
+        Facility(f)("Compoundrate") = (1 + irr(f)) ^ ((dt - startdate) / 365#)
+        Facility(f)("RemainosFV") = CDbl(Facility(f)("RemainosPV")) * CDbl(Facility(f)("Compoundrate"))
     Next f
 
 End Sub
@@ -365,8 +359,8 @@ End Function
 
 Private Sub PrintSecurityResult_NoTypes(ByVal order As Long, ByVal scen As Long, ByVal m As Long, _
                                        ByRef Facility() As Object, ByRef Security() As Object, _
-                                       ByRef RankBySecurity() As Integer, ByRef irr() As Double, _
-                                       ByVal startdate As Date, ByVal BlankRowUpside As Long, ByVal Height As Long, _
+                                       ByRef RankBySecurity() As Integer, _
+                                       ByVal BlankRowUpside As Long, ByVal Height As Long, _
                                        ByRef wsPrint As Worksheet, ByRef PrintRow As Long)
 
     Dim rangeStr As String
@@ -395,15 +389,8 @@ Private Sub PrintSecurityResult_NoTypes(ByVal order As Long, ByVal scen As Long,
 
                 Cell.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = allocPV
 
-                If Security(order)("Paymentdate") <> "12:00:00 AM" Then
-                    If CDbl(Facility(i)("Compoundrate")) = 0# Then
-                        Facility(i)("Compoundrate") = (1 + irr(i)) ^ ((Security(order)("Paymentdate") - startdate) / 365#)
-                    End If
-                    If CDbl(Facility(i)("Compoundrate")) <> 0# Then
-                        Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 1 / CDbl(Facility(i)("Compoundrate"))
-                    Else
-                        Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0
-                    End If
+                If Security(order)("Paymentdate") <> "12:00:00 AM" And CDbl(Facility(i)("Compoundrate")) <> 0# Then
+                    Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 1 / CDbl(Facility(i)("Compoundrate"))
                 Else
                     Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0
                 End If
