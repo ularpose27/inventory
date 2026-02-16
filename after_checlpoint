@@ -1,0 +1,445 @@
+Sub CalSharingofPV()
+
+    If Not ActiveSheet.Name = "Security Apportionment" Then
+        MsgBox "Please open sheet 'Security Apportionment'", vbExclamation
+        Exit Sub
+    End If
+
+    Application.ScreenUpdating = False
+
+    Dim PrintRow As Integer
+    PrintRow = 2
+    Dim wsPrint As Worksheet
+    Set wsPrint = ThisWorkbook.Sheets("Hide - ECF Report 1")
+    wsPrint.Range("A3:N1048576").ClearContents
+    wsPrint.Range("B2, E2, F2, J2, H2, L2, M2").ClearContents
+
+    Dim i As Long, j As Long
+    Dim m As Long, n As Long
+    m = CountFacility()
+    n = CountSecurity()
+
+    Dim BlankRowUpside As Long
+    BlankRowUpside = BlankRow_Upside()
+
+    Dim Height As Long
+    If m >= 5 Then
+        Height = 11 + m
+    Else
+        Height = 11 + 5
+    End If
+
+    Dim startdate As Date
+    startdate = Sheets("Start").Range("B3").Value
+
+    Dim DrawnOriginal() As Double, irr() As Double
+    ReDim DrawnOriginal(1 To m)
+    ReDim irr(1 To m)
+
+    For i = 1 To m
+        DrawnOriginal(i) = Sheets("Hide - Facility").Range("L" & (1 + i)).Value
+        irr(i) = Sheets("Facility").Range("AK" & (7 + i)).Value
+    Next i
+
+    Dim securityWs As Worksheet
+    Set securityWs = ThisWorkbook.Sheets("Hide - Security1")
+
+    With securityWs.Sort
+        .SortFields.Clear
+        .SortFields.Add Key:=securityWs.Range("A1"), Order:=xlDescending
+        .SortFields.Add Key:=securityWs.Range("I1"), Order:=xlAscending
+        .SetRange securityWs.Range("A:K")
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+
+    Dim scen As Integer
+    For scen = 1 To 4
+
+        Dim Facility() As FacilityInfo
+        ReDim Facility(1 To m)
+
+        For i = 1 To m
+            Facility(i).LoanName = Sheets("Facility").Range("J" & (7 + i)).Value
+            Facility(i).RemainosPV = DrawnOriginal(i)
+            Facility(i).RemainosPVStore = 0#
+            Facility(i).RemainosFV = 0#
+            Facility(i).Compoundrate = 0#
+            Facility(i).Rank = 0
+            Facility(i).Weight = 0
+        Next i
+
+        Dim Security() As SecurityInfo
+        ReDim Security(1 To n)
+
+        For i = 1 To n
+            Security(i).SecurityName = Sheets("Hide - Security1").Range("B" & (1 + i)).Value
+            Security(i).OriginalOrder = i
+            Security(i).MarketValue = Sheets("Security Apportionment").Range("K" & (BlankRowUpside + 7 + (i - 1) * Height)).Offset(0, 1 + 3 * (scen - 1)).Value
+            Security(i).Paymentdate = Sheets("Security Apportionment").Range("K" & (BlankRowUpside + 2 + (i - 1) * Height)).Offset(0, 1 + 3 * (scen - 1)).Value
+        Next i
+
+        Dim temp As SecurityInfo
+        Dim a As Long, b As Long
+        For a = 1 To UBound(Security) - 1
+            For b = 1 To UBound(Security) - a
+                If Security(b).Paymentdate > Security(b + 1).Paymentdate Then
+                    temp = Security(b)
+                    Security(b) = Security(b + 1)
+                    Security(b + 1) = temp
+                End If
+            Next b
+        Next a
+
+        Dim HasFacility() As Boolean
+        Dim RankBySec() As Long
+        Dim WeightBySec() As Long
+        Dim CompBySec() As Double
+        Dim PaidPV() As Double
+
+        ReDim HasFacility(1 To n, 1 To m)
+        ReDim RankBySec(1 To n, 1 To m)
+        ReDim WeightBySec(1 To n, 1 To m)
+        ReDim CompBySec(1 To n, 1 To m)
+        ReDim PaidPV(1 To n, 1 To m)
+
+        For i = 1 To n
+            For j = 1 To m
+                HasFacility(i, j) = False
+                RankBySec(i, j) = 0
+                WeightBySec(i, j) = 0
+                CompBySec(i, j) = 0#
+                PaidPV(i, j) = 0#
+            Next j
+        Next i
+
+        Dim Cell As Range
+        Dim rangeStr As String
+        Dim facRowOrder As Long
+
+        For i = 1 To n
+            rangeStr = "D" & (BlankRowUpside + 9 + (Security(i).OriginalOrder - 1) * Height) _
+                     & ":D" & (BlankRowUpside + 9 + m + (Security(i).OriginalOrder - 1) * Height)
+
+            facRowOrder = 0
+            For Each Cell In ThisWorkbook.Worksheets("Security Apportionment").Range(rangeStr)
+                For j = 1 To m
+                    If Facility(j).LoanName = Cell.Value Then
+
+                        If Cell.Offset(0, 2).Value <> Empty Then
+                            HasFacility(i, j) = True
+                            RankBySec(i, j) = CLng(Cell.Offset(0, 2).Value)
+                            facRowOrder = facRowOrder + 1
+                            WeightBySec(i, j) = facRowOrder
+
+                            If Security(i).Paymentdate <> "12:00:00 AM" Then
+                                If (1 + irr(j)) > 0 Then
+                                    CompBySec(i, j) = (1 + irr(j)) ^ ((Security(i).Paymentdate - startdate) / 365#)
+                                Else
+                                    CompBySec(i, j) = 0#
+                                End If
+                            Else
+                                CompBySec(i, j) = 0#
+                            End If
+                        End If
+
+                        Exit For
+                    End If
+                Next j
+            Next Cell
+        Next i
+
+        Dim firstOrder As Long, lastOrder As Long
+        Dim dt As Variant
+
+        firstOrder = 1
+        Do While firstOrder <= n
+
+            dt = Security(firstOrder).Paymentdate
+            lastOrder = firstOrder
+            Do While lastOrder < n
+                If Security(lastOrder + 1).Paymentdate = dt Then
+                    lastOrder = lastOrder + 1
+                Else
+                    Exit Do
+                End If
+            Loop
+
+            Dim BestRank() As Long
+            ReDim BestRank(1 To m)
+
+            For j = 1 To m
+                BestRank(j) = 9999
+            Next j
+
+            For i = firstOrder To lastOrder
+                For j = 1 To m
+                    If HasFacility(i, j) Then
+                        If RankBySec(i, j) >= 1 And RankBySec(i, j) <= 3 Then
+                            If RankBySec(i, j) < BestRank(j) Then
+                                BestRank(j) = RankBySec(i, j)
+                            End If
+                        End If
+                    End If
+                Next j
+            Next i
+
+            Dim sumPV As Double
+            Dim pvOut As Double
+            Dim comp As Double
+            Dim repayFV As Double
+            Dim repayPV As Double
+            Dim allocatedFV As Double
+
+            For i = firstOrder To lastOrder
+                Do While Security(i).MarketValue > 0.1
+
+                    sumPV = 0#
+                    For j = 1 To m
+                        If HasFacility(i, j) Then
+                            If RankBySec(i, j) = 1 And BestRank(j) = 1 Then
+                                comp = CompBySec(i, j)
+                                If comp > 0# Then
+                                    If Facility(j).RemainosPV > 0# Then
+                                        sumPV = sumPV + Facility(j).RemainosPV
+                                    End If
+                                End If
+                            End If
+                        End If
+                    Next j
+
+                    If sumPV <= 0# Then Exit Do
+
+                    allocatedFV = 0#
+                    For j = 1 To m
+                        If HasFacility(i, j) Then
+                            If RankBySec(i, j) = 1 And BestRank(j) = 1 Then
+                                comp = CompBySec(i, j)
+                                If comp > 0# Then
+                                    If Facility(j).RemainosPV > 0# Then
+
+                                        pvOut = Facility(j).RemainosPV
+                                        repayFV = Security(i).MarketValue * (pvOut / sumPV)
+
+                                        If repayFV > (Facility(j).RemainosPV * comp) Then repayFV = Facility(j).RemainosPV * comp
+                                        repayPV = repayFV / comp
+                                        If repayPV > Facility(j).RemainosPV Then repayPV = Facility(j).RemainosPV
+
+                                        Facility(j).RemainosPV = Facility(j).RemainosPV - repayPV
+                                        PaidPV(i, j) = PaidPV(i, j) + repayPV
+                                        allocatedFV = allocatedFV + repayFV
+
+                                    End If
+                                End If
+                            End If
+                        End If
+                    Next j
+
+                    If allocatedFV <= 0.000001 Then Exit Do
+                    Security(i).MarketValue = Security(i).MarketValue - allocatedFV
+                    If Security(i).MarketValue < 0# Then Security(i).MarketValue = 0#
+
+                Loop
+            Next i
+
+            Dim orderList() As Long
+            Dim cOrd As Long
+            cOrd = lastOrder - firstOrder + 1
+            ReDim orderList(1 To cOrd)
+
+            For a = 1 To cOrd
+                orderList(a) = firstOrder + (a - 1)
+            Next a
+
+            If cOrd > 1 Then
+                For a = 1 To cOrd - 1
+                    For b = a + 1 To cOrd
+                        If Security(orderList(b)).OriginalOrder < Security(orderList(a)).OriginalOrder Then
+                            Dim tmpL As Long
+                            tmpL = orderList(a)
+                            orderList(a) = orderList(b)
+                            orderList(b) = tmpL
+                        End If
+                    Next b
+                Next a
+            End If
+
+            Dim currentrank As Long
+            For currentrank = 2 To 3
+                For a = 1 To cOrd
+                    i = orderList(a)
+                    If Security(i).MarketValue > 0.1 Then
+                        Call AllocateRankWaterfall(i, m, Facility, RankBySec, WeightBySec, CompBySec, HasFacility, PaidPV, BestRank, currentrank, Security(i).MarketValue)
+                    End If
+                Next a
+            Next currentrank
+
+            firstOrder = lastOrder + 1
+
+        Loop
+
+        For i = 1 To n
+            rangeStr = "D" & (BlankRowUpside + 9 + (Security(i).OriginalOrder - 1) * Height) _
+                     & ":D" & (BlankRowUpside + 9 + m + (Security(i).OriginalOrder - 1) * Height)
+
+            For Each Cell In ThisWorkbook.Worksheets("Security Apportionment").Range(rangeStr)
+                For j = 1 To m
+                    If Facility(j).LoanName = Cell.Value Then
+
+                        If Cell.Offset(0, 2).Value = Empty Then
+                            Cell.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = 0#
+                            Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0#
+                            Cell.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = 0#
+                            Exit For
+                        End If
+
+                        comp = CompBySec(i, j)
+                        Cell.Offset(0, 8 + 0 + 3 * (scen - 1)).Value = PaidPV(i, j)
+
+                        If comp > 0# Then
+                            Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 1# / comp
+                            Cell.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = PaidPV(i, j) * comp
+                        Else
+                            Cell.Offset(0, 8 + 1 + 3 * (scen - 1)).Value = 0#
+                            Cell.Offset(0, 8 + 2 + 3 * (scen - 1)).Value = 0#
+                        End If
+
+                        wsPrint.Range("B" & PrintRow).Value = Facility(j).LoanName
+                        wsPrint.Range("L" & PrintRow).Value = PaidPV(i, j)
+
+                        If comp > 0# Then
+                            wsPrint.Range("J" & PrintRow).Value = 1# / comp
+                        Else
+                            wsPrint.Range("J" & PrintRow).Value = 0#
+                        End If
+
+                        wsPrint.Range("F" & PrintRow).Value = PaidPV(i, j) * comp
+                        wsPrint.Range("H" & PrintRow).Value = Security(i).Paymentdate
+                        wsPrint.Range("M" & PrintRow).Value = Security(i).SecurityName
+
+                        If scen = 1 Then
+                            wsPrint.Range("E" & PrintRow).Value = "Upper"
+                        ElseIf scen = 2 Then
+                            wsPrint.Range("E" & PrintRow).Value = "Base"
+                        ElseIf scen = 3 Then
+                            wsPrint.Range("E" & PrintRow).Value = "Lower"
+                        ElseIf scen = 4 Then
+                            wsPrint.Range("E" & PrintRow).Value = "2nd Strategy"
+                        End If
+
+                        PrintRow = PrintRow + 1
+                        Exit For
+                    End If
+                Next j
+            Next Cell
+        Next i
+
+        For i = 1 To m
+            Facility(i).Compoundrate = 0#
+            Facility(i).Rank = 0
+            Facility(i).Weight = 0
+        Next i
+
+        For i = 1 To m
+            Facility(i).LoanName = Sheets("Facility").Range("J" & (7 + i)).Value
+            Facility(i).Compoundrate = 0#
+            Facility(i).RemainosPV = DrawnOriginal(i)
+            Facility(i).RemainosPVStore = 0#
+            Facility(i).Rank = 0
+            Facility(i).Weight = 0
+        Next i
+
+    Next scen
+
+    If PrintRow > 2 Then
+        wsPrint.Range("A2").AutoFill Destination:=wsPrint.Range("A2:A" & PrintRow), Type:=xlFillDefault
+        wsPrint.Range("C2").AutoFill Destination:=wsPrint.Range("C2:C" & PrintRow), Type:=xlFillDefault
+        wsPrint.Range("D2").AutoFill Destination:=wsPrint.Range("D2:D" & PrintRow), Type:=xlFillDefault
+        wsPrint.Range("G2").AutoFill Destination:=wsPrint.Range("G2:G" & PrintRow), Type:=xlFillDefault
+        wsPrint.Range("I2").AutoFill Destination:=wsPrint.Range("I2:I" & PrintRow), Type:=xlFillDefault
+        wsPrint.Range("K2").AutoFill Destination:=wsPrint.Range("K2:K" & PrintRow), Type:=xlFillDefault
+        wsPrint.Range("N2").AutoFill Destination:=wsPrint.Range("N2:N" & PrintRow), Type:=xlFillDefault
+    End If
+
+    With securityWs.Sort
+        .SortFields.Clear
+        .SortFields.Add Key:=securityWs.Range("J1"), Order:=xlAscending
+        .SetRange securityWs.Range("A:K")
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+
+    Application.ScreenUpdating = True
+
+End Sub
+
+Private Sub AllocateRankWaterfall(ByVal order As Long, ByVal m As Long, ByRef Facility() As FacilityInfo, _
+                                 ByRef RankBySec() As Long, ByRef WeightBySec() As Long, ByRef CompBySec() As Double, _
+                                 ByRef HasFacility() As Boolean, ByRef PaidPV() As Double, ByRef BestRank() As Long, _
+                                 ByVal currentrank As Long, ByRef remainingMV As Double)
+
+    Dim idx() As Long
+    Dim sortCount As Long
+    Dim a As Long, b As Long, tmpIdx As Long
+    Dim i As Long
+
+    sortCount = 0
+    ReDim idx(1 To m)
+
+    For i = 1 To m
+        If HasFacility(order, i) Then
+            If RankBySec(order, i) = currentrank Then
+                If BestRank(i) <= currentrank Then
+                    sortCount = sortCount + 1
+                    idx(sortCount) = i
+                End If
+            End If
+        End If
+    Next i
+
+    If sortCount > 1 Then
+        For a = 1 To sortCount - 1
+            For b = a + 1 To sortCount
+                If WeightBySec(order, idx(b)) < WeightBySec(order, idx(a)) Then
+                    tmpIdx = idx(a)
+                    idx(a) = idx(b)
+                    idx(b) = tmpIdx
+                End If
+            Next b
+        Next a
+    End If
+
+    Dim comp As Double
+    Dim repayFV As Double, repayPV As Double
+
+    For a = 1 To sortCount
+        i = idx(a)
+
+        If remainingMV <= 0.000001 Then Exit For
+
+        comp = CompBySec(order, i)
+        If comp <= 0# Then GoTo NextOne
+
+        If Facility(i).RemainosPV <= 0# Then GoTo NextOne
+
+        repayFV = Facility(i).RemainosPV * comp
+        If repayFV > remainingMV Then repayFV = remainingMV
+
+        repayPV = repayFV / comp
+        If repayPV > Facility(i).RemainosPV Then repayPV = Facility(i).RemainosPV
+
+        Facility(i).RemainosPV = Facility(i).RemainosPV - repayPV
+        PaidPV(order, i) = PaidPV(order, i) + repayPV
+        remainingMV = remainingMV - repayFV
+        If remainingMV < 0# Then remainingMV = 0#
+
+NextOne:
+    Next a
+
+End Sub
