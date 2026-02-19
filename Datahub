@@ -1,17 +1,1 @@
-# 4. Preparing final dataset before saving
-
-# 1️⃣ Ensure CIF is stored as TEXT (important for SharePoint match)
-df_final["CIF Customer Id"] = df_final["CIF Customer Id"].astype(str)
-
-# 2️⃣ Add ActiveFlag column (all customers in snapshot are active)
-df_final["ActiveFlag"] = "Yes"
-
-# 3️⃣ Add Snapshot Date (for audit / tracking)
-from datetime import datetime
-df_final["SnapshotDate"] = datetime.today().date()
-
-# 4️⃣ Saving the file
-output_path = r"C:/Users/45365912/OneDrive - HSBC/SCU_DataPipeline/03_Outputs/CustomerRepository_Update.xlsx"
-
-# Save the filtered dataset – this is the actual SCU customer repository update.
-df_final.to_excel(output_path, index=False)
+field_1 eq '@{string(items('Apply_to_each')?['CIF Customer Id'])}'
