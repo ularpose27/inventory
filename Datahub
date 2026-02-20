@@ -1,5 +1,1 @@
-if(
-  empty(items('Apply_to_each')?['Review Date']),
-  null,
-  formatDateTime(addDays('1899-12-30', int(items('Apply_to_each')?['Review Date'])), 'yyyy-MM-ddTHH:mm:ssZ')
-)
+items('Apply_to_each')?['Master Net Direct Balance']
