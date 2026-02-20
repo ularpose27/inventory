@@ -1,1 +1,4 @@
-first(body('Get_items')?['value'])?['ID']
+formatDateTime(
+  addDays('1899-12-30', int(items('Apply_to_each')?['Review Date'])),
+  'yyyy-MM-ddTHH:mm:ssZ'
+)
