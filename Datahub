@@ -1,1 +1,1 @@
-field_1 eq '@{items('Apply_to_each')?['CIF Customer Id']}'
+first(body('Get_items')?['value'])?['ID']
