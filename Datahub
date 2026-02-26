@@ -1,19 +1,9 @@
 if(
   or(
-    empty(items('Apply_to_each')?['Review Date']),
-    equals(trim(string(items('Apply_to_each')?['Review Date'])), ''),
-    equals(trim(string(items('Apply_to_each')?['Review Date'])), '-')
+    empty(items('Apply_to_each')?['Best_Facility_Grade']),
+    equals(trim(string(items('Apply_to_each')?['Best_Facility_Grade'])), ''),
+    equals(trim(string(items('Apply_to_each')?['Best_Facility_Grade'])), '-')
   ),
   null,
-  if(
-    or(
-      contains(string(items('Apply_to_each')?['Review Date']), '-'),
-      contains(string(items('Apply_to_each')?['Review Date']), '/')
-    ),
-    formatDateTime(items('Apply_to_each')?['Review Date'], 'yyyy-MM-ddTHH:mm:ssZ'),
-    formatDateTime(
-      addDays('1899-12-30', int(float(items('Apply_to_each')?['Review Date']))),
-      'yyyy-MM-ddTHH:mm:ssZ'
-    )
-  )
+  float(replace(string(items('Apply_to_each')?['Best_Facility_Grade']), ',', ''))
 )
