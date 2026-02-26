@@ -1,9 +1,9 @@
 if(
   or(
-    empty(items('Apply_to_each')?['Best_Facility_Grade']),
-    equals(trim(string(items('Apply_to_each')?['Best_Facility_Grade'])), ''),
-    equals(trim(string(items('Apply_to_each')?['Best_Facility_Grade'])), '-')
+    empty(items('Apply_to_each')?['Worst_Facility_Grade']),
+    equals(trim(string(items('Apply_to_each')?['Worst_Facility_Grade'])), ''),
+    equals(trim(string(items('Apply_to_each')?['Worst_Facility_Grade'])), '-')
   ),
   null,
-  float(replace(string(items('Apply_to_each')?['Best_Facility_Grade']), ',', ''))
+  float(replace(string(items('Apply_to_each')?['Worst_Facility_Grade']), ',', ''))
 )
