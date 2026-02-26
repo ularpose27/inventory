@@ -1,7 +1,8 @@
-@if(
+if(
   or(
     empty(items('Apply_to_each')?['Review Date']),
-    equals(trim(string(items('Apply_to_each')?['Review Date'])), '')
+    equals(trim(string(items('Apply_to_each')?['Review Date'])), ''),
+    equals(trim(string(items('Apply_to_each')?['Review Date'])), '-')
   ),
   null,
   if(
