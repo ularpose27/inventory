@@ -5,7 +5,10 @@
   ),
   null,
   if(
-    contains(string(items('Apply_to_each')?['Review Date']), '-'),
+    or(
+      contains(string(items('Apply_to_each')?['Review Date']), '-'),
+      contains(string(items('Apply_to_each')?['Review Date']), '/')
+    ),
     formatDateTime(items('Apply_to_each')?['Review Date'], 'yyyy-MM-ddTHH:mm:ssZ'),
     formatDateTime(
       addDays('1899-12-30', int(float(items('Apply_to_each')?['Review Date']))),
