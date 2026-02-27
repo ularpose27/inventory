@@ -1,5 +1,5 @@
 if(
-  empty(first(body('Get_items')?['value'])?['field_10']),
+  equals(first(body('Get_items')?['value'])?['field_10'], null),
   null,
   int(
     ceiling(
