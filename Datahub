@@ -1,10 +1,12 @@
-
 if(
   empty(first(body('Get_items')?['value'])?['field_10']),
   null,
   int(
     ceiling(
-      float(first(body('Get_items')?['value'])?['field_10']) / 1000000
+      div(
+        float(first(body('Get_items')?['value'])?['field_10']),
+        1000000
+      )
     )
   )
 )
