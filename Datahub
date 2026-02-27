@@ -1,20 +1,10 @@
 if(
-  equals(length(body('Get_items')?['value']),0),
+  empty(first(body('Get_items')?['value'])?['Master Net Direct Balance']),
   null,
   int(
     ceiling(
       div(
-        float(
-          replace(
-            replace(
-              string(first(body('Get_items')?['value'])?['Master Net Direct Balance']),
-              ',',
-              ''
-            ),
-            '$',
-            ''
-          )
-        ),
+        float(replace(string(first(body('Get_items')?['value'])?['Master Net Direct Balance']),',','')),
         1000000
       )
     )
