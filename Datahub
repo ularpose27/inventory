@@ -1,9 +1,22 @@
 if(
-  or(
-    empty(items('Apply_to_each')?['Best_Facility_Grade']),
-    equals(trim(string(items('Apply_to_each')?['Best_Facility_Grade'])), ''),
-    equals(trim(string(items('Apply_to_each')?['Best_Facility_Grade'])), '-')
-  ),
+  equals(length(body('Get_items')?['value']),0),
   null,
-  float(replace(string(items('Apply_to_each')?['Best_Facility_Grade']), ',', ''))
+  int(
+    ceiling(
+      div(
+        float(
+          replace(
+            replace(
+              string(first(body('Get_items')?['value'])?['Master Net Direct Balance']),
+              ',',
+              ''
+            ),
+            '$',
+            ''
+          )
+        ),
+        1000000
+      )
+    )
+  )
 )
