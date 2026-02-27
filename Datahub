@@ -1,11 +1,4 @@
-if(
-  equals(first(body('Get_items')?['value'])?['field_10'], null),
-  null,
-  div(
-    add(
-      int(first(body('Get_items')?['value'])?['field_10']),
-      999999
-    ),
-    1000000
-  )
-)
+=XLOOKUP(--TRIM(K2),
+         'Customer Repository'!B:B,
+         'Customer Repository'!D:D,
+         "")
