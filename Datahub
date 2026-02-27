@@ -1,12 +1,10 @@
+
 if(
-  empty(first(body('Get_items')?['value'])?['Master Net Direct Balance']),
+  empty(first(body('Get_items')?['value'])?['field_10']),
   null,
   int(
     ceiling(
-      div(
-        float(replace(string(first(body('Get_items')?['value'])?['Master Net Direct Balance']),',','')),
-        1000000
-      )
+      float(first(body('Get_items')?['value'])?['field_10']) / 1000000
     )
   )
 )
