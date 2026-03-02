@@ -1,97 +1,63 @@
+// =========================
 // Master Net Direct Balance (field_10)
+// =========================
 if(
   or(
     equals(first(body('Get_items')?['value'])?['field_10'], null),
     equals(trim(string(first(body('Get_items')?['value'])?['field_10'])), '')
   ),
   null,
-  int(
-    div(
-      add(
-        float(replace(trim(string(first(body('Get_items')?['value'])?['field_10'])), ',', '')),
-        999999
-      ),
-      1000000
-    )
-  )
+  float(replace(trim(string(first(body('Get_items')?['value'])?['field_10'])), ',', ''))
 )
 
 
-
+// =========================
 // Cat B Exposure (field_8)
+// =========================
 if(
   or(
     equals(first(body('Get_items')?['value'])?['field_8'], null),
     equals(trim(string(first(body('Get_items')?['value'])?['field_8'])), '')
   ),
   null,
-  int(
-    div(
-      add(
-        float(replace(trim(string(first(body('Get_items')?['value'])?['field_8'])), ',', '')),
-        999999
-      ),
-      1000000
-    )
-  )
+  float(replace(trim(string(first(body('Get_items')?['value'])?['field_8'])), ',', ''))
 )
 
 
-
+// =========================
 // Cat A Limit (field_17)
+// =========================
 if(
   or(
     equals(first(body('Get_items')?['value'])?['field_17'], null),
     equals(trim(string(first(body('Get_items')?['value'])?['field_17'])), '')
   ),
   null,
-  int(
-    div(
-      add(
-        float(replace(trim(string(first(body('Get_items')?['value'])?['field_17'])), ',', '')),
-        999999
-      ),
-      1000000
-    )
-  )
+  float(replace(trim(string(first(body('Get_items')?['value'])?['field_17'])), ',', ''))
 )
 
 
-
+// =========================
 // Cat B Limit (field_18)
+// =========================
 if(
   or(
     equals(first(body('Get_items')?['value'])?['field_18'], null),
     equals(trim(string(first(body('Get_items')?['value'])?['field_18'])), '')
   ),
   null,
-  int(
-    div(
-      add(
-        float(replace(trim(string(first(body('Get_items')?['value'])?['field_18'])), ',', '')),
-        999999
-      ),
-      1000000
-    )
-  )
+  float(replace(trim(string(first(body('Get_items')?['value'])?['field_18'])), ',', ''))
 )
 
 
-
+// =========================
 // Cat A Exposure (field_6)
+// =========================
 if(
   or(
     equals(first(body('Get_items')?['value'])?['field_6'], null),
     equals(trim(string(first(body('Get_items')?['value'])?['field_6'])), '')
   ),
   null,
-  int(
-    div(
-      add(
-        float(replace(trim(string(first(body('Get_items')?['value'])?['field_6'])), ',', '')),
-        999999
-      ),
-      1000000
-    )
-  )
+  float(replace(trim(string(first(body('Get_items')?['value'])?['field_6'])), ',', ''))
 )
