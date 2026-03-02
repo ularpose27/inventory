@@ -1,9 +1,72 @@
-"item/MasterNetDirectBalance": "@{if(equals(first(body('Get_items')?['value'])?['field_10'], null), null, div(add(int(first(body('Get_items')?['value'])?['field_10']), 999999), 1000000)))}",
+// Master Net Direct Balance (field_10)
+if(
+    equals(first(body('Get_items')?['value'])?['field_10'], null),
+    null,
+    div(
+        add(
+            int(first(body('Get_items')?['value'])?['field_10']),
+            999999
+        ),
+        1000000
+    )
+)
 
-"item/CatBExposure": "@{if(equals(first(body('Get_items')?['value'])?['field_8'], null), null, div(add(int(first(body('Get_items')?['value'])?['field_8']), 999999), 1000000)))}",
 
-"item/CatALimit": "@{if(equals(first(body('Get_items')?['value'])?['field_17'], null), null, div(add(int(first(body('Get_items')?['value'])?['field_17']), 999999), 1000000)))}",
 
-"item/CatBLimit": "@{if(equals(first(body('Get_items')?['value'])?['field_18'], null), null, div(add(int(first(body('Get_items')?['value'])?['field_18']), 999999), 1000000)))}",
+// Cat B Exposure (field_8)
+if(
+    equals(first(body('Get_items')?['value'])?['field_8'], null),
+    null,
+    div(
+        add(
+            int(first(body('Get_items')?['value'])?['field_8']),
+            999999
+        ),
+        1000000
+    )
+)
 
-"item/CatAExposure": "@{if(equals(first(body('Get_items')?['value'])?['field_6'], null), null, div(add(int(first(body('Get_items')?['value'])?['field_6']), 999999), 1000000)))}"
+
+
+// Cat A Limit (field_17)
+if(
+    equals(first(body('Get_items')?['value'])?['field_17'], null),
+    null,
+    div(
+        add(
+            int(first(body('Get_items')?['value'])?['field_17']),
+            999999
+        ),
+        1000000
+    )
+)
+
+
+
+// Cat B Limit (field_18)
+if(
+    equals(first(body('Get_items')?['value'])?['field_18'], null),
+    null,
+    div(
+        add(
+            int(first(body('Get_items')?['value'])?['field_18']),
+            999999
+        ),
+        1000000
+    )
+)
+
+
+
+// Cat A Exposure (field_6)
+if(
+    equals(first(body('Get_items')?['value'])?['field_6'], null),
+    null,
+    div(
+        add(
+            int(first(body('Get_items')?['value'])?['field_6']),
+            999999
+        ),
+        1000000
+    )
+)
