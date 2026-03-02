@@ -1,49 +1,109 @@
 if(
-  equals(first(body('Get_items')?['value'])?['field_6'], null),
+  or(
+    equals(first(body('Get_items')?['value'])?['field_10'], null),
+    equals(trim(string(first(body('Get_items')?['value'])?['field_10'])), '')
+  ),
   null,
   int(
-    div(
-      add(float(first(body('Get_items')?['value'])?['field_6']), 999999),
-      1000000
+    string(
+      div(
+        add(
+          float(replace(string(first(body('Get_items')?['value'])?['field_10']), ',', '')),
+          999999
+        ),
+        1000000
+      )
     )
   )
 )
+
+
 
 
 
 if(
-  equals(first(body('Get_items')?['value'])?['field_8'], null),
+  or(
+    equals(first(body('Get_items')?['value'])?['field_8'], null),
+    equals(trim(string(first(body('Get_items')?['value'])?['field_8'])), '')
+  ),
   null,
   int(
-    div(
-      add(float(first(body('Get_items')?['value'])?['field_8']), 999999),
-      1000000
+    string(
+      div(
+        add(
+          float(replace(string(first(body('Get_items')?['value'])?['field_8']), ',', '')),
+          999999
+        ),
+        1000000
+      )
     )
   )
 )
+
+
+if(
+  or(
+    equals(first(body('Get_items')?['value'])?['field_17'], null),
+    equals(trim(string(first(body('Get_items')?['value'])?['field_17'])), '')
+  ),
+  null,
+  int(
+    string(
+      div(
+        add(
+          float(replace(string(first(body('Get_items')?['value'])?['field_17']), ',', '')),
+          999999
+        ),
+        1000000
+      )
+    )
+  )
+)
+
+
+
 
 
 
 if(
-  equals(first(body('Get_items')?['value'])?['field_17'], null),
+  or(
+    equals(first(body('Get_items')?['value'])?['field_18'], null),
+    equals(trim(string(first(body('Get_items')?['value'])?['field_18'])), '')
+  ),
   null,
   int(
-    div(
-      add(float(first(body('Get_items')?['value'])?['field_17']), 999999),
-      1000000
+    string(
+      div(
+        add(
+          float(replace(string(first(body('Get_items')?['value'])?['field_18']), ',', '')),
+          999999
+        ),
+        1000000
+      )
     )
   )
 )
+
+
 
 
 
 if(
-  equals(first(body('Get_items')?['value'])?['field_18'], null),
+  or(
+    equals(first(body('Get_items')?['value'])?['field_6'], null),
+    equals(trim(string(first(body('Get_items')?['value'])?['field_6'])), '')
+  ),
   null,
   int(
-    div(
-      add(float(first(body('Get_items')?['value'])?['field_18']), 999999),
-      1000000
+    string(
+      div(
+        add(
+          float(replace(string(first(body('Get_items')?['value'])?['field_6']), ',', '')),
+          999999
+        ),
+        1000000
+      )
     )
   )
 )
+
