@@ -1,4 +1,49 @@
-=XLOOKUP(--TRIM(K2),
-         'Customer Repository'!B:B,
-         'Customer Repository'!D:D,
-         "")
+if(
+  equals(first(body('Get_items')?['value'])?['field_6'], null),
+  null,
+  int(
+    div(
+      add(float(first(body('Get_items')?['value'])?['field_6']), 999999),
+      1000000
+    )
+  )
+)
+
+
+
+if(
+  equals(first(body('Get_items')?['value'])?['field_8'], null),
+  null,
+  int(
+    div(
+      add(float(first(body('Get_items')?['value'])?['field_8']), 999999),
+      1000000
+    )
+  )
+)
+
+
+
+if(
+  equals(first(body('Get_items')?['value'])?['field_17'], null),
+  null,
+  int(
+    div(
+      add(float(first(body('Get_items')?['value'])?['field_17']), 999999),
+      1000000
+    )
+  )
+)
+
+
+
+if(
+  equals(first(body('Get_items')?['value'])?['field_18'], null),
+  null,
+  int(
+    div(
+      add(float(first(body('Get_items')?['value'])?['field_18']), 999999),
+      1000000
+    )
+  )
+)
