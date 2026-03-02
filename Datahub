@@ -1,6 +1,6 @@
-// =========================
-// Master Net Direct Balance (field_10)
-// =========================
+========================
+MasterNetDirectBalance  (source: field_10)
+========================
 if(
   or(
     equals(first(body('Get_items')?['value'])?['field_10'], null),
@@ -10,10 +10,21 @@ if(
   float(replace(trim(string(first(body('Get_items')?['value'])?['field_10'])), ',', ''))
 )
 
+========================
+CatBExposure  (source: field_7)
+========================
+if(
+  or(
+    equals(first(body('Get_items')?['value'])?['field_7'], null),
+    equals(trim(string(first(body('Get_items')?['value'])?['field_7'])), '')
+  ),
+  null,
+  float(replace(trim(string(first(body('Get_items')?['value'])?['field_7'])), ',', ''))
+)
 
-// =========================
-// Cat B Exposure (field_8)
-// =========================
+========================
+CatALimit  (source: field_8)
+========================
 if(
   or(
     equals(first(body('Get_items')?['value'])?['field_8'], null),
@@ -23,36 +34,21 @@ if(
   float(replace(trim(string(first(body('Get_items')?['value'])?['field_8'])), ',', ''))
 )
 
-
-// =========================
-// Cat A Limit (field_17)
-// =========================
+========================
+CatBLimit  (source: field_9)
+========================
 if(
   or(
-    equals(first(body('Get_items')?['value'])?['field_17'], null),
-    equals(trim(string(first(body('Get_items')?['value'])?['field_17'])), '')
+    equals(first(body('Get_items')?['value'])?['field_9'], null),
+    equals(trim(string(first(body('Get_items')?['value'])?['field_9'])), '')
   ),
   null,
-  float(replace(trim(string(first(body('Get_items')?['value'])?['field_17'])), ',', ''))
+  float(replace(trim(string(first(body('Get_items')?['value'])?['field_9'])), ',', ''))
 )
 
-
-// =========================
-// Cat B Limit (field_18)
-// =========================
-if(
-  or(
-    equals(first(body('Get_items')?['value'])?['field_18'], null),
-    equals(trim(string(first(body('Get_items')?['value'])?['field_18'])), '')
-  ),
-  null,
-  float(replace(trim(string(first(body('Get_items')?['value'])?['field_18'])), ',', ''))
-)
-
-
-// =========================
-// Cat A Exposure (field_6)
-// =========================
+========================
+CatAExposure  (source: field_6)
+========================
 if(
   or(
     equals(first(body('Get_items')?['value'])?['field_6'], null),
