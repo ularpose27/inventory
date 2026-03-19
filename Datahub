@@ -1,1 +1,791 @@
-Customer_x0020_Name_x003a_CIF_x0Id eq @{first(body('Get_items_Repository_After_Update')?['value'])?['ID']}
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.datavalidation import DataValidation
+from openpyxl.comments import Comment
+from openpyxl.formatting.rule import CellIsRule
+from openpyxl import load_workbook
+ 
+OUTPUT_FILE = "SCU_Governance_Q225_Input_and_Slide_Templates.xlsx"
+ 
+# -----------------------------
+# Styles
+# -----------------------------
+ORANGE = "C65911"
+BLACK = "1F1F1F"
+WHITE = "FFFFFF"
+LIGHT_BLUE = "D9EAF7"
+MID_BLUE = "B8CCE4"
+LIGHT_GREEN = "D9EAD3"
+PALE_GREEN = "E2F0D9"
+YELLOW = "FFF2CC"
+GRAY = "D9D9D9"
+LIGHT_GRAY = "F3F3F3"
+TEAL = "D9EAF7"
+RED_FILL = "F4CCCC"
+ 
+thin_gray = Side(style="thin", color="BFBFBF")
+medium_orange = Side(style="medium", color=ORANGE)
+ 
+title_fill = PatternFill("solid", fgColor=ORANGE)
+section_fill = PatternFill("solid", fgColor=BLACK)
+subheader_fill = PatternFill("solid", fgColor=LIGHT_BLUE)
+input_fill = PatternFill("solid", fgColor=YELLOW)
+metric_fill = PatternFill("solid", fgColor=PALE_GREEN)
+note_fill = PatternFill("solid", fgColor=LIGHT_GRAY)
+ 
+title_font = Font(name="Calibri", size=14, bold=True, color=WHITE)
+section_font = Font(name="Calibri", size=11, bold=True, color=WHITE)
+subheader_font = Font(name="Calibri", size=10, bold=True, color="000000")
+body_font = Font(name="Calibri", size=10, color="000000")
+input_font = Font(name="Calibri", size=10, color="0000FF")
+formula_font = Font(name="Calibri", size=10, color="000000")
+linked_font = Font(name="Calibri", size=10, color="008000")
+small_font = Font(name="Calibri", size=9, color="666666", italic=True)
+ 
+center = Alignment(horizontal="center", vertical="center", wrap_text=True)
+left = Alignment(horizontal="left", vertical="top", wrap_text=True)
+right = Alignment(horizontal="right", vertical="center")
+ 
+all_border = Border(left=thin_gray, right=thin_gray, top=thin_gray, bottom=thin_gray)
+top_accent_border = Border(top=medium_orange, bottom=thin_gray)
+ 
+# -----------------------------
+# Input catalog
+# -----------------------------
+sections = [
+    {
+        "slide_no": 1,
+        "slide_name": "Helios Controls",
+        "rows": [
+            ("HC_TOTAL_CONTROLS", "Total SCU-owned Helios controls", "Number", "Enter total controls in scope"),
+            ("HC_L1_EFFECTIVE", "L1 controls rated Effective", "Number", ""),
+            ("HC_L1_NI", "L1 controls rated Needs Improvement / Ineffective", "Number", ""),
+            ("HC_L2_EFFECTIVE", "L2 controls rated Effective", "Number", ""),
+            ("HC_L2_NI", "L2 controls rated Needs Improvement / Ineffective", "Number", ""),
+            ("HC_ASSURANCE_PASS", "Risk Assurance reviews – Pass", "Number", ""),
+            ("HC_ASSURANCE_MH", "Risk Assurance reviews – Medium/High Risk", "Number", ""),
+            ("HC_TOTAL_ACTIONS", "Total actions", "Number", ""),
+            ("HC_OVERDUE_ACTIONS", "Overdue actions", "Number", ""),
+            ("HC_OPEN_AUDIT_ACTIONS", "Open audit actions (VH/H/Med)", "Number", ""),
+            ("HC_OVERDUE_AUDIT", "Overdue audit actions", "Number", ""),
+            ("HC_EVENTS_YTD", "Internal events linked to SCU controls – YTD", "Number", ""),
+            ("HC_EVENTS_QTD", "Internal events linked to SCU controls – current quarter", "Number", ""),
+            ("HC_ACTUAL_LOSSES", "Actual losses", "Currency", "Use numeric value only"),
+            ("HC_SMR_YTD", "YTD SMR escalations", "Number", ""),
+            ("HC_SMR_QTD", "QTD SMR escalations", "Number", ""),
+            ("HC_SUMMARY_1", "Summary point 1", "Long text", "Key control effectiveness message"),
+            ("HC_SUMMARY_2", "Summary point 2", "Long text", "Key retirement / issue / assurance message"),
+            ("HC_SUMMARY_3", "Summary point 3", "Long text", "Optional additional message"),
+        ],
+    },
+    {
+        "slide_no": 2,
+        "slide_name": "Issues and Actions",
+        "rows": [],
+    },
+    {
+        "slide_no": 3,
+        "slide_name": "Service Failures and Litigation",
+        "rows": [
+            ("SFL_TOTAL_COMPLAINTS", "Total complaints in quarter / YTD (use basis agreed internally)", "Number", ""),
+            ("SFL_ESCALATED_COMPLAINTS", "Escalated complaints", "Number", ""),
+            ("SFL_LITIGATION_CASES", "Litigation / legal cases", "Number", ""),
+            ("SFL_MATERIAL_CASES", "Material / reputationally sensitive cases", "Number", ""),
+            ("SFL_SUMMARY_1", "Summary point 1", "Long text", "Headline service failure / litigation commentary"),
+            ("SFL_SUMMARY_2", "Summary point 2", "Long text", ""),
+        ],
+    },
+    {
+        "slide_no": 4,
+        "slide_name": "Operational Risk Testing and BCM",
+        "rows": [
+            ("ORB_TESTS_CONDUCTED", "Total testing / BCM activities conducted", "Number", ""),
+            ("ORB_ISSUES_FOUND", "Issues / gaps identified", "Number", ""),
+            ("ORB_FAILED_TESTS", "Failed tests / material gaps", "Number", ""),
+            ("ORB_SUMMARY_1", "Summary point 1", "Long text", "Headline operational risk / BCM message"),
+            ("ORB_SUMMARY_2", "Summary point 2", "Long text", ""),
+        ],
+    },
+    {
+        "slide_no": 5,
+        "slide_name": "Financial Crime Compliance",
+        "rows": [
+            ("FCC_CDD_ISSUES", "CDD issues", "Number", ""),
+            ("FCC_CSEM_EXITS", "CSEM exits", "Number", ""),
+            ("FCC_FRAUD_CASES", "Fraud cases identified", "Number", ""),
+            ("FCC_FRAUD_LOSS", "Fraud loss", "Currency", ""),
+            ("FCC_SUMMARY_1", "Summary point 1", "Long text", "Headline financial crime message"),
+            ("FCC_SUMMARY_2", "Summary point 2", "Long text", ""),
+        ],
+    },
+    {
+        "slide_no": 6,
+        "slide_name": "Core Sampling Outcomes",
+        "rows": [
+            ("CSO_SCU_VOLUME", "SCU sampling – volume reviewed", "Number", ""),
+            ("CSO_SCU_ISSUES", "SCU sampling – issues identified", "Number", ""),
+            ("CSO_SCU_PASS", "SCU sampling – pass rate", "Percentage", "Enter as decimal e.g. 0.95 for 95%"),
+            ("CSO_FLOD_VOLUME", "FLoD sampling – volume reviewed", "Number", ""),
+            ("CSO_FLOD_ISSUES", "FLoD sampling – issues identified", "Number", ""),
+            ("CSO_FLOD_PASS", "FLoD sampling – pass rate", "Percentage", "Enter as decimal e.g. 0.90 for 90%"),
+            ("CSO_SUMMARY_1", "Summary point 1", "Long text", "Headline sampling message"),
+            ("CSO_SUMMARY_2", "Summary point 2", "Long text", ""),
+        ],
+    },
+    {
+        "slide_no": 7,
+        "slide_name": "Conduct Risk Measures Dashboard",
+        "rows": [
+            ("CRM_MANAGER_OBS", "Manager observations completed", "Number", ""),
+            ("CRM_CJR", "Customer journey reviews", "Number", ""),
+            ("CRM_ENHANCED_CARE", "Customers with enhanced care needs", "Number", ""),
+            ("CRM_CONDUCT_CASES", "Cases with significant conduct / reputational risk", "Number", ""),
+            ("CRM_SUMMARY_1", "Summary point 1", "Long text", "Headline conduct risk message"),
+            ("CRM_SUMMARY_2", "Summary point 2", "Long text", ""),
+        ],
+    },
+    {
+        "slide_no": 8,
+        "slide_name": "Conflicts of Interest",
+        "rows": [
+            ("COI_GAE_VOLUME", "Gifts & Entertainment activity volume", "Number", ""),
+            ("COI_GAE_ISSUES", "Gifts & Entertainment issues identified", "Number", ""),
+            ("COI_PANEL_VOLUME", "Panel firm engagements", "Number", ""),
+            ("COI_PANEL_ISSUES", "Panel firm issues identified", "Number", ""),
+            ("COI_SUMMARY_1", "Summary point 1", "Long text", "Headline conflicts message"),
+            ("COI_SUMMARY_2", "Summary point 2", "Long text", ""),
+        ],
+    },
+    {
+        "slide_no": 9,
+        "slide_name": "Credit Risk Performance",
+        "rows": [
+            ("CRP_TOTAL_CASES", "Total full responsibility cases", "Number", ""),
+            ("CRP_OVERDUES", "Overdue cases", "Number", ""),
+            ("CRP_RESUBMISSIONS", "Resubmissions", "Number", ""),
+            ("CRP_AVG_RESOLUTION", "Average resolution time (days)", "Number", ""),
+            ("CRP_SUMMARY_1", "Summary point 1", "Long text", "Headline credit performance message"),
+            ("CRP_SUMMARY_2", "Summary point 2", "Long text", ""),
+        ],
+    },
+    {
+        "slide_no": 10,
+        "slide_name": "Third Party Providers",
+        "rows": [
+            ("TPP_SUMMARY_1", "Summary point 1", "Long text", "Headline provider performance / pricing message"),
+            ("TPP_SUMMARY_2", "Summary point 2", "Long text", ""),
+        ],
+    },
+    {
+        "slide_no": 11,
+        "slide_name": "Lessons Learned",
+        "rows": [
+            ("LL_SUMMARY_1", "Quarter headline lesson 1", "Long text", ""),
+            ("LL_SUMMARY_2", "Quarter headline lesson 2", "Long text", ""),
+            ("LL_SUMMARY_3", "Quarter headline lesson 3", "Long text", ""),
+        ],
+    },
+]
+ 
+# Detailed repeating rows
+# Slide 2 Issues and Actions
+for prefix, count, label in [
+    ("IA_EXISTING", 3, "Existing Issue"),
+    ("IA_NEW", 3, "New Issue"),
+    ("IA_EXT", 2, "Extended Issue"),
+    ("IA_CLOSED", 2, "Closed Issue"),
+]:
+    for i in range(1, count + 1):
+        if prefix == "IA_EXT":
+            fields = [
+                ("ID", f"{label} {i} – Issue ID", "Text", ""),
+                ("DETAIL", f"{label} {i} – Issue detail", "Long text", ""),
+                ("SEVERITY", f"{label} {i} – Severity", "List: Low, Medium, High, Very High", ""),
+                ("OWNER", f"{label} {i} – Owner", "Text", ""),
+                ("ORIG_DATE", f"{label} {i} – Original target date", "Date", ""),
+                ("NEW_DATE", f"{label} {i} – New target date", "Date", ""),
+                ("CONTROL", f"{label} {i} – Linked control", "Text", ""),
+                ("COMMENTS", f"{label} {i} – Comments", "Long text", ""),
+            ]
+        elif prefix == "IA_CLOSED":
+            fields = [
+                ("ID", f"{label} {i} – Issue ID", "Text", ""),
+                ("DETAIL", f"{label} {i} – Issue detail", "Long text", ""),
+                ("SEVERITY", f"{label} {i} – Severity", "List: Low, Medium, High, Very High", ""),
+                ("OWNER", f"{label} {i} – Owner", "Text", ""),
+                ("CLOSE_DATE", f"{label} {i} – Closure date", "Date", ""),
+                ("CONTROL", f"{label} {i} – Linked control", "Text", ""),
+                ("COMMENTS", f"{label} {i} – Comments", "Long text", ""),
+            ]
+        else:
+            fields = [
+                ("ID", f"{label} {i} – Issue ID", "Text", ""),
+                ("DETAIL", f"{label} {i} – {'Issue title' if prefix == 'IA_NEW' else 'Issue detail'}", "Long text", ""),
+                ("SEVERITY", f"{label} {i} – Severity", "List: Low, Medium, High, Very High", ""),
+                ("OWNER", f"{label} {i} – Owner", "Text", ""),
+                ("TARGET_DATE", f"{label} {i} – Target date", "Date", ""),
+                ("CONTROL", f"{label} {i} – Linked control", "Text", ""),
+                ("STATUS", f"{label} {i} – Status", "List: On Track, Delayed, Closed, Not Started", ""),
+                ("COMMENTS", f"{label} {i} – Comments", "Long text", ""),
+            ]
+        sections[1]["rows"].extend([(f"{prefix}{i}_{suffix}", question, expected, note) for suffix, question, expected, note in fields])
+ 
+# Slide 3 cases
+for i in range(1, 4):
+    sections[2]["rows"].extend([
+        (f"SFL_CASE{i}_ID", f"Case {i} – Case ID", "Text", ""),
+        (f"SFL_CASE{i}_TYPE", f"Case {i} – Type", "List: Complaint, Litigation, Both", ""),
+        (f"SFL_CASE{i}_DESC", f"Case {i} – Description", "Long text", ""),
+        (f"SFL_CASE{i}_STATUS", f"Case {i} – Status", "Text", ""),
+        (f"SFL_CASE{i}_OWNER", f"Case {i} – Owner", "Text", ""),
+        (f"SFL_CASE{i}_IMPACT", f"Case {i} – Financial impact", "Currency", ""),
+        (f"SFL_CASE{i}_DATE", f"Case {i} – Date", "Date", ""),
+        (f"SFL_CASE{i}_COMMENTS", f"Case {i} – Comments", "Long text", ""),
+    ])
+ 
+# Slide 4 activities
+for i in range(1, 5):
+    sections[3]["rows"].extend([
+        (f"ORB_ACT{i}_TYPE", f"Activity {i} – Activity type", "Text", ""),
+        (f"ORB_ACT{i}_DESC", f"Activity {i} – Description", "Long text", ""),
+        (f"ORB_ACT{i}_DATE", f"Activity {i} – Date", "Date", ""),
+        (f"ORB_ACT{i}_OUTCOME", f"Activity {i} – Outcome", "Text", ""),
+        (f"ORB_ACT{i}_ISSUES", f"Activity {i} – Issues identified", "Number", ""),
+        (f"ORB_ACT{i}_STATUS", f"Activity {i} – Status", "Text", ""),
+        (f"ORB_ACT{i}_OWNER", f"Activity {i} – Owner", "Text", ""),
+    ])
+ 
+# Slide 5 cases
+for i in range(1, 4):
+    sections[4]["rows"].extend([
+        (f"FCC_CASE{i}_ID", f"Case {i} – Case ID", "Text", ""),
+        (f"FCC_CASE{i}_TYPE", f"Case {i} – Type", "Text", ""),
+        (f"FCC_CASE{i}_STATUS", f"Case {i} – Status", "Text", ""),
+        (f"FCC_CASE{i}_RISK", f"Case {i} – Risk level", "List: Low, Medium, High, Very High", ""),
+        (f"FCC_CASE{i}_ACTION", f"Case {i} – Action taken", "Long text", ""),
+        (f"FCC_CASE{i}_COMMENTS", f"Case {i} – Comments", "Long text", ""),
+    ])
+ 
+# Slide 6 findings
+for i in range(1, 4):
+    sections[5]["rows"].extend([
+        (f"CSO_FIND{i}_TYPE", f"Finding {i} – Sampling type", "List: SCU, FLoD, Other", ""),
+        (f"CSO_FIND{i}_DETAIL", f"Finding {i} – Key finding", "Long text", ""),
+    ])
+ 
+# Slide 7 key cases
+for i in range(1, 4):
+    sections[6]["rows"].extend([
+        (f"CRM_CASE{i}_ID", f"Case {i} – Case ID", "Text", ""),
+        (f"CRM_CASE{i}_RISK", f"Case {i} – Risk type", "Text", ""),
+        (f"CRM_CASE{i}_DESC", f"Case {i} – Description", "Long text", ""),
+        (f"CRM_CASE{i}_STATUS", f"Case {i} – Status", "Text", ""),
+        (f"CRM_CASE{i}_OWNER", f"Case {i} – Owner", "Text", ""),
+        (f"CRM_CASE{i}_COMMENTS", f"Case {i} – Comments", "Long text", ""),
+    ])
+ 
+# Slide 9 detail rows
+for i in range(1, 5):
+    sections[8]["rows"].extend([
+        (f"CRP_CASE{i}_ID", f"Case {i} – Case ID", "Text", ""),
+        (f"CRP_CASE{i}_STATUS", f"Case {i} – Status", "Text", ""),
+        (f"CRP_CASE{i}_DAYS", f"Case {i} – Days overdue", "Number", ""),
+        (f"CRP_CASE{i}_ACTION", f"Case {i} – Action", "Long text", ""),
+        (f"CRP_CASE{i}_OWNER", f"Case {i} – Owner", "Text", ""),
+    ])
+ 
+# Slide 10 providers
+provider_rows = [("LEGAL", "Legal Advisors"), ("VALUERS", "Valuers"), ("IP", "Insolvency Practitioners"), ("RECOVERY", "Recovery Agents")]
+for code, label in provider_rows:
+    sections[9]["rows"].extend([
+        (f"TPP_{code}_VOLUME", f"{label} – Volume", "Number", ""),
+        (f"TPP_{code}_RATING", f"{label} – Performance rating", "List: Strong, Satisfactory, Watchlist, Poor", ""),
+        (f"TPP_{code}_COST", f"{label} – Cost", "Currency", ""),
+        (f"TPP_{code}_ISSUES", f"{label} – Issues", "Long text", ""),
+        (f"TPP_{code}_COMMENTS", f"{label} – Comments", "Long text", ""),
+    ])
+ 
+# Slide 11 lessons rows
+for i in range(1, 4):
+    sections[10]["rows"].extend([
+        (f"LL_ROW{i}_THEME", f"Lesson {i} – Theme", "Text", ""),
+        (f"LL_ROW{i}_DESC", f"Lesson {i} – Description", "Long text", ""),
+        (f"LL_ROW{i}_ROOT", f"Lesson {i} – Root cause", "Long text", ""),
+        (f"LL_ROW{i}_ACTION", f"Lesson {i} – Action taken", "Long text", ""),
+        (f"LL_ROW{i}_OWNER", f"Lesson {i} – Owner", "Text", ""),
+        (f"LL_ROW{i}_STATUS", f"Lesson {i} – Status", "Text", ""),
+    ])
+ 
+def add_title(ws, title, end_col=8):
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=end_col)
+    c = ws.cell(1, 1, title)
+    c.fill = title_fill
+    c.font = title_font
+    c.alignment = left
+    ws.row_dimensions[1].height = 24
+ 
+def style_cell(cell, fill=None, font=None, alignment=None, border=None, num_format=None):
+    if fill:
+        cell.fill = fill
+    if font:
+        cell.font = font
+    if alignment:
+        cell.alignment = alignment
+    if border:
+        cell.border = border
+    if num_format:
+        cell.number_format = num_format
+ 
+def set_widths(ws, widths):
+    for col, width in widths.items():
+        ws.column_dimensions[get_column_letter(col)].width = width
+ 
+def pull_formula(input_id):
+    # INDEX/MATCH for compatibility
+    return f'=IFERROR(INDEX(\'1_Input_Request\'!$G:$G,MATCH("{input_id}",\'1_Input_Request\'!$C:$C,0)),"")'
+ 
+def pull_text_with_label(label, input_id):
+    return f'="{label}: "&IFERROR(INDEX(\'1_Input_Request\'!$G:$G,MATCH("{input_id}",\'1_Input_Request\'!$C:$C,0)),"")'
+ 
+def add_back_to_input(ws, row, col=1):
+    c = ws.cell(row, col, "Go to Input tab")
+    c.hyperlink = "#'1_Input_Request'!A1"
+    c.style = "Hyperlink"
+    c.font = Font(name="Calibri", size=10, underline="single", color="0563C1")
+ 
+def add_table_header(ws, row, headers, start_col=1):
+    for idx, h in enumerate(headers, start=start_col):
+        cell = ws.cell(row, idx, h)
+        style_cell(cell, fill=section_fill, font=section_font, alignment=center, border=all_border)
+    ws.row_dimensions[row].height = 22
+ 
+def add_label_value_table(ws, start_row, title, rows, start_col=1):
+    ws.merge_cells(start_row=start_row, start_column=start_col, end_row=start_row, end_column=start_col+1)
+    c = ws.cell(start_row, start_col, title)
+    style_cell(c, fill=section_fill, font=section_font, alignment=left, border=all_border)
+    r = start_row + 1
+    for label, formula, fmt in rows:
+        lc = ws.cell(r, start_col, label)
+        vc = ws.cell(r, start_col+1)
+        lc.fill = subheader_fill
+        lc.font = subheader_font
+        lc.alignment = left
+        lc.border = all_border
+        vc.value = formula
+        vc.fill = metric_fill
+        vc.font = formula_font
+        vc.alignment = center
+        vc.border = all_border
+        if fmt:
+            vc.number_format = fmt
+        r += 1
+    return r
+ 
+def add_notes_box(ws, start_row, title, ids, start_col=5, width=4):
+    ws.merge_cells(start_row=start_row, start_column=start_col, end_row=start_row, end_column=start_col+width-1)
+    c = ws.cell(start_row, start_col, title)
+    style_cell(c, fill=section_fill, font=section_font, alignment=left, border=all_border)
+    row = start_row + 1
+    for item_title, input_id in ids:
+        ws.merge_cells(start_row=row, start_column=start_col, end_row=row, end_column=start_col+width-1)
+        cc = ws.cell(row, start_col)
+        cc.value = pull_text_with_label(item_title, input_id)
+        style_cell(cc, fill=note_fill, font=formula_font, alignment=left, border=all_border)
+        row += 1
+    return row
+ 
+# -----------------------------
+# Create workbook
+# -----------------------------
+wb = Workbook()
+default_ws = wb.active
+wb.remove(default_ws)
+ 
+# -----------------------------
+# Input tab
+# -----------------------------
+ws = wb.create_sheet("1_Input_Request")
+ws.sheet_view.showGridLines = False
+ws.freeze_panes = "A4"
+ws.sheet_view.zoomScale = 90
+add_title(ws, "SCU Governance Q2'25 – Boss Input Sheet", end_col=8)
+ 
+ws["A2"] = "How to use"
+ws["A2"].font = section_font
+ws["A2"].fill = section_fill
+ws["A2"].alignment = left
+ws["B2"] = "Only complete yellow cells in column G (Response). Do not sort rows. Slide tabs will automatically pull your responses."
+ws["B2"].alignment = left
+ws["B2"].font = body_font
+ws.merge_cells("B2:H2")
+for cell in ws["2:2"]:
+    cell.border = all_border
+ 
+headers = ["Slide #", "Slide Name", "Input ID", "Question / Field", "Expected Input", "Guidance", "Response", "Notes / Optional Context"]
+for col, h in enumerate(headers, start=1):
+    cell = ws.cell(3, col, h)
+    style_cell(cell, fill=section_fill, font=section_font, alignment=center, border=all_border)
+ 
+set_widths(ws, {1:8, 2:25, 3:22, 4:48, 5:20, 6:30, 7:26, 8:32})
+ 
+input_row_map = {}
+row = 4
+ 
+# Data validations
+severity_dv = DataValidation(type="list", formula1='"Low,Medium,High,Very High"', allow_blank=True)
+status_dv = DataValidation(type="list", formula1='"On Track,Delayed,Closed,Not Started"', allow_blank=True)
+rating_dv = DataValidation(type="list", formula1='"Strong,Satisfactory,Watchlist,Poor"', allow_blank=True)
+case_type_dv = DataValidation(type="list", formula1='"Complaint,Litigation,Both"', allow_blank=True)
+sampling_type_dv = DataValidation(type="list", formula1='"SCU,FLoD,Other"', allow_blank=True)
+short_type_dv = DataValidation(type="list", formula1='"Low,Medium,High,Very High"', allow_blank=True)
+for dv in [severity_dv, status_dv, rating_dv, case_type_dv, sampling_type_dv, short_type_dv]:
+    ws.add_data_validation(dv)
+ 
+for section in sections:
+    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=8)
+    c = ws.cell(row, 1, f"Slide {section['slide_no']} – {section['slide_name']}")
+    style_cell(c, fill=subheader_fill, font=Font(name="Calibri", size=11, bold=True), alignment=left, border=all_border)
+    row += 1
+ 
+    for input_id, question, expected, guidance in section["rows"]:
+        input_row_map[input_id] = row
+        values = [section["slide_no"], section["slide_name"], input_id, question, expected, guidance, "", ""]
+        for col, val in enumerate(values, start=1):
+            cell = ws.cell(row, col, val)
+            style_cell(cell, font=body_font, alignment=left, border=all_border)
+            if col in (1,):
+                cell.alignment = center
+        # response cell
+        rc = ws.cell(row, 7)
+        rc.fill = input_fill
+        rc.font = input_font
+        rc.alignment = left
+        rc.comment = Comment("Enter response here. This cell feeds the corresponding slide tab.", "OpenAI")
+        # notes
+        nc = ws.cell(row, 8)
+        nc.fill = note_fill
+        nc.font = body_font
+        # formatting based on expected type
+        if expected == "Currency":
+            rc.number_format = '$#,##0;[Red]($#,##0);-'
+        elif expected == "Percentage":
+            rc.number_format = '0.0%'
+        elif expected == "Date":
+            rc.number_format = 'DD-MMM-YYYY'
+        elif expected == "Number":
+            rc.number_format = '#,##0;[Red](#,##0);-'
+        # validations
+        exp = expected.lower()
+        if "very high" in exp and "on track" in exp:
+            status_dv.add(rc)
+        elif expected.startswith("List:"):
+            if "Very High" in expected and "On Track" not in expected:
+                severity_dv.add(rc)
+            elif "Strong" in expected:
+                rating_dv.add(rc)
+            elif "Complaint" in expected:
+                case_type_dv.add(rc)
+            elif "SCU,FLoD,Other" in expected.replace(" ", "") or "SCU, FLoD, Other" in expected:
+                sampling_type_dv.add(rc)
+        row += 1
+    row += 1
+ 
+# conditional formatting for response blanks
+ws.conditional_formatting.add(f"G4:G{row}", CellIsRule(operator='equal', formula=['""'], fill=input_fill))
+ 
+# -----------------------------
+# Common slide setup
+# -----------------------------
+def basic_slide(ws, title, widths=None):
+    ws.sheet_view.showGridLines = False
+    ws.sheet_view.zoomScale = 85
+    ws.freeze_panes = "A3"
+    add_title(ws, title, end_col=10)
+    ws["A2"] = "Populate yellow response cells in 1_Input_Request. This tab auto-pulls those inputs."
+    ws["A2"].font = small_font
+    ws.merge_cells("A2:F2")
+    add_back_to_input(ws, 2, 8)
+    if widths:
+        set_widths(ws, widths)
+ 
+# Slide 1
+ws = wb.create_sheet("2_Helios_Controls")
+basic_slide(ws, "Slide 1 – Helios Controls Profile and Summary", {1:28, 2:18, 3:18, 4:18, 5:18, 6:18, 7:18, 8:18, 9:20})
+r = 4
+r = add_label_value_table(ws, r, "Controls Overview", [
+    ("Total Controls", pull_formula("HC_TOTAL_CONTROLS"), '#,##0;[Red](#,##0);-'),
+    ("L1 Effective", pull_formula("HC_L1_EFFECTIVE"), '#,##0;[Red](#,##0);-'),
+    ("L1 Needs Improvement / Ineffective", pull_formula("HC_L1_NI"), '#,##0;[Red](#,##0);-'),
+    ("L2 Effective", pull_formula("HC_L2_EFFECTIVE"), '#,##0;[Red](#,##0);-'),
+    ("L2 Needs Improvement / Ineffective", pull_formula("HC_L2_NI"), '#,##0;[Red](#,##0);-'),
+    ("Assurance Reviews – Pass", pull_formula("HC_ASSURANCE_PASS"), '#,##0;[Red](#,##0);-'),
+    ("Assurance Reviews – Medium / High Risk", pull_formula("HC_ASSURANCE_MH"), '#,##0;[Red](#,##0);-'),
+], start_col=1)
+r2 = add_notes_box(ws, 4, "Boss Summary Inputs", [("Summary 1", "HC_SUMMARY_1"), ("Summary 2", "HC_SUMMARY_2"), ("Summary 3", "HC_SUMMARY_3")], start_col=4, width=5)
+r = max(r, r2) + 1
+r = add_label_value_table(ws, r, "Actions, Events and Escalations", [
+    ("Total Actions", pull_formula("HC_TOTAL_ACTIONS"), '#,##0;[Red](#,##0);-'),
+    ("Overdue Actions", pull_formula("HC_OVERDUE_ACTIONS"), '#,##0;[Red](#,##0);-'),
+    ("Open Audit Actions", pull_formula("HC_OPEN_AUDIT_ACTIONS"), '#,##0;[Red](#,##0);-'),
+    ("Overdue Audit Actions", pull_formula("HC_OVERDUE_AUDIT"), '#,##0;[Red](#,##0);-'),
+    ("Internal Events – YTD", pull_formula("HC_EVENTS_YTD"), '#,##0;[Red](#,##0);-'),
+    ("Internal Events – Quarter", pull_formula("HC_EVENTS_QTD"), '#,##0;[Red](#,##0);-'),
+    ("Actual Losses", pull_formula("HC_ACTUAL_LOSSES"), '$#,##0;[Red]($#,##0);-'),
+    ("SMR Escalations – YTD", pull_formula("HC_SMR_YTD"), '#,##0;[Red](#,##0);-'),
+    ("SMR Escalations – Quarter", pull_formula("HC_SMR_QTD"), '#,##0;[Red](#,##0);-'),
+], start_col=1)
+ 
+# Slide 2
+ws = wb.create_sheet("3_Issues_Actions")
+basic_slide(ws, "Slide 2 – Helios Issues & Actions (I&As)", {1:16,2:34,3:13,4:16,5:14,6:16,7:14,8:40,9:18})
+row = 4
+def add_issue_table(ws, title, start_row, headers, row_keys):
+    ws.merge_cells(start_row=start_row, start_column=1, end_row=start_row, end_column=len(headers))
+    c = ws.cell(start_row, 1, title)
+    style_cell(c, fill=section_fill, font=section_font, alignment=left, border=all_border)
+    add_table_header(ws, start_row + 1, headers, 1)
+    r = start_row + 2
+    for keyset in row_keys:
+        for col_idx, input_id in enumerate(keyset, start=1):
+            cell = ws.cell(r, col_idx)
+            cell.value = pull_formula(input_id)
+            style_cell(cell, fill=metric_fill, font=formula_font, alignment=left if col_idx not in (3,5) else center, border=all_border)
+            if "DATE" in input_id or "CLOSE_DATE" in input_id or "ORIG_DATE" in input_id or "NEW_DATE" in input_id:
+                cell.number_format = 'DD-MMM-YYYY'
+        r += 1
+    return r + 1
+ 
+row = add_issue_table(ws, "Existing Issues", row, ["Issue ID","Issue Detail","Severity","Owner","Target Date","Control","Status","Comments"], [
+    [f"IA_EXISTING1_ID", f"IA_EXISTING1_DETAIL", f"IA_EXISTING1_SEVERITY", f"IA_EXISTING1_OWNER", f"IA_EXISTING1_TARGET_DATE", f"IA_EXISTING1_CONTROL", f"IA_EXISTING1_STATUS", f"IA_EXISTING1_COMMENTS"],
+    [f"IA_EXISTING2_ID", f"IA_EXISTING2_DETAIL", f"IA_EXISTING2_SEVERITY", f"IA_EXISTING2_OWNER", f"IA_EXISTING2_TARGET_DATE", f"IA_EXISTING2_CONTROL", f"IA_EXISTING2_STATUS", f"IA_EXISTING2_COMMENTS"],
+    [f"IA_EXISTING3_ID", f"IA_EXISTING3_DETAIL", f"IA_EXISTING3_SEVERITY", f"IA_EXISTING3_OWNER", f"IA_EXISTING3_TARGET_DATE", f"IA_EXISTING3_CONTROL", f"IA_EXISTING3_STATUS", f"IA_EXISTING3_COMMENTS"],
+])
+row = add_issue_table(ws, "New Issues", row, ["Issue ID","Issue Title","Severity","Owner","Target Date","Control","Status","Comments"], [
+    [f"IA_NEW1_ID", f"IA_NEW1_DETAIL", f"IA_NEW1_SEVERITY", f"IA_NEW1_OWNER", f"IA_NEW1_TARGET_DATE", f"IA_NEW1_CONTROL", f"IA_NEW1_STATUS", f"IA_NEW1_COMMENTS"],
+    [f"IA_NEW2_ID", f"IA_NEW2_DETAIL", f"IA_NEW2_SEVERITY", f"IA_NEW2_OWNER", f"IA_NEW2_TARGET_DATE", f"IA_NEW2_CONTROL", f"IA_NEW2_STATUS", f"IA_NEW2_COMMENTS"],
+    [f"IA_NEW3_ID", f"IA_NEW3_DETAIL", f"IA_NEW3_SEVERITY", f"IA_NEW3_OWNER", f"IA_NEW3_TARGET_DATE", f"IA_NEW3_CONTROL", f"IA_NEW3_STATUS", f"IA_NEW3_COMMENTS"],
+])
+row = add_issue_table(ws, "Extended Issues", row, ["Issue ID","Issue Detail","Severity","Owner","Original Target Date","New Target Date","Control","Comments"], [
+    [f"IA_EXT1_ID", f"IA_EXT1_DETAIL", f"IA_EXT1_SEVERITY", f"IA_EXT1_OWNER", f"IA_EXT1_ORIG_DATE", f"IA_EXT1_NEW_DATE", f"IA_EXT1_CONTROL", f"IA_EXT1_COMMENTS"],
+    [f"IA_EXT2_ID", f"IA_EXT2_DETAIL", f"IA_EXT2_SEVERITY", f"IA_EXT2_OWNER", f"IA_EXT2_ORIG_DATE", f"IA_EXT2_NEW_DATE", f"IA_EXT2_CONTROL", f"IA_EXT2_COMMENTS"],
+])
+row = add_issue_table(ws, "Closed Issues", row, ["Issue ID","Issue Detail","Severity","Owner","Closure Date","Control","Comments"], [
+    [f"IA_CLOSED1_ID", f"IA_CLOSED1_DETAIL", f"IA_CLOSED1_SEVERITY", f"IA_CLOSED1_OWNER", f"IA_CLOSED1_CLOSE_DATE", f"IA_CLOSED1_CONTROL", f"IA_CLOSED1_COMMENTS"],
+    [f"IA_CLOSED2_ID", f"IA_CLOSED2_DETAIL", f"IA_CLOSED2_SEVERITY", f"IA_CLOSED2_OWNER", f"IA_CLOSED2_CLOSE_DATE", f"IA_CLOSED2_CONTROL", f"IA_CLOSED2_COMMENTS"],
+])
+ 
+# Slide 3
+ws = wb.create_sheet("4_Service_Litigation")
+basic_slide(ws, "Slide 3 – Service Failures and Litigation Against the Bank", {1:16,2:18,3:34,4:14,5:16,6:16,7:14,8:38,9:24})
+r = add_label_value_table(ws, 4, "Summary Metrics", [
+    ("Total Complaints", pull_formula("SFL_TOTAL_COMPLAINTS"), '#,##0;[Red](#,##0);-'),
+    ("Escalated Complaints", pull_formula("SFL_ESCALATED_COMPLAINTS"), '#,##0;[Red](#,##0);-'),
+    ("Litigation Cases", pull_formula("SFL_LITIGATION_CASES"), '#,##0;[Red](#,##0);-'),
+    ("Material / Reputationally Sensitive Cases", pull_formula("SFL_MATERIAL_CASES"), '#,##0;[Red](#,##0);-'),
+], start_col=1)
+r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "SFL_SUMMARY_1"), ("Summary 2", "SFL_SUMMARY_2")], start_col=4, width=6)
+r = max(r, r2) + 1
+add_table_header(ws, r, ["Case ID","Type","Description","Status","Owner","Financial Impact","Date","Comments"])
+for i in range(1,4):
+    rr = r+i
+    ids = [f"SFL_CASE{i}_ID",f"SFL_CASE{i}_TYPE",f"SFL_CASE{i}_DESC",f"SFL_CASE{i}_STATUS",f"SFL_CASE{i}_OWNER",f"SFL_CASE{i}_IMPACT",f"SFL_CASE{i}_DATE",f"SFL_CASE{i}_COMMENTS"]
+    for cidx, iid in enumerate(ids, start=1):
+        cell = ws.cell(rr, cidx, pull_formula(iid))
+        style_cell(cell, fill=metric_fill, font=formula_font, alignment=left, border=all_border)
+        if "IMPACT" in iid:
+            cell.number_format = '$#,##0;[Red]($#,##0);-'
+        if iid.endswith("_DATE"):
+            cell.number_format = 'DD-MMM-YYYY'
+ 
+# Slide 4
+ws = wb.create_sheet("5_OpRisk_BCM")
+basic_slide(ws, "Slide 4 – Operational Risk Testing and BCM", {1:18,2:36,3:14,4:18,5:16,6:14,7:16,8:28})
+r = add_label_value_table(ws, 4, "Quarter Metrics", [
+    ("Tests / BCM Activities Conducted", pull_formula("ORB_TESTS_CONDUCTED"), '#,##0;[Red](#,##0);-'),
+    ("Issues / Gaps Identified", pull_formula("ORB_ISSUES_FOUND"), '#,##0;[Red](#,##0);-'),
+    ("Failed Tests / Material Gaps", pull_formula("ORB_FAILED_TESTS"), '#,##0;[Red](#,##0);-'),
+], start_col=1)
+r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "ORB_SUMMARY_1"), ("Summary 2", "ORB_SUMMARY_2")], start_col=4, width=5)
+r = max(r, r2) + 1
+add_table_header(ws, r, ["Activity Type","Description","Date","Outcome","Issues Identified","Status","Owner"])
+for i in range(1,5):
+    rr = r+i
+    ids = [f"ORB_ACT{i}_TYPE",f"ORB_ACT{i}_DESC",f"ORB_ACT{i}_DATE",f"ORB_ACT{i}_OUTCOME",f"ORB_ACT{i}_ISSUES",f"ORB_ACT{i}_STATUS",f"ORB_ACT{i}_OWNER"]
+    for cidx, iid in enumerate(ids, start=1):
+        cell = ws.cell(rr, cidx, pull_formula(iid))
+        style_cell(cell, fill=metric_fill, font=formula_font, alignment=left, border=all_border)
+        if iid.endswith("_DATE"):
+            cell.number_format = 'DD-MMM-YYYY'
+        if iid.endswith("_ISSUES"):
+            cell.number_format = '#,##0;[Red](#,##0);-'
+ 
+# Slide 5
+ws = wb.create_sheet("6_FinCrime")
+basic_slide(ws, "Slide 5 – Financial Crime Compliance", {1:28,2:16,3:16,4:16,5:16,6:16,7:20})
+r = add_label_value_table(ws, 4, "Core Metrics", [
+    ("CDD Issues", pull_formula("FCC_CDD_ISSUES"), '#,##0;[Red](#,##0);-'),
+    ("CSEM Exits", pull_formula("FCC_CSEM_EXITS"), '#,##0;[Red](#,##0);-'),
+    ("Fraud Cases Identified", pull_formula("FCC_FRAUD_CASES"), '#,##0;[Red](#,##0);-'),
+    ("Fraud Loss", pull_formula("FCC_FRAUD_LOSS"), '$#,##0;[Red]($#,##0);-'),
+], start_col=1)
+r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "FCC_SUMMARY_1"), ("Summary 2", "FCC_SUMMARY_2")], start_col=4, width=4)
+r = max(r, r2) + 1
+add_table_header(ws, r, ["Case ID","Type","Status","Risk Level","Action Taken","Comments"])
+for i in range(1,4):
+    rr = r+i
+    ids = [f"FCC_CASE{i}_ID",f"FCC_CASE{i}_TYPE",f"FCC_CASE{i}_STATUS",f"FCC_CASE{i}_RISK",f"FCC_CASE{i}_ACTION",f"FCC_CASE{i}_COMMENTS"]
+    for cidx, iid in enumerate(ids, start=1):
+        cell = ws.cell(rr, cidx, pull_formula(iid))
+        style_cell(cell, fill=metric_fill, font=formula_font, alignment=left, border=all_border)
+ 
+# Slide 6
+ws = wb.create_sheet("7_Core_Sampling")
+basic_slide(ws, "Slide 6 – Core Sampling Outcomes", {1:20,2:18,3:18,4:18,5:36,6:24})
+r = 4
+ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=5)
+style_cell(ws.cell(r,1,"Sampling Results"), fill=section_fill, font=section_font, alignment=left, border=all_border)
+add_table_header(ws, r+1, ["Sampling Type","Volume Reviewed","Issues Identified","Pass Rate","Key Findings"])
+sampling_rows = [
+    ("SCU", "CSO_SCU_VOLUME", "CSO_SCU_ISSUES", "CSO_SCU_PASS", "CSO_FIND1_DETAIL"),
+    ("FLoD", "CSO_FLOD_VOLUME", "CSO_FLOD_ISSUES", "CSO_FLOD_PASS", "CSO_FIND2_DETAIL"),
+]
+for i, rowcfg in enumerate(sampling_rows, start=r+2):
+    label, vol, issues, pr, finding = rowcfg
+    vals = [label, pull_formula(vol), pull_formula(issues), pull_formula(pr), pull_formula(finding)]
+    for cidx, val in enumerate(vals, start=1):
+        cell = ws.cell(i, cidx, val)
+        style_cell(cell, fill=metric_fill if cidx > 1 else subheader_fill, font=formula_font if cidx > 1 else subheader_font, alignment=left if cidx in (1,5) else center, border=all_border)
+        if cidx in (2,3):
+            cell.number_format = '#,##0;[Red](#,##0);-'
+        if cidx == 4:
+            cell.number_format = '0.0%'
+r = r + 5
+r2 = add_notes_box(ws, r, "Additional Commentary", [("Summary 1", "CSO_SUMMARY_1"), ("Summary 2", "CSO_SUMMARY_2"), ("Finding 3", "CSO_FIND3_DETAIL")], start_col=1, width=5)
+ 
+# Slide 7
+ws = wb.create_sheet("8_Conduct_Risk")
+basic_slide(ws, "Slide 7 – Conduct Risk Measures / Dashboard", {1:28,2:16,3:16,4:16,5:16,6:16,7:32})
+r = add_label_value_table(ws, 4, "Conduct Metrics", [
+    ("Manager Observations", pull_formula("CRM_MANAGER_OBS"), '#,##0;[Red](#,##0);-'),
+    ("Customer Journey Reviews", pull_formula("CRM_CJR"), '#,##0;[Red](#,##0);-'),
+    ("Enhanced Care Needs Customers", pull_formula("CRM_ENHANCED_CARE"), '#,##0;[Red](#,##0);-'),
+    ("Significant Conduct / Reputational Risk Cases", pull_formula("CRM_CONDUCT_CASES"), '#,##0;[Red](#,##0);-'),
+], start_col=1)
+r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "CRM_SUMMARY_1"), ("Summary 2", "CRM_SUMMARY_2")], start_col=4, width=4)
+r = max(r, r2) + 1
+add_table_header(ws, r, ["Case ID","Risk Type","Description","Status","Owner","Comments"])
+for i in range(1,4):
+    rr = r+i
+    ids = [f"CRM_CASE{i}_ID",f"CRM_CASE{i}_RISK",f"CRM_CASE{i}_DESC",f"CRM_CASE{i}_STATUS",f"CRM_CASE{i}_OWNER",f"CRM_CASE{i}_COMMENTS"]
+    for cidx, iid in enumerate(ids, start=1):
+        cell = ws.cell(rr, cidx, pull_formula(iid))
+        style_cell(cell, fill=metric_fill, font=formula_font, alignment=left, border=all_border)
+ 
+# Slide 8
+ws = wb.create_sheet("9_Conflicts")
+basic_slide(ws, "Slide 8 – Conflicts of Interest", {1:28,2:16,3:16,4:16,5:36})
+r = 4
+ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+style_cell(ws.cell(r,1,"Conflicts Metrics"), fill=section_fill, font=section_font, alignment=left, border=all_border)
+add_table_header(ws, r+1, ["Type","Volume","Issues Identified","Comments"])
+rows = [
+    ("Gifts & Entertainment", "COI_GAE_VOLUME", "COI_GAE_ISSUES", "COI_SUMMARY_1"),
+    ("Panel Firm Engagements", "COI_PANEL_VOLUME", "COI_PANEL_ISSUES", "COI_SUMMARY_2"),
+]
+for idx, rowcfg in enumerate(rows, start=r+2):
+    label, vol, issues, comments = rowcfg
+    vals = [label, pull_formula(vol), pull_formula(issues), pull_formula(comments)]
+    for cidx, val in enumerate(vals, start=1):
+        cell = ws.cell(idx, cidx, val)
+        style_cell(cell, fill=metric_fill if cidx > 1 else subheader_fill, font=formula_font if cidx > 1 else subheader_font, alignment=left if cidx in (1,4) else center, border=all_border)
+        if cidx in (2,3):
+            cell.number_format = '#,##0;[Red](#,##0);-'
+ 
+# Slide 9
+ws = wb.create_sheet("10_Credit_Performance")
+basic_slide(ws, "Slide 9 – Credit Risk Performance Measures", {1:30,2:16,3:18,4:36,5:18,6:28})
+r = add_label_value_table(ws, 4, "Performance Metrics", [
+    ("Total Full Responsibility Cases", pull_formula("CRP_TOTAL_CASES"), '#,##0;[Red](#,##0);-'),
+    ("Overdue Cases", pull_formula("CRP_OVERDUES"), '#,##0;[Red](#,##0);-'),
+    ("Resubmissions", pull_formula("CRP_RESUBMISSIONS"), '#,##0;[Red](#,##0);-'),
+    ("Average Resolution Time (days)", pull_formula("CRP_AVG_RESOLUTION"), '#,##0;[Red](#,##0);-'),
+], start_col=1)
+r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "CRP_SUMMARY_1"), ("Summary 2", "CRP_SUMMARY_2")], start_col=4, width=4)
+r = max(r, r2) + 1
+add_table_header(ws, r, ["Case ID","Status","Days Overdue","Action","Owner"])
+for i in range(1,5):
+    rr = r+i
+    ids = [f"CRP_CASE{i}_ID",f"CRP_CASE{i}_STATUS",f"CRP_CASE{i}_DAYS",f"CRP_CASE{i}_ACTION",f"CRP_CASE{i}_OWNER"]
+    for cidx, iid in enumerate(ids, start=1):
+        cell = ws.cell(rr, cidx, pull_formula(iid))
+        style_cell(cell, fill=metric_fill, font=formula_font, alignment=left if cidx != 3 else center, border=all_border)
+        if iid.endswith("_DAYS"):
+            cell.number_format = '#,##0;[Red](#,##0);-'
+ 
+# Slide 10
+ws = wb.create_sheet("11_Third_Parties")
+basic_slide(ws, "Slide 10 – Third Party Providers", {1:30,2:14,3:16,4:14,5:34,6:34})
+r = 4
+ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
+style_cell(ws.cell(r,1,"Third Party Provider Analysis"), fill=section_fill, font=section_font, alignment=left, border=all_border)
+add_table_header(ws, r+1, ["Provider Type","Volume","Performance Rating","Cost","Issues","Comments"])
+providers = [
+    ("Legal Advisors","TPP_LEGAL_VOLUME","TPP_LEGAL_RATING","TPP_LEGAL_COST","TPP_LEGAL_ISSUES","TPP_LEGAL_COMMENTS"),
+    ("Valuers","TPP_VALUERS_VOLUME","TPP_VALUERS_RATING","TPP_VALUERS_COST","TPP_VALUERS_ISSUES","TPP_VALUERS_COMMENTS"),
+    ("Insolvency Practitioners","TPP_IP_VOLUME","TPP_IP_RATING","TPP_IP_COST","TPP_IP_ISSUES","TPP_IP_COMMENTS"),
+    ("Recovery Agents","TPP_RECOVERY_VOLUME","TPP_RECOVERY_RATING","TPP_RECOVERY_COST","TPP_RECOVERY_ISSUES","TPP_RECOVERY_COMMENTS"),
+]
+for i, rowcfg in enumerate(providers, start=r+2):
+    label, vol, rating, cost, issues, comments = rowcfg
+    vals = [label, pull_formula(vol), pull_formula(rating), pull_formula(cost), pull_formula(issues), pull_formula(comments)]
+    for cidx, val in enumerate(vals, start=1):
+        cell = ws.cell(i, cidx, val)
+        style_cell(cell, fill=metric_fill if cidx > 1 else subheader_fill, font=formula_font if cidx > 1 else subheader_font, alignment=left if cidx in (1,5,6) else center, border=all_border)
+        if cidx == 2:
+            cell.number_format = '#,##0;[Red](#,##0);-'
+        if cidx == 4:
+            cell.number_format = '$#,##0;[Red]($#,##0);-'
+r = r + 8
+add_notes_box(ws, r, "Boss Commentary", [("Summary 1", "TPP_SUMMARY_1"), ("Summary 2", "TPP_SUMMARY_2")], start_col=1, width=6)
+ 
+# Slide 11
+ws = wb.create_sheet("12_Lessons_Learned")
+basic_slide(ws, "Slide 11 – Lessons Learned", {1:18,2:34,3:34,4:34,5:16,6:16})
+r = 4
+add_notes_box(ws, r, "Headline Lessons", [("Headline 1", "LL_SUMMARY_1"), ("Headline 2", "LL_SUMMARY_2"), ("Headline 3", "LL_SUMMARY_3")], start_col=1, width=6)
+r += 5
+add_table_header(ws, r, ["Theme","Description","Root Cause","Action Taken","Owner","Status"])
+for i in range(1,4):
+    rr = r+i
+    ids = [f"LL_ROW{i}_THEME",f"LL_ROW{i}_DESC",f"LL_ROW{i}_ROOT",f"LL_ROW{i}_ACTION",f"LL_ROW{i}_OWNER",f"LL_ROW{i}_STATUS"]
+    for cidx, iid in enumerate(ids, start=1):
+        cell = ws.cell(rr, cidx, pull_formula(iid))
+        style_cell(cell, fill=metric_fill, font=formula_font, alignment=left, border=all_border)
+ 
+# Add auto-filter only on input sheet
+ws = wb["1_Input_Request"]
+ws.auto_filter.ref = f"A3:H{row}"
+ 
+# tab colors
+tab_colors = {
+    "1_Input_Request": ORANGE, "2_Helios_Controls": ORANGE, "3_Issues_Actions": ORANGE,
+    "4_Service_Litigation": ORANGE, "5_OpRisk_BCM": ORANGE, "6_FinCrime": ORANGE,
+    "7_Core_Sampling": ORANGE, "8_Conduct_Risk": ORANGE, "9_Conflicts": ORANGE,
+    "10_Credit_Performance": ORANGE, "11_Third_Parties": ORANGE, "12_Lessons_Learned": ORANGE,
+}
+for sname, color in tab_colors.items():
+    wb[sname].sheet_properties.tabColor = color
+ 
+# freeze and print config
+for sname in wb.sheetnames:
+    ws = wb[sname]
+    ws.page_setup.orientation = "landscape"
+    ws.page_margins.left = 0.25
+    ws.page_margins.right = 0.25
+    ws.page_margins.top = 0.4
+    ws.page_margins.bottom = 0.4
+ 
+# Save
+wb.save(OUTPUT_FILE)
+print(f"Workbook created: {OUTPUT_FILE}")
