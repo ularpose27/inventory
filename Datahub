@@ -7,7 +7,7 @@ from openpyxl.comments import Comment
 from openpyxl.formatting.rule import CellIsRule
 from openpyxl import load_workbook
  
-OUTPUT_FILE = "SCU_Governance_Q425_Input_and_Slide_Templates.xlsx"
+OUTPUT_FILE = "SCU_Governance_Report_Template.xlsx"
  
 # -----------------------------
 # Styles
@@ -150,10 +150,31 @@ sections = [
         "slide_no": 8,
         "slide_name": "Conflicts of Interest",
         "rows": [
-            ("COI_GAE_VOLUME", "Gifts & Entertainment activity volume", "Number", ""),
-            ("COI_GAE_ISSUES", "Gifts & Entertainment issues identified", "Number", ""),
-            ("COI_PANEL_VOLUME", "Panel firm engagements", "Number", ""),
-            ("COI_PANEL_ISSUES", "Panel firm issues identified", "Number", ""),
+            ("COI_GH_TEAM1", "Gifts & Hospitality – Team 1 name", "Text", "Edit team labels if needed"),
+            ("COI_GH_TEAM1_M1", "Gifts & Hospitality – Team 1 – Month 1 amount", "Currency", ""),
+            ("COI_GH_TEAM1_M2", "Gifts & Hospitality – Team 1 – Month 2 amount", "Currency", ""),
+            ("COI_GH_TEAM1_M3", "Gifts & Hospitality – Team 1 – Month 3 amount", "Currency", ""),
+            ("COI_GH_TEAM2", "Gifts & Hospitality – Team 2 name", "Text", ""),
+            ("COI_GH_TEAM2_M1", "Gifts & Hospitality – Team 2 – Month 1 amount", "Currency", ""),
+            ("COI_GH_TEAM2_M2", "Gifts & Hospitality – Team 2 – Month 2 amount", "Currency", ""),
+            ("COI_GH_TEAM2_M3", "Gifts & Hospitality – Team 2 – Month 3 amount", "Currency", ""),
+            ("COI_GH_TEAM3", "Gifts & Hospitality – Team 3 name", "Text", ""),
+            ("COI_GH_TEAM3_M1", "Gifts & Hospitality – Team 3 – Month 1 amount", "Currency", ""),
+            ("COI_GH_TEAM3_M2", "Gifts & Hospitality – Team 3 – Month 2 amount", "Currency", ""),
+            ("COI_GH_TEAM3_M3", "Gifts & Hospitality – Team 3 – Month 3 amount", "Currency", ""),
+            ("COI_GH_TEAM4", "Gifts & Hospitality – Team 4 name", "Text", ""),
+            ("COI_GH_TEAM4_M1", "Gifts & Hospitality – Team 4 – Month 1 amount", "Currency", ""),
+            ("COI_GH_TEAM4_M2", "Gifts & Hospitality – Team 4 – Month 2 amount", "Currency", ""),
+            ("COI_GH_TEAM4_M3", "Gifts & Hospitality – Team 4 – Month 3 amount", "Currency", ""),
+            ("COI_GH_TEAM5", "Gifts & Hospitality – Team 5 name", "Text", ""),
+            ("COI_GH_TEAM5_M1", "Gifts & Hospitality – Team 5 – Month 1 amount", "Currency", ""),
+            ("COI_GH_TEAM5_M2", "Gifts & Hospitality – Team 5 – Month 2 amount", "Currency", ""),
+            ("COI_GH_TEAM5_M3", "Gifts & Hospitality – Team 5 – Month 3 amount", "Currency", ""),
+            ("COI_GH_TEAM6", "Gifts & Hospitality – Team 6 name", "Text", ""),
+            ("COI_GH_TEAM6_M1", "Gifts & Hospitality – Team 6 – Month 1 amount", "Currency", ""),
+            ("COI_GH_TEAM6_M2", "Gifts & Hospitality – Team 6 – Month 2 amount", "Currency", ""),
+            ("COI_GH_TEAM6_M3", "Gifts & Hospitality – Team 6 – Month 3 amount", "Currency", ""),
+            ("COI_PANEL_SUMMARY", "Panel firm engagements / other conflicts commentary", "Long text", ""),
             ("COI_SUMMARY_1", "Summary point 1", "Long text", "Headline conflicts message"),
             ("COI_SUMMARY_2", "Summary point 2", "Long text", ""),
         ],
@@ -349,6 +370,9 @@ def pull_formula(input_id):
 def pull_text_with_label(label, input_id):
     return f'="{label}: "&IFERROR(INDEX(\'1_Input_Request\'!$G:$G,MATCH("{input_id}",\'1_Input_Request\'!$C:$C,0)),"")'
  
+def report_meta_formula(ref):
+    return f"='1_Input_Request'!{ref}"
+ 
 def add_back_to_input(ws, row, col=1):
     c = ws.cell(row, col, "Go to Input tab")
     c.hyperlink = "#'1_Input_Request'!A1"
@@ -408,30 +432,53 @@ wb.remove(default_ws)
 # -----------------------------
 ws = wb.create_sheet("1_Input_Request")
 ws.sheet_view.showGridLines = False
-ws.freeze_panes = "A4"
+ws.freeze_panes = "A5"
 ws.sheet_view.zoomScale = 90
-add_title(ws, "SCU Governance Q4'25 – Team Leader Input Sheet", end_col=8)
  
-ws["A2"] = "How to use"
-ws["A2"].font = section_font
-ws["A2"].fill = section_fill
-ws["A2"].alignment = left
-ws["B2"] = "Only complete yellow cells in column G (Response). Do not sort rows. Slide tabs will automatically pull your responses."
-ws["B2"].alignment = left
-ws["B2"].font = body_font
-ws.merge_cells("B2:H2")
-for cell in ws["2:2"]:
+# Quarter / Year selectors
+ws["A1"] = "Report Quarter"
+style_cell(ws["A1"], fill=section_fill, font=section_font, alignment=center, border=all_border)
+ws["B1"] = "Q4"
+style_cell(ws["B1"], fill=input_fill, font=input_font, alignment=center, border=all_border)
+ 
+ws["C1"] = "Report Year"
+style_cell(ws["C1"], fill=section_fill, font=section_font, alignment=center, border=all_border)
+ws["D1"] = 2025
+style_cell(ws["D1"], fill=input_fill, font=input_font, alignment=center, border=all_border)
+ 
+# Hidden helper month cells used by Slide 8
+ws["F1"] = '=CHOOSE(MATCH($B$1,{"Q1","Q2","Q3","Q4"},0),"Jan","Apr","Jul","Oct")'
+ws["G1"] = '=CHOOSE(MATCH($B$1,{"Q1","Q2","Q3","Q4"},0),"Feb","May","Aug","Nov")'
+ws["H1"] = '=CHOOSE(MATCH($B$1,{"Q1","Q2","Q3","Q4"},0),"Mar","Jun","Sep","Dec")'
+ws["I1"] = '=$B$1&" "&$D$1'
+for c in ("F1","G1","H1","I1"):
+    ws.column_dimensions[c[0]].hidden = True
+ 
+# Dynamic title
+ws.merge_cells("A2:H2")
+ws["A2"] = '= "SCU Governance " & $B$1 & " " & $D$1 & " – Team Leader Input Sheet"'
+style_cell(ws["A2"], fill=title_fill, font=title_font, alignment=left, border=all_border)
+ 
+ws["A3"] = "How to use"
+ws["A3"].font = section_font
+ws["A3"].fill = section_fill
+ws["A3"].alignment = left
+ws["B3"] = "Select quarter and year in row 1. Only complete yellow cells in column G (Response). Do not sort rows. Slide tabs will automatically pull your responses."
+ws["B3"].alignment = left
+ws["B3"].font = body_font
+ws.merge_cells("B3:H3")
+for cell in ws["3:3"]:
     cell.border = all_border
  
 headers = ["Slide #", "Slide Name", "Input ID", "Question / Field", "Expected Input", "Guidance", "Response", "Notes / Optional Context"]
 for col, h in enumerate(headers, start=1):
-    cell = ws.cell(3, col, h)
+    cell = ws.cell(4, col, h)
     style_cell(cell, fill=section_fill, font=section_font, alignment=center, border=all_border)
  
-set_widths(ws, {1:8, 2:25, 3:22, 4:48, 5:20, 6:30, 7:26, 8:32})
+set_widths(ws, {1:8, 2:25, 3:22, 4:52, 5:20, 6:30, 7:26, 8:32})
  
 input_row_map = {}
-row = 4
+row = 5
  
 # Data validations
 severity_dv = DataValidation(type="list", formula1='"Low,Medium,High,Very High"', allow_blank=True)
@@ -442,6 +489,13 @@ sampling_type_dv = DataValidation(type="list", formula1='"SCU,FLoD,Other"', allo
 short_type_dv = DataValidation(type="list", formula1='"Low,Medium,High,Very High"', allow_blank=True)
 for dv in [severity_dv, status_dv, rating_dv, case_type_dv, sampling_type_dv, short_type_dv]:
     ws.add_data_validation(dv)
+ 
+quarter_dv = DataValidation(type="list", formula1='"Q1,Q2,Q3,Q4"', allow_blank=False)
+year_dv = DataValidation(type="list", formula1='"2024,2025,2026,2027,2028"', allow_blank=False)
+ws.add_data_validation(quarter_dv)
+ws.add_data_validation(year_dv)
+quarter_dv.add(ws["B1"])
+year_dv.add(ws["D1"])
  
 for section in sections:
     ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=8)
@@ -504,6 +558,10 @@ def basic_slide(ws, title, widths=None):
     ws.freeze_panes = "A3"
     add_title(ws, title, end_col=10)
     ws["A2"] = "Populate yellow response cells in 1_Input_Request. This tab auto-pulls those inputs."
+    ws["G2"] = "Reporting Period:"
+    ws["G2"].font = small_font
+    ws["H2"] = '=\'1_Input_Request\'!$B$1&" "&\'1_Input_Request\'!$D$1'
+    ws["H2"].font = small_font
     ws["A2"].font = small_font
     ws.merge_cells("A2:F2")
     add_back_to_input(ws, 2, 8)
@@ -685,23 +743,54 @@ for i in range(1,4):
  
 # Slide 8
 ws = wb.create_sheet("9_Conflicts")
-basic_slide(ws, "Slide 8 – Conflicts of Interest", {1:28,2:16,3:16,4:16,5:36})
+basic_slide(ws, "Slide 8 – Conflicts of Interest", {1:24,2:14,3:14,4:14,5:14,6:34,7:20,8:20,9:20,10:20})
 r = 4
-ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
-style_cell(ws.cell(r,1,"Conflicts Metrics"), fill=section_fill, font=section_font, alignment=left, border=all_border)
-add_table_header(ws, r+1, ["Type","Volume","Issues Identified","Comments"])
-rows = [
-    ("Gifts & Entertainment", "COI_GAE_VOLUME", "COI_GAE_ISSUES", "COI_SUMMARY_1"),
-    ("Panel Firm Engagements", "COI_PANEL_VOLUME", "COI_PANEL_ISSUES", "COI_SUMMARY_2"),
-]
-for idx, rowcfg in enumerate(rows, start=r+2):
-    label, vol, issues, comments = rowcfg
-    vals = [label, pull_formula(vol), pull_formula(issues), pull_formula(comments)]
-    for cidx, val in enumerate(vals, start=1):
-        cell = ws.cell(idx, cidx, val)
-        style_cell(cell, fill=metric_fill if cidx > 1 else subheader_fill, font=formula_font if cidx > 1 else subheader_font, alignment=left if cidx in (1,4) else center, border=all_border)
-        if cidx in (2,3):
-            cell.number_format = '#,##0;[Red](#,##0);-'
+ 
+# Main quarterly Gifts & Hospitality table with dynamic month headers
+ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
+style_cell(ws.cell(r,1,"Gifts & Hospitality – Amount by Team"), fill=section_fill, font=section_font, alignment=left, border=all_border)
+ 
+headers_row = r + 1
+add_table_header(ws, headers_row, ["Team", "", "", "", "Quarter Total", "Commentary"])
+ws.cell(headers_row, 2).value = report_meta_formula("$F$1")
+ws.cell(headers_row, 3).value = report_meta_formula("$G$1")
+ws.cell(headers_row, 4).value = report_meta_formula("$H$1")
+for cidx in (2,3,4):
+    style_cell(ws.cell(headers_row, cidx), fill=section_fill, font=section_font, alignment=center, border=all_border)
+ 
+team_defaults = ["Team 1","Team 2","Team 3","Team 4","Team 5","Team 6"]
+for i in range(1, 7):
+    rr = headers_row + i
+    team_cell = ws.cell(rr, 1, pull_formula(f"COI_GH_TEAM{i}"))
+    style_cell(team_cell, fill=subheader_fill, font=subheader_font, alignment=left, border=all_border)
+    if i <= len(team_defaults):
+        team_cell.comment = Comment(f"Suggested default label: {team_defaults[i-1]}", "OpenAI")
+    for cidx, iid in enumerate([f"COI_GH_TEAM{i}_M1", f"COI_GH_TEAM{i}_M2", f"COI_GH_TEAM{i}_M3"], start=2):
+        cell = ws.cell(rr, cidx, pull_formula(iid))
+        style_cell(cell, fill=metric_fill, font=formula_font, alignment=center, border=all_border)
+        cell.number_format = '$#,##0;[Red]($#,##0);-'
+    total_cell = ws.cell(rr, 5, f"=SUM(B{rr}:D{rr})")
+    style_cell(total_cell, fill=metric_fill, font=formula_font, alignment=center, border=all_border)
+    total_cell.number_format = '$#,##0;[Red]($#,##0);-'
+    comment_cell = ws.cell(rr, 6, "")
+    style_cell(comment_cell, fill=note_fill, font=formula_font, alignment=left, border=all_border)
+ 
+totals_row = headers_row + 7
+style_cell(ws.cell(totals_row,1,"Quarter Total"), fill=section_fill, font=section_font, alignment=left, border=all_border)
+for cidx in range(2,6):
+    col_letter = get_column_letter(cidx)
+    cell = ws.cell(totals_row, cidx, f"=SUM({col_letter}{headers_row+1}:{col_letter}{headers_row+6})")
+    style_cell(cell, fill=metric_fill, font=formula_font, alignment=center, border=all_border)
+    cell.number_format = '$#,##0;[Red]($#,##0);-'
+style_cell(ws.cell(totals_row,6,pull_formula("COI_SUMMARY_1")), fill=note_fill, font=formula_font, alignment=left, border=all_border)
+ 
+r = totals_row + 2
+ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
+style_cell(ws.cell(r,1,"Other Conflicts / Panel Firm Commentary"), fill=section_fill, font=section_font, alignment=left, border=all_border)
+for rr, iid in enumerate(["COI_PANEL_SUMMARY", "COI_SUMMARY_2"], start=r+1):
+    ws.merge_cells(start_row=rr, start_column=1, end_row=rr, end_column=6)
+    cell = ws.cell(rr,1,pull_formula(iid))
+    style_cell(cell, fill=note_fill, font=formula_font, alignment=left, border=all_border)
  
 # Slide 9
 ws = wb.create_sheet("10_Credit_Performance")
