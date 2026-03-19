@@ -1,3 +1,4 @@
+
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
 from openpyxl.utils import get_column_letter
@@ -6,7 +7,7 @@ from openpyxl.comments import Comment
 from openpyxl.formatting.rule import CellIsRule
 from openpyxl import load_workbook
  
-OUTPUT_FILE = "SCU_Governance_Q225_Input_and_Slide_Templates.xlsx"
+OUTPUT_FILE = "SCU_Governance_Q425_Input_and_Slide_Templates.xlsx"
  
 # -----------------------------
 # Styles
@@ -409,7 +410,7 @@ ws = wb.create_sheet("1_Input_Request")
 ws.sheet_view.showGridLines = False
 ws.freeze_panes = "A4"
 ws.sheet_view.zoomScale = 90
-add_title(ws, "SCU Governance Q2'25 – Boss Input Sheet", end_col=8)
+add_title(ws, "SCU Governance Q4'25 – Team Leader Input Sheet", end_col=8)
  
 ws["A2"] = "How to use"
 ws["A2"].font = section_font
@@ -522,7 +523,7 @@ r = add_label_value_table(ws, r, "Controls Overview", [
     ("Assurance Reviews – Pass", pull_formula("HC_ASSURANCE_PASS"), '#,##0;[Red](#,##0);-'),
     ("Assurance Reviews – Medium / High Risk", pull_formula("HC_ASSURANCE_MH"), '#,##0;[Red](#,##0);-'),
 ], start_col=1)
-r2 = add_notes_box(ws, 4, "Boss Summary Inputs", [("Summary 1", "HC_SUMMARY_1"), ("Summary 2", "HC_SUMMARY_2"), ("Summary 3", "HC_SUMMARY_3")], start_col=4, width=5)
+r2 = add_notes_box(ws, 4, "Team Leader Summary Inputs", [("Summary 1", "HC_SUMMARY_1"), ("Summary 2", "HC_SUMMARY_2"), ("Summary 3", "HC_SUMMARY_3")], start_col=4, width=5)
 r = max(r, r2) + 1
 r = add_label_value_table(ws, r, "Actions, Events and Escalations", [
     ("Total Actions", pull_formula("HC_TOTAL_ACTIONS"), '#,##0;[Red](#,##0);-'),
@@ -584,7 +585,7 @@ r = add_label_value_table(ws, 4, "Summary Metrics", [
     ("Litigation Cases", pull_formula("SFL_LITIGATION_CASES"), '#,##0;[Red](#,##0);-'),
     ("Material / Reputationally Sensitive Cases", pull_formula("SFL_MATERIAL_CASES"), '#,##0;[Red](#,##0);-'),
 ], start_col=1)
-r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "SFL_SUMMARY_1"), ("Summary 2", "SFL_SUMMARY_2")], start_col=4, width=6)
+r2 = add_notes_box(ws, 4, "Team Leader Commentary", [("Summary 1", "SFL_SUMMARY_1"), ("Summary 2", "SFL_SUMMARY_2")], start_col=4, width=6)
 r = max(r, r2) + 1
 add_table_header(ws, r, ["Case ID","Type","Description","Status","Owner","Financial Impact","Date","Comments"])
 for i in range(1,4):
@@ -606,7 +607,7 @@ r = add_label_value_table(ws, 4, "Quarter Metrics", [
     ("Issues / Gaps Identified", pull_formula("ORB_ISSUES_FOUND"), '#,##0;[Red](#,##0);-'),
     ("Failed Tests / Material Gaps", pull_formula("ORB_FAILED_TESTS"), '#,##0;[Red](#,##0);-'),
 ], start_col=1)
-r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "ORB_SUMMARY_1"), ("Summary 2", "ORB_SUMMARY_2")], start_col=4, width=5)
+r2 = add_notes_box(ws, 4, "Team Leader Commentary", [("Summary 1", "ORB_SUMMARY_1"), ("Summary 2", "ORB_SUMMARY_2")], start_col=4, width=5)
 r = max(r, r2) + 1
 add_table_header(ws, r, ["Activity Type","Description","Date","Outcome","Issues Identified","Status","Owner"])
 for i in range(1,5):
@@ -629,7 +630,7 @@ r = add_label_value_table(ws, 4, "Core Metrics", [
     ("Fraud Cases Identified", pull_formula("FCC_FRAUD_CASES"), '#,##0;[Red](#,##0);-'),
     ("Fraud Loss", pull_formula("FCC_FRAUD_LOSS"), '$#,##0;[Red]($#,##0);-'),
 ], start_col=1)
-r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "FCC_SUMMARY_1"), ("Summary 2", "FCC_SUMMARY_2")], start_col=4, width=4)
+r2 = add_notes_box(ws, 4, "Team Leader Commentary", [("Summary 1", "FCC_SUMMARY_1"), ("Summary 2", "FCC_SUMMARY_2")], start_col=4, width=4)
 r = max(r, r2) + 1
 add_table_header(ws, r, ["Case ID","Type","Status","Risk Level","Action Taken","Comments"])
 for i in range(1,4):
@@ -672,7 +673,7 @@ r = add_label_value_table(ws, 4, "Conduct Metrics", [
     ("Enhanced Care Needs Customers", pull_formula("CRM_ENHANCED_CARE"), '#,##0;[Red](#,##0);-'),
     ("Significant Conduct / Reputational Risk Cases", pull_formula("CRM_CONDUCT_CASES"), '#,##0;[Red](#,##0);-'),
 ], start_col=1)
-r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "CRM_SUMMARY_1"), ("Summary 2", "CRM_SUMMARY_2")], start_col=4, width=4)
+r2 = add_notes_box(ws, 4, "Team Leader Commentary", [("Summary 1", "CRM_SUMMARY_1"), ("Summary 2", "CRM_SUMMARY_2")], start_col=4, width=4)
 r = max(r, r2) + 1
 add_table_header(ws, r, ["Case ID","Risk Type","Description","Status","Owner","Comments"])
 for i in range(1,4):
@@ -711,7 +712,7 @@ r = add_label_value_table(ws, 4, "Performance Metrics", [
     ("Resubmissions", pull_formula("CRP_RESUBMISSIONS"), '#,##0;[Red](#,##0);-'),
     ("Average Resolution Time (days)", pull_formula("CRP_AVG_RESOLUTION"), '#,##0;[Red](#,##0);-'),
 ], start_col=1)
-r2 = add_notes_box(ws, 4, "Boss Commentary", [("Summary 1", "CRP_SUMMARY_1"), ("Summary 2", "CRP_SUMMARY_2")], start_col=4, width=4)
+r2 = add_notes_box(ws, 4, "Team Leader Commentary", [("Summary 1", "CRP_SUMMARY_1"), ("Summary 2", "CRP_SUMMARY_2")], start_col=4, width=4)
 r = max(r, r2) + 1
 add_table_header(ws, r, ["Case ID","Status","Days Overdue","Action","Owner"])
 for i in range(1,5):
@@ -747,7 +748,7 @@ for i, rowcfg in enumerate(providers, start=r+2):
         if cidx == 4:
             cell.number_format = '$#,##0;[Red]($#,##0);-'
 r = r + 8
-add_notes_box(ws, r, "Boss Commentary", [("Summary 1", "TPP_SUMMARY_1"), ("Summary 2", "TPP_SUMMARY_2")], start_col=1, width=6)
+add_notes_box(ws, r, "Team Leader Commentary", [("Summary 1", "TPP_SUMMARY_1"), ("Summary 2", "TPP_SUMMARY_2")], start_col=1, width=6)
  
 # Slide 11
 ws = wb.create_sheet("12_Lessons_Learned")
