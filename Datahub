@@ -444,39 +444,29 @@ def build_input_sheet(wb):
  
     # Slide 11
     row = m["TPP_TABLE_END"] + 3
-    add_section_band(ws, row, "Slide 11 – Lessons Learned | Case Summary and Themes")
+    add_section_band(ws, row, "Slide 11 – Lessons Learned")
     row += 1
-    merge_write(ws, f"A{row}:J{row}", "This template is based on the lessons learned summary slides and appendix screenshots. It supports multiple cases, themes/issues, and appendix-level case assessment inputs.", fill=fill_note, font=font_note, align=align_left)
+    merge_write(ws, f"A{row}:J{row}", "Use this section as a compact quarterly view of the most recent lessons learned pack. Keep the screenshot headings that are visibly used in the pack: Themes, Non Fraud related issues identified, Potential Fraud related issues identified, and Implications or actions taken including UARs raised.", fill=fill_note, font=font_note, align=align_left)
     row += 2
-    m["LL_CASE_SUMMARY_START"], m["LL_CASE_SUMMARY_END"] = add_input_detail_table(
-        ws, row, "Slide 11 – Case Summary / Engagement Activities",
-        ["Case / Borrower", "Exposure Summary", "Period Covered", "Engagement Summary", "Case Status", "Notes", "", ""],
-        [20, 18, 16, 34, 16, 20, 2, 2], 3
+ 
+    m["LL_CASE_COUNT"] = add_input_row(ws, row, "Lessons learned cases in last 6 months", "Simple summary metric")
+    row += 2
+ 
+    m["LL_CASE_TABLE_START"], m["LL_CASE_TABLE_END"] = add_input_detail_table(
+        ws, row, "Slide 11 – Lessons Learned Case Summary",
+        ["Case", "HBUS Exposure", "Themes", "Non Fraud related issues identified", "Potential Fraud related issues identified", "Implications or actions taken incl. UARs raised", "Raised in Helios?", "UAR?"],
+        [22, 16, 24, 28, 28, 30, 14, 10], 3,
+        {2: '$#,##0;[Red]($#,##0);-'}
     )
-    row = m["LL_CASE_SUMMARY_END"] + 2
-    m["LL_THEMES_START"], m["LL_THEMES_END"] = add_input_detail_table(
-        ws, row, "Slide 11 – Themes and Issues Arising",
-        ["Case / Borrower", "Category", "Theme / Issue", "Implications / Actions Taken", "Raised in Helios?", "UAR Raised?", "Notes", ""],
-        [20, 18, 28, 32, 16, 14, 22, 2], 8
+    row = m["LL_CASE_TABLE_END"] + 2
+ 
+    m["LL_APPENDIX_TABLE_START"], m["LL_APPENDIX_TABLE_END"] = add_input_detail_table(
+        ws, row, "Slide 11 – Lessons Learned Case Snapshot",
+        ["Case", "CAT A Limits USDm", "CAT B Limits USDm", "Settlement Limits USDm", "Total Limits USDm", "Current CRR / WWM status"],
+        [22, 16, 16, 18, 16, 24], 3,
+        {2: '0.000', 3: '0.000', 4: '0.000', 5: '0.000'}
     )
-    row = m["LL_THEMES_END"] + 2
-    m["LL_APPENDIX_META_START"], m["LL_APPENDIX_META_END"] = add_input_detail_table(
-        ws, row, "Slide 11 – Appendix / Individual Case Assessment | Header and Limits",
-        ["Case / Borrower", "Date of Report", "Prepared By", "Division/Country", "Customer Mastergroup", "Cat A Limits USDm", "Cat B Limits USDm", "Settlement Limits USDm", "Total Limits USDm"],
-        [18, 14, 16, 18, 24, 14, 14, 18, 14], 3, {2: 'DD-MMM-YYYY', 6: '#,##0.0', 7: '#,##0.0', 8: '#,##0.0', 9: '#,##0.0'}
-    )
-    row = m["LL_APPENDIX_META_END"] + 2
-    m["LL_APPENDIX_RISK_START"], m["LL_APPENDIX_RISK_END"] = add_input_detail_table(
-        ws, row, "Slide 11 – Appendix / Individual Case Assessment | Risk and Context",
-        ["Case / Borrower", "Head Office Domicile", "Security Held", "Other Borrowing Relationships", "Current CRR / History", "WWM Status", "LMU Involvement", "CROL? / Helios / Fraud Summary"],
-        [18, 18, 24, 24, 18, 16, 18, 28], 3
-    )
-    row = m["LL_APPENDIX_RISK_END"] + 2
-    m["LL_APPENDIX_NARR_START"], m["LL_APPENDIX_NARR_END"] = add_input_detail_table(
-        ws, row, "Slide 11 – Appendix / Individual Case Assessment | Narrative Blocks",
-        ["Case / Borrower", "Customer Business Profile", "Nature of HSBC Relationship", "Key Facility / Documentation Issues", "Overview / Timeline", "What Went Wrong / Why", "How To Prevent Recurrence", "Additional Recommendations"],
-        [18, 28, 28, 26, 34, 28, 30, 24], 3
-    )
+    row = m["LL_APPENDIX_TABLE_END"] + 2
  
     return ws, m
  
@@ -727,43 +717,29 @@ def build_slide_10(wb, m):
  
 def build_slide_11(wb, m):
     ws = wb.create_sheet("11_Lessons_Learned")
-    configure_sheet(ws, widths={1:20,2:18,3:18,4:28,5:16,6:14,7:18,8:28,9:14,10:14})
+    configure_sheet(ws, widths={1:22,2:16,3:24,4:28,5:28,6:30,7:14,8:10,9:16,10:20})
     add_sheet_header(ws, "Slide 11 – Lessons Learned")
     row = 4
  
-    row = add_output_table(ws, row, "Case Summary / Engagement Activities",
-                           ["Case / Borrower", "Exposure Summary", "Period Covered", "Engagement Summary", "Case Status", "Notes", "", ""],
-                           3, m["LL_CASE_SUMMARY_START"], 8,
-                           widths=[20,18,16,34,16,20,2,2])
+    row = add_metric_table(ws, row, "Lessons Learned Summary", [
+        ("Lessons Learned Cases in Last 6 Months", ref(m["LL_CASE_COUNT"]), "Number"),
+    ])
  
     row += 1
-    row = add_output_table(ws, row, "Themes and Issues Arising",
-                           ["Case / Borrower", "Category", "Theme / Issue", "Implications / Actions Taken", "Raised in Helios?", "UAR Raised?", "Notes", ""],
-                           8, m["LL_THEMES_START"], 8,
-                           widths=[20,18,28,32,16,14,22,2])
+    row = add_output_table(ws, row, "Case Summary",
+                           ["Case", "HBUS Exposure", "Themes", "Non Fraud related issues identified", "Potential Fraud related issues identified", "Implications or actions taken incl. UARs raised", "Raised in Helios?", "UAR?"],
+                           3, m["LL_CASE_TABLE_START"], 8,
+                           widths=[22,16,24,28,28,30,14,10],
+                           col_formats={2: '$#,##0;[Red]($#,##0);-'})
  
     row += 1
-    row = add_output_table(ws, row, "Appendix / Individual Case Assessment | Header and Limits",
-                           ["Case / Borrower", "Date of Report", "Prepared By", "Division/Country", "Customer Mastergroup", "Cat A Limits USDm", "Cat B Limits USDm", "Settlement Limits USDm", "Total Limits USDm"],
-                           3, m["LL_APPENDIX_META_START"], 9,
-                           widths=[18,14,16,18,24,14,14,18,14],
-                           col_formats={2: 'DD-MMM-YYYY', 6: '#,##0.0', 7: '#,##0.0', 8: '#,##0.0', 9: '#,##0.0'})
+    row = add_output_table(ws, row, "Case Snapshot",
+                           ["Case", "CAT A Limits USDm", "CAT B Limits USDm", "Settlement Limits USDm", "Total Limits USDm", "Current CRR / WWM status"],
+                           3, m["LL_APPENDIX_TABLE_START"], 6,
+                           widths=[22,16,16,18,16,24],
+                           col_formats={2: '0.000', 3: '0.000', 4: '0.000', 5: '0.000'})
  
-    row += 1
-    row = add_output_table(ws, row, "Appendix / Individual Case Assessment | Risk and Context",
-                           ["Case / Borrower", "Head Office Domicile", "Security Held", "Other Borrowing Relationships", "Current CRR / History", "WWM Status", "LMU Involvement", "CROL? / Helios / Fraud Summary"],
-                           3, m["LL_APPENDIX_RISK_START"], 8,
-                           widths=[18,18,24,24,18,16,18,28])
  
-    row += 1
-    add_output_table(ws, row, "Appendix / Individual Case Assessment | Narrative Blocks",
-                     ["Case / Borrower", "Customer Business Profile", "Nature of HSBC Relationship", "Key Facility / Documentation Issues", "Overview / Timeline", "What Went Wrong / Why", "How To Prevent Recurrence", "Additional Recommendations"],
-                     3, m["LL_APPENDIX_NARR_START"], 8,
-                     widths=[18,28,28,26,34,28,30,24])
- 
-# -----------------------------
-# Build workbook
-# -----------------------------
 def build_workbook():
     wb = Workbook()
     wb.remove(wb.active)
