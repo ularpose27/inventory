@@ -2,39 +2,51 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
 from openpyxl.utils import get_column_letter
 
+# =====================================================
+# FILE NAME
+# =====================================================
 output_file = "tables for Manco.xlsx"
 
-# Colors
+# =====================================================
+# COLORS (clean corporate palette)
+# =====================================================
 RED = "DB0011"
 BLACK = "000000"
 DARK_GREY = "4A4F55"
 LIGHT_GREY = "F4F5F7"
 WHITE = "FFFFFF"
 
-# Workbook
+# =====================================================
+# WORKBOOK SETUP
+# =====================================================
 wb = Workbook()
 wb.remove(wb.active)
 
-# Styles
+# =====================================================
+# STYLES
+# =====================================================
 header_fill = PatternFill("solid", fgColor=DARK_GREY)
 section_fill = PatternFill("solid", fgColor=RED)
 body_fill = PatternFill("solid", fgColor=WHITE)
 alt_fill = PatternFill("solid", fgColor=LIGHT_GREY)
 
-header_font = Font(color=WHITE, bold=True)
-section_font = Font(color=WHITE, bold=True)
+header_font = Font(color=WHITE, bold=True, size=11)
+section_font = Font(color=WHITE, bold=True, size=13)
 body_font = Font(size=10)
 bold_font = Font(bold=True)
 
-thin = Side(style="thin", color="CCCCCC")
+thin = Side(style="thin", color="D0D0D0")
 border = Border(left=thin, right=thin, top=thin, bottom=thin)
 
 center = Alignment(horizontal="center", vertical="center", wrap_text=True)
 left = Alignment(horizontal="left", vertical="top", wrap_text=True)
 
-def set_width(ws, widths):
-    for i, w in widths.items():
-        ws.column_dimensions[get_column_letter(i)].width = w
+# =====================================================
+# HELPERS
+# =====================================================
+def set_column_width(ws, widths):
+    for col, width in widths.items():
+        ws.column_dimensions[get_column_letter(col)].width = width
 
 def style(cell, fill=None, font=None, align=None):
     if fill: cell.fill = fill
@@ -43,108 +55,128 @@ def style(cell, fill=None, font=None, align=None):
     cell.border = border
 
 # =====================================================
-# SLIDE 16 — SIMPLIFIED (COMMENT → ACTION → FINAL TEXT)
+# SLIDE 16 TABLE
 # =====================================================
 ws16 = wb.create_sheet("Slide 16")
 ws16.sheet_view.showGridLines = False
 
-set_width(ws16, {1: 35, 2: 35, 3: 45})
+set_column_width(ws16, {
+    1: 38,
+    2: 32,
+    3: 45
+})
 
 # Section title
 ws16.merge_cells("A1:C1")
 cell = ws16["A1"]
-cell.value = "Slide 16 – Issues (WACC)"
+cell.value = "Slide 16 – Issues (WACC Review)"
 style(cell, fill=section_fill, font=section_font, align=center)
 
-# Headers
-headers = ["Comment from Review", "What you should do", "Final slide wording"]
-for i, h in enumerate(headers, 1):
-    c = ws16.cell(3, i, h)
+# Column headers
+headers = ["Comment from Review", "Required Action", "Final Slide Wording"]
+for col, h in enumerate(headers, 1):
+    c = ws16.cell(3, col, h)
     style(c, fill=header_fill, font=header_font, align=center)
 
-rows = [
+# Content rows (directly based on email)
+rows_16 = [
     [
-        "No standardized approach for WACC in EV calculation for non-accrual borrowers with negative equity.",
-        "Clearly state this as the core issue.",
-        "No standardized approach was identified for WACC calculation in EV assessment of non-accrual borrowers with negative equity."
+        "Absence of standardized WACC approach for EV calculation in non-accrual borrowers with negative equity.",
+        "State clearly as the main issue.",
+        "A lack of standardized approach was identified for WACC calculation in EV assessment of non-accrual borrowers with negative equity."
     ],
     [
-        "Example borrowers mentioned.",
-        "Include examples to support the issue.",
+        "Examples were identified during review.",
+        "Include concrete borrower examples.",
         "The review referenced YS Garments LLC and WHCG Bidco LLC."
     ],
     [
-        "Model WACC does not reflect true financing cost.",
-        "Explain why this is a problem.",
+        "Model-generated WACC does not reflect actual financing cost.",
+        "Explain why this is problematic.",
         "Model-generated WACC did not accurately reflect the true cost of financing."
     ],
     [
-        "Issues with comparables, beta and multiples.",
-        "Add as supporting explanation (not main point).",
-        "Challenges were also identified in selecting distressed comparables and in variability of beta and valuation multiples."
+        "Additional issues with comparables, beta and valuation multiples.",
+        "Include as supporting explanation.",
+        "Challenges were also identified in selecting distressed comparables and variability in beta and valuation multiples."
     ],
     [
-        "Recommendation: use 17.5% floor or model WACC.",
-        "Present as clear recommendation.",
+        "Recommendation to standardize WACC.",
+        "Present as a clear rule.",
         "A standardized approach was recommended using the greater of 17.5% or the model-generated WACC."
     ],
     [
         "Final decision remains with SCU.",
-        "Add governance clarification at the end.",
+        "Add governance clarification.",
         "Final determination remains subject to SCU expert judgment."
-    ],
+    ]
 ]
 
-start = 4
-for r, row in enumerate(rows):
+start_row = 4
+for r, row in enumerate(rows_16):
     fill = alt_fill if r % 2 == 0 else body_fill
-    for c, val in enumerate(row, 1):
-        cell = ws16.cell(start + r, c, val)
+    for c, value in enumerate(row, 1):
+        cell = ws16.cell(start_row + r, c, value)
         style(cell, fill=fill, font=body_font, align=left)
 
 # =====================================================
-# SLIDE 18 — SIMPLIFIED
+# SLIDE 18 TABLE
 # =====================================================
 ws18 = wb.create_sheet("Slide 18")
 ws18.sheet_view.showGridLines = False
 
-set_width(ws18, {1: 35, 2: 35, 3: 45})
+set_column_width(ws18, {
+    1: 38,
+    2: 32,
+    3: 45
+})
 
+# Section title
 ws18.merge_cells("A1:C1")
 cell = ws18["A1"]
 cell.value = "Slide 18 – Service Feedback"
 style(cell, fill=section_fill, font=section_font, align=center)
 
-headers = ["Comment from Review", "What you should do", "Final slide wording"]
-for i, h in enumerate(headers, 1):
-    c = ws18.cell(3, i, h)
+# Headers
+headers = ["Comment from Review", "Required Action", "Final Slide Wording"]
+for col, h in enumerate(headers, 1):
+    c = ws18.cell(3, col, h)
     style(c, fill=header_fill, font=header_font, align=center)
 
-rows = [
+# Content rows
+rows_18 = [
     [
-        "No matters currently directed at SCU.",
-        "State clearly at the beginning.",
+        "No matters are currently directed at SCU.",
+        "State clearly at the start of the slide.",
         "No matters are currently directed at SCU."
     ],
     [
-        "Mention Nebraskaland case.",
-        "Add as context only.",
+        "Mention Nebraskaland litigation.",
+        "Add as contextual information.",
         "Litigation has been initiated by an SCU managed borrower (Nebraskaland) in connection with an alleged fraud on their account."
     ],
     [
-        "SCU is not involved.",
+        "SCU is not involved in the case.",
         "Clarify explicitly.",
         "SCU is not a party to the proceedings and is not directly involved in the matter."
     ],
     [
-        "Combine everything into one final statement.",
-        "Use as final slide text box.",
+        "Provide final combined statement.",
+        "Use as final textbox in slide.",
         "No matters are currently directed at SCU. Litigation has been initiated by an SCU managed borrower (Nebraskaland) in connection with an alleged fraud on their account. SCU is not a party to the proceedings and is not directly involved in the matter."
-    ],
+    ]
 ]
 
-start = 4
-for r, row in enumerate(rows):
+start_row = 4
+for r, row in enumerate(rows_18):
     fill = alt_fill if r % 2 == 0 else body_fill
-    for c, val in enumerate(row, 1):
-        cell = ws18.cell(start + r, c,
+    for c, value in enumerate(row, 1):
+        cell = ws18.cell(start_row + r, c, value)
+        style(cell, fill=fill, font=body_font, align=left)
+
+# =====================================================
+# SAVE FILE
+# =====================================================
+wb.save(output_file)
+
+print("Excel file created successfully:", output_file)
