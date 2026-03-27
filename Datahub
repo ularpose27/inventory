@@ -1,6 +1,5 @@
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
-from openpyxl.utils import get_column_letter
 
 # =========================================================
 # File
@@ -32,7 +31,6 @@ alt_fill = PatternFill("solid", fgColor=LIGHT_GREY)
 header_font = Font(color=WHITE, bold=True, size=12)
 subheader_font = Font(color=WHITE, bold=True, size=10)
 body_font = Font(size=10)
-bold_font = Font(bold=True, size=10)
 
 align_center = Alignment(horizontal="center", vertical="center", wrap_text=True)
 align_left = Alignment(horizontal="left", vertical="top", wrap_text=True)
@@ -40,121 +38,68 @@ align_left = Alignment(horizontal="left", vertical="top", wrap_text=True)
 thin = Side(style="thin", color="CCCCCC")
 border = Border(left=thin, right=thin, top=thin, bottom=thin)
 
-# =========================================================
-# Helper
-# =========================================================
-def set_width(ws):
-    ws.column_dimensions["A"].width = 45
-    ws.column_dimensions["B"].width = 70
-    ws.sheet_view.showGridLines = False
-
 def style(cell, fill=None, font=None, align=None):
     if fill: cell.fill = fill
     if font: cell.font = font
     if align: cell.alignment = align
     cell.border = border
 
+def setup_sheet(ws):
+    ws.column_dimensions["A"].width = 110
+    ws.sheet_view.showGridLines = False
+
 # =========================================================
-# Slide 16 (WACC comment)
+# Slide 16 — KEEP ORIGINAL CONTENT (STRUCTURED ONLY)
 # =========================================================
 ws16 = wb.create_sheet("Slide 16")
-set_width(ws16)
+setup_sheet(ws16)
 
-# Title
-ws16.merge_cells("A1:B1")
-ws16["A1"] = "Slide 16 – WACC Comment"
+ws16["A1"] = "Slide 16 – Issue Summary (WACC)"
 style(ws16["A1"], header_fill, header_font, align_center)
 
-# Header
-ws16["A3"] = "Comment from Review"
-ws16["B3"] = "What to put in the slide"
-style(ws16["A3"], subheader_fill, subheader_font, align_center)
-style(ws16["B3"], subheader_fill, subheader_font, align_center)
-
-# Content (cleaned from email)
-rows_16 = [
-    (
-        "No standardized approach for WACC calculation for non-accrual borrowers with negative equity.",
-        "No standardized WACC approach was applied for EV calculation in non-accrual borrowers with negative equity."
-    ),
-    (
-        "Example borrowers: YS Garments LLC and WHCG Bidco LLC.",
-        "The issue was observed in sampled borrowers including YS Garments LLC and WHCG Bidco LLC."
-    ),
-    (
-        "Model-generated WACC did not reflect true financing cost. Issues with comparables, beta and multiples.",
-        "Model-generated WACC did not reflect true financing cost, with additional limitations in comparables, beta and valuation multiples."
-    ),
-    (
-        "Recommendation: apply standardized WACC using greater of 17.5% or model output.",
-        "A standardized WACC approach is applied using the greater of 17.5% or the model-generated WACC."
-    ),
-    (
-        "SCU will still apply expert judgment.",
-        "Final outcomes remain subject to SCU expert judgment."
-    ),
+content_16 = [
+    "CR identified the absence of a standardized approach for calculation of the weighted average cost of capital (WACC) when determining the EV of non-accrual borrowers with negative equity.",
+    
+    "For two sampled borrowers (YS Garments LLC and WHCG Bidco LLC), the EV model generated WACC values that did not accurately reflect the true cost of financing of the borrowers.",
+    
+    "SCU acknowledged this deficiency and highlighted other shortcomings in the EV model, including difficulty in finding appropriate comparables for distressed companies and variances in beta and multiples.",
+    
+    "To address these model deficiencies, SCU recommended a standardized approach for WACC at the greater of 17.5% or the model generated WACC, subject to final determination by SCU for all EV dependent borrowers.",
+    
+    "Ultimately, SCU will continue to exercise expert judgment to determine the reserves for these borrowers."
 ]
 
-row = 4
-for i, (comment, slide) in enumerate(rows_16):
+row = 3
+for i, text in enumerate(content_16):
     fill = alt_fill if i % 2 else None
-    
-    ws16[f"A{row}"] = comment
-    ws16[f"B{row}"] = slide
-    
+    ws16[f"A{row}"] = text
     style(ws16[f"A{row}"], fill, body_font, align_left)
-    style(ws16[f"B{row}"], fill, body_font, align_left)
-    
-    ws16.row_dimensions[row].height = 45
+    ws16.row_dimensions[row].height = 55
     row += 1
 
 # =========================================================
-# Slide 18 (Nebraskaland comment)
+# Slide 18 — KEEP EXACT WORDING (STRUCTURED CLEANLY)
 # =========================================================
 ws18 = wb.create_sheet("Slide 18")
-set_width(ws18)
+setup_sheet(ws18)
 
-# Title
-ws18.merge_cells("A1:B1")
-ws18["A1"] = "Slide 18 – Service Feedback"
+ws18["A1"] = "Slide 18 – Service Feedback (Nebraskaland)"
 style(ws18["A1"], header_fill, header_font, align_center)
 
-# Header
-ws18["A3"] = "Comment from Review"
-ws18["B3"] = "What to put in the slide"
-style(ws18["A3"], subheader_fill, subheader_font, align_center)
-style(ws18["B3"], subheader_fill, subheader_font, align_center)
-
-rows_18 = [
-    (
-        "No matters currently directed at SCU.",
-        "No matters are currently directed at SCU."
-    ),
-    (
-        "Litigation exists but from borrower (Nebraskaland), not SCU.",
-        "Litigation has been initiated by an SCU managed borrower (Nebraskaland) in connection with an alleged fraud."
-    ),
-    (
-        "SCU is not involved.",
-        "SCU is not a party to the proceedings and is not directly involved."
-    ),
-    (
-        "Final wording suggested in email.",
-        "No matters are currently directed at SCU. Litigation has been initiated by an SCU managed borrower (Nebraskaland) in connection with an alleged fraud on their account. SCU is not a party to the proceedings and is not directly involved in the matter."
-    ),
+content_18 = [
+    "No matters are currently directed at SCU.",
+    
+    "Litigation has been initiated by an SCU managed borrower (Nebraskaland) in connection with an alleged fraud on their account.",
+    
+    "SCU is not a party to the proceedings and is not directly involved in the matter."
 ]
 
-row = 4
-for i, (comment, slide) in enumerate(rows_18):
+row = 3
+for i, text in enumerate(content_18):
     fill = alt_fill if i % 2 else None
-    
-    ws18[f"A{row}"] = comment
-    ws18[f"B{row}"] = slide
-    
+    ws18[f"A{row}"] = text
     style(ws18[f"A{row}"], fill, body_font, align_left)
-    style(ws18[f"B{row}"], fill, body_font, align_left)
-    
-    ws18.row_dimensions[row].height = 50 if i == 3 else 40
+    ws18.row_dimensions[row].height = 55
     row += 1
 
 # =========================================================
