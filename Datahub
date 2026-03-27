@@ -1,5 +1,3 @@
-concat(
-  'RDP_Daily_BO_',
-  formatDateTime(triggerOutputs()?['body/receivedDateTime'],'yyyy-MM-dd_HHmmss'),
-  '.xlsx'
-)
+WWM volumes continue to be primarily driven by deteriorating financial performance and adverse market conditions, indicating broad-based credit stress rather than isolated events.
+
+The Worry category continues to account for the majority of exposure, with MME representing the highest concentration and showing minimal QoQ improvement.
