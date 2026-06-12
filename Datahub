@@ -1,18 +1,1475 @@
-Hola Rafa,
+You are a senior Python developer, corporate finance specialist, financial controller, CFO advisor, and professional HTML report designer.
 
-Espero que estés muy bien.
+Your task is to generate ONE complete, executable Python script that creates a very extensive, realistic, self-contained HTML financial information package for a fictional company that is submitting financial information to a bank as part of a loan or credit line application.
 
-Como seguimiento a la reunión que tuvimos el día de ayer sobre el alcance de prioridades en los equipos, quería comentarte que ya realicé mi registro para participar como embajador de Inteligencia Artificial.
+The final HTML file will later be opened in a browser and exported/printed to PDF. The printed PDF should be approximately 80 pages long. Browser pagination may vary, but the HTML must contain enough meaningful content, detailed schedules, financial statements, supporting tables, notes, and appendices to reasonably produce an extensive PDF of approximately 80 pages.
 
-Asimismo, quedo a disposición para las indicaciones relacionadas con las iniciativas que les mencioné durante la sesión, en caso de que consideren conveniente registrarlas dentro del programa de innovación.
+CRITICAL OUTPUT RULE
 
-También queda pendiente el acercamiento con Iván para explorar posibles sinergias y entender mejor en qué iniciativas se encuentra trabajando actualmente, así como identificar oportunidades donde pudiéramos contribuir o apoyarnos mutuamente.
+Return only the complete Python script.
 
-Si lo consideran conveniente, con gusto puedo agendar una sesión con él para revisar posibles puntos de colaboración y definir la mejor manera de abordar el tema.
+Do not explain the code.
+Do not summarize the report.
+Do not provide markdown commentary outside the code.
+Do not create multiple scripts.
+Do not require external files.
+Do not use real company data.
+Do not use real company names.
+Do not use real bank names.
+Do not leave placeholders.
+Do not write “TODO.”
+Do not write “continue later.”
+Do not say that the report is too long.
+Generate the full executable script.
 
-Quedo atento a cualquier comentario y, si me pudieras indicar con quién sería mejor coordinarme para los siguientes pasos, te lo agradecería mucho.
+MAIN OBJECTIVE
 
-Muchas gracias nuevamente por el tiempo y el feedback de ayer.
+Create a Python script that generates one standalone HTML file:
 
-Saludos,
-Armando
+"fictional_company_bank_financial_package.html"
+
+The HTML file must represent the type of financial documentation package that a company would submit to a bank when applying for financing.
+
+The report must be written from the perspective of the company’s finance department, not from the bank’s credit committee.
+
+The report must provide all relevant financial, operational, and supporting information that a bank could use to evaluate whether to approve, reject, condition, resize, or restructure a loan or credit facility.
+
+IMPORTANT: The report must NOT make the bank’s final credit decision. It must NOT say whether the bank should approve or reject the loan. It must NOT include a final bank recommendation. Instead, it should provide a complete and realistic financial information package that allows a lender to perform its own analysis.
+
+The document should feel like a serious borrower-submitted financial package prepared by a CFO, finance manager, or external financial advisor for a commercial bank.
+
+The report must include:
+
+- Company overview
+- Financing request summary
+- Purpose of financing
+- Sources and uses of funds
+- Historical financial statements
+- Forecast financial statements
+- Detailed notes to financial statements
+- Management discussion and analysis
+- Working capital schedules
+- Debt schedules
+- Collateral schedules
+- Inventory details
+- Receivables details
+- Payables details
+- Cash flow analysis
+- Loan repayment support information
+- Financial ratios
+- Scenario information
+- Sensitivity information
+- Operational KPIs
+- Risk disclosures
+- Supporting appendices
+
+The goal is to generate a realistic, detailed financial package that a bank relationship manager, credit analyst, risk officer, or credit committee could review to make an informed lending decision.
+
+FICTIONAL COMPANY PROFILE
+
+Create a fictional company with the following profile:
+
+Company name:
+Atlas Meridian Industrial Supply, S.A. de C.V.
+
+Country:
+Mexico
+
+Currency:
+Mexican pesos, expressed mostly in MXN millions unless otherwise stated.
+
+Industry:
+Industrial hardware distribution, construction supplies, maintenance tools, safety equipment, industrial consumables, and e-commerce sales.
+
+Business model:
+
+- Operates regional stores
+- Operates distribution centers
+- Sells to B2B customers
+- Sells to retail customers
+- Sells through its own e-commerce platform
+- Sells through third-party marketplaces
+- Provides short-term trade credit to selected B2B customers
+- Imports part of its product catalog from Asia and the United States
+- Offers both third-party branded products and higher-margin private-label products
+
+Customer base:
+
+- Construction companies
+- Independent contractors
+- Small and medium hardware stores
+- Industrial maintenance teams
+- Manufacturing plants
+- Workshops
+- Electricians
+- Plumbers
+- Retail customers
+- Online marketplace buyers
+
+Main product categories:
+
+- Power tools
+- Hand tools
+- Fasteners
+- Electrical supplies
+- Plumbing supplies
+- Safety equipment
+- Adhesives and sealants
+- Paint accessories
+- Industrial consumables
+- Welding supplies
+- Construction hardware
+- Garden and outdoor equipment
+- Storage and organization
+- Measuring instruments
+- Cleaning and maintenance supplies
+
+Company situation:
+Atlas Meridian Industrial Supply, S.A. de C.V. is submitting a financial information package to a bank because it is applying for credit facilities to support working capital, inventory purchases, seasonal demand, supplier payments, digital sales growth, and partial refinancing of short-term debt.
+
+The company must be realistic and financially imperfect. It should have a profitable core business, but also operational and financial pressure points.
+
+The company should have:
+
+- Long operating history
+- Growing revenue
+- Positive EBITDA
+- Positive but pressured net income
+- Significant inventory needs
+- Accounts receivable exposure
+- Increasing e-commerce and marketplace sales
+- Pressure on gross margin from competition
+- Imported product exposure
+- FX sensitivity
+- Logistics cost increases
+- Working capital strain
+- Debt from a recent expansion project
+- Need for better financial reporting
+- Need for improved SKU-level profitability analysis
+- Need for inventory optimization
+- Need for more disciplined pricing
+
+Do not make the company perfect.
+Do not make the company bankrupt.
+Do not make every metric improve every year.
+Include realistic volatility, operational problems, financial constraints, and management improvement plans.
+
+FINANCING REQUEST TO INCLUDE
+
+The company is requesting the following facilities from a fictional commercial bank:
+
+1. Revolving working capital credit line
+
+- Requested amount: MXN 325 million
+- Purpose: inventory purchases, accounts receivable financing, seasonal working capital, marketplace fulfillment, and supplier payments
+- Requested tenor: 24 months
+- Expected repayment source: conversion of inventory and receivables into cash
+
+2. Term loan
+
+- Requested amount: MXN 180 million
+- Purpose: refinancing of short-term debt related to distribution center expansion, logistics equipment, and warehouse automation
+- Requested tenor: 5 years
+- Expected repayment source: operating cash flow
+
+3. Ancillary credit facilities
+
+- Requested amount: MXN 45 million
+- Purpose: letters of credit, import guarantees, supplier guarantees, FX hedging support, and documentary trade finance needs
+
+Total requested exposure:
+MXN 550 million
+
+Important:
+The report should present the request and supporting financial information, but it should not decide whether the bank should approve it.
+
+TECHNICAL REQUIREMENTS
+
+The Python script must:
+
+1. Use only Python standard library modules where possible.
+
+Allowed modules:
+
+- os
+- math
+- random
+- statistics
+- datetime
+- textwrap
+- html
+- json
+- pathlib
+
+Avoid external dependencies completely.
+
+Do not use:
+
+- pandas
+- numpy
+- matplotlib
+- seaborn
+- plotly
+- jinja2
+- fpdf
+- reportlab
+- weasyprint
+- openpyxl
+- xlsxwriter
+- any external library
+
+2. Generate one standalone HTML file.
+
+The HTML must include all CSS, tables, charts, styles, section formatting, notes, and appendices inline.
+
+Do not link to:
+
+- External CSS
+- External JavaScript
+- External images
+- External fonts
+- CDNs
+- Online resources
+
+The HTML must work offline.
+
+3. Include print-ready CSS.
+
+The HTML must be designed so the user can open it in a browser and print/export it to PDF.
+
+Include:
+
+- "@media print"
+- A4 page size
+- Print margins
+- Page-break classes
+- Section page breaks
+- Appendix page breaks
+- Table formatting suitable for PDF
+- Avoid awkward table row breaks where possible
+- Professional document typography
+- Clear section hierarchy
+- Cover page styling
+- Table of contents styling
+- Footer-style small disclaimers
+- Page-break handling for large tables
+- Print instruction inside the HTML:
+  “Open this HTML file in a browser and use Print > Save as PDF.”
+
+4. Generate a long, professional report.
+
+The report must be long enough to produce approximately 80 pages when printed to PDF. Achieve this through useful financial content, not meaningless filler.
+
+Use:
+
+- Detailed tables
+- Multi-year financial statements
+- Long management explanations
+- Supporting schedules
+- Notes to financial statements
+- Appendices
+- KPI tables
+- Product-level tables
+- Customer concentration tables
+- Debt schedules
+- Inventory schedules
+- Receivables schedules
+- Forecast assumptions
+- Scenario outputs
+- Risk disclosures
+
+5. Generate inline SVG charts using Python functions.
+
+Do not use any charting library.
+
+Create inline SVG charts for at least:
+
+- Revenue trend
+- Gross profit trend
+- EBITDA trend
+- Net income trend
+- Operating cash flow trend
+- Free cash flow trend
+- Gross margin trend
+- EBITDA margin trend
+- Cash balance trend
+- Total debt trend
+- Net debt trend
+- Inventory trend
+- Accounts receivable trend
+- Accounts payable trend
+- Cash conversion cycle trend
+- Revenue by channel
+- Revenue by product family
+- Inventory aging
+- AR aging
+- Debt maturity profile
+- Forecast revenue by scenario
+- Forecast EBITDA by scenario
+- Liquidity by scenario
+
+6. Include clean Python helper functions.
+
+The script must include functions such as:
+
+- "format_mxn(value)"
+- "format_pct(value)"
+- "format_ratio(value)"
+- "format_days(value)"
+- "format_multiple(value)"
+- "html_escape(value)"
+- "html_table(headers, rows, ...)"
+- "section_header(title, subtitle=None)"
+- "subsection_header(title)"
+- "page_break()"
+- "kpi_card(label, value, comment=None)"
+- "callout_box(title, text, box_type="info")"
+- "note_box(title, text)"
+- "svg_bar_chart(title, labels, values, ...)"
+- "svg_line_chart(title, labels, values, ...)"
+- "svg_stacked_bar_chart(title, labels, series, ...)"
+- "generate_company_profile()"
+- "generate_financing_request()"
+- "generate_historical_financials()"
+- "generate_forecast_financials()"
+- "calculate_ratios()"
+- "generate_working_capital_schedules()"
+- "generate_debt_schedule()"
+- "generate_inventory_schedule()"
+- "generate_receivables_schedule()"
+- "generate_payables_schedule()"
+- "generate_collateral_schedule()"
+- "generate_scenarios()"
+- "generate_sensitivities()"
+- "validate_financials(data)"
+- "generate_report_html(data)"
+- "write_html_file(html_content, output_path)"
+
+7. Use deterministic synthetic data.
+
+Set a random seed.
+
+Use generated data where appropriate, but ensure all numbers are realistic and internally consistent.
+
+8. Include financial validation checks.
+
+The script must validate:
+
+- Gross profit = revenue - cost of goods sold
+- EBITDA = gross profit - operating expenses before depreciation and amortization
+- EBIT = EBITDA - depreciation and amortization
+- EBT = EBIT - interest expense + FX gain/loss + other income/expense
+- Net income = EBT - income tax
+- Total assets = total liabilities + total equity for every historical year
+- Total assets = total liabilities + total equity for every forecast year
+- Total current assets sums correctly
+- Total non-current assets sums correctly
+- Total current liabilities sums correctly
+- Total non-current liabilities sums correctly
+- Ending cash in the cash flow statement agrees with balance sheet cash
+- Total debt in the debt schedule agrees with balance sheet debt
+- Net debt = total debt + lease liabilities - cash
+- Operating cash flow is logically derived from net income, non-cash charges, and working capital changes
+- Free cash flow = operating cash flow - capital expenditures
+- Current ratio calculated correctly
+- Quick ratio calculated correctly
+- Inventory turnover calculated correctly
+- Days sales outstanding calculated correctly
+- Days inventory outstanding calculated correctly
+- Days payable outstanding calculated correctly
+- Cash conversion cycle calculated correctly
+- DSCR calculated correctly
+- Interest coverage calculated correctly
+
+If checks fail, the script must raise a clear error explaining what failed.
+
+FINANCIAL SCALE AND REALISM
+
+Use the following approximate company scale:
+
+Historical years:
+FY2021, FY2022, FY2023, FY2024, FY2025
+
+Forecast years:
+FY2026, FY2027, FY2028
+
+Approximate historical financial profile:
+
+- FY2021 revenue around MXN 1,150 million
+- FY2025 revenue around MXN 1,900 million to MXN 2,050 million
+- Gross margin between 25% and 33%
+- EBITDA margin between 7% and 12%
+- Net margin positive but under pressure in some years
+- Total assets growing over time
+- Inventory growing faster than revenue in at least one year
+- Accounts receivable collection worsening in at least one year
+- Debt increasing materially in FY2023 or FY2024 due to expansion capex
+- Operating cash flow pressured in at least one year due to working capital absorption
+- FY2025 should show stress but not insolvency
+- Forecast years should show gradual improvement under management’s base plan, but not unrealistic perfection
+
+Approximate FY2025 target profile:
+
+- Revenue: MXN 1,900 million to MXN 2,050 million
+- Gross margin: 27% to 31%
+- EBITDA: MXN 160 million to MXN 210 million
+- Net income: positive but modest
+- Cash: MXN 70 million to MXN 110 million
+- Total debt including leases: MXN 575 million to MXN 675 million
+- Net debt / EBITDA: around 2.8x to 3.5x
+- Current ratio: around 1.25x to 1.60x
+- DSCR: above 1.10x but not extremely strong
+- Interest coverage: around 2.5x to 4.0x
+- Cash conversion cycle should be relatively long because the company is inventory-heavy
+
+Make the company plausible as a borrower:
+
+- It should have enough operating cash flow to justify a loan discussion
+- It should have enough risk to require detailed analysis
+- It should have collateral, but collateral should not be perfect
+- It should have working capital needs that make the revolving credit line logical
+- It should have a credible use for the term loan
+- It should have financial documentation good enough for a bank to evaluate
+
+REPORT CONTENT REQUIREMENTS
+
+The generated HTML report must include all of the following sections.
+
+SECTION 1 — Cover Page
+
+Include:
+
+- Company name
+- Report title: “Financial Information Package for Bank Financing Review”
+- Borrower: Atlas Meridian Industrial Supply, S.A. de C.V.
+- Purpose: Submission of financial information in support of requested bank financing
+- Total requested facilities: MXN 550 million
+- Historical period: FY2021–FY2025
+- Forecast period: FY2026–FY2028
+- Currency: MXN millions unless otherwise stated
+- Prepared by: Management of Atlas Meridian Industrial Supply, S.A. de C.V.
+- Date generated by the script
+- Clear fictional and synthetic data disclaimer
+
+SECTION 2 — Confidentiality and Synthetic Data Disclaimer
+
+Explain:
+
+- The company is fictional
+- The information is synthetic
+- The report is for demonstration, training, workflow testing, or analytical purposes
+- The numbers are not audited
+- The information does not represent any real borrower
+- The information does not represent any real bank
+- The report is not investment advice
+- The report is not a real loan application
+- The bank’s decision is intentionally not included
+
+SECTION 3 — Table of Contents
+
+Create a detailed table of contents with all major sections and subsections.
+
+SECTION 4 — Financing Request Summary
+
+Include:
+
+- Borrower name
+- Industry
+- Total requested amount
+- Requested facilities
+- Purpose of each facility
+- Requested tenor
+- Expected repayment source
+- Proposed collateral categories
+- Existing debt summary
+- Key management rationale for the financing request
+
+Include a table with:
+
+- Facility type
+- Requested amount
+- Purpose
+- Requested tenor
+- Expected repayment source
+- Proposed collateral
+- Management comments
+
+Do not include a bank recommendation.
+
+SECTION 5 — Sources and Uses of Funds
+
+Create a detailed sources and uses table.
+
+Sources should include:
+
+- Revolving credit facility
+- Term loan
+- Ancillary facilities
+- Existing cash contribution, if applicable
+- Operating cash flow contribution, if applicable
+
+Uses should include:
+
+- Inventory purchases
+- Seasonal working capital
+- Supplier payments
+- Accounts receivable financing
+- Refinancing of short-term expansion debt
+- Warehouse automation
+- Logistics equipment
+- Import guarantees
+- Transaction costs
+- Liquidity reserve
+
+Include management commentary explaining why the funds are requested.
+
+SECTION 6 — Executive Summary Prepared by Management
+
+Write from the company’s management perspective.
+
+Include:
+
+- Business overview
+- Recent performance
+- Growth drivers
+- Profitability trends
+- Working capital needs
+- Inventory position
+- Receivables position
+- Debt position
+- Liquidity position
+- Forecast outlook
+- Main financial challenges
+- Management’s improvement plan
+- Why the requested financing supports the business plan
+
+Do not state whether the bank should approve or deny.
+
+SECTION 7 — Company Profile
+
+Include:
+
+- Company history
+- Ownership structure
+- Legal structure
+- Management team
+- Corporate governance
+- Business units
+- Product categories
+- Geographic footprint
+- Distribution centers
+- Stores
+- Employees
+- Sales channels
+- Supplier base
+- Customer base
+- Technology systems
+- ERP and reporting limitations
+- E-commerce capabilities
+- Marketplace operations
+- Competitive positioning
+- Strategic priorities
+
+SECTION 8 — Industry and Market Context
+
+This must be fictional but plausible.
+Do not cite real sources.
+
+Include:
+
+- Mexican industrial hardware distribution market context
+- B2B purchasing behavior
+- Industrial supply demand drivers
+- Construction and maintenance demand
+- E-commerce trend in industrial supplies
+- Marketplace pricing pressure
+- Import exposure
+- FX volatility
+- Logistics cost pressure
+- Supplier concentration
+- Competitive landscape
+- Private-label margin opportunity
+- Digital pricing opportunity
+- Risks affecting the borrower’s market
+
+SECTION 9 — Business Model and Revenue Quality
+
+Analyze:
+
+- Revenue streams
+- Physical store sales
+- B2B sales
+- E-commerce direct sales
+- Marketplace sales
+- Private-label products
+- Third-party branded products
+- Credit sales
+- Cash sales
+- Supplier rebates
+- Return rates
+- Seasonality
+- Revenue concentration
+- Repeat customer behavior
+- Pricing model
+- Gross margin structure
+- Operating leverage
+- Revenue quality from a lender’s information perspective
+
+SECTION 10 — Product and Segment Analysis
+
+Create detailed tables and commentary for:
+
+- Revenue by product family
+- Gross margin by product family
+- Revenue by channel
+- Gross margin by channel
+- SKU count by category
+- Inventory days by category
+- Fast-moving inventory
+- Slow-moving inventory
+- Private-label vs third-party branded products
+- Marketplace price-sensitive products
+- Import-exposed products
+- Products exposed to FX volatility
+- Products with high working capital intensity
+- Products with high return rates
+- Products selected for SKU rationalization
+
+SECTION 11 — Customer and Sales Concentration
+
+Include:
+
+- Top 20 customer groups
+- Revenue by customer type
+- Revenue by region
+- Revenue by sales channel
+- B2B vs B2C split
+- Credit sales vs cash sales
+- Customer concentration risk
+- Customer payment behavior
+- Average collection days by customer segment
+- Management commentary on customer diversification
+
+Create realistic fictional customer names, but do not use real companies.
+
+SECTION 12 — Supplier and Procurement Analysis
+
+Include:
+
+- Top supplier groups
+- Local vs imported procurement
+- Supplier payment terms
+- Supplier concentration
+- Procurement by product family
+- FX exposure by supplier region
+- Import lead times
+- Supplier rebates
+- Supplier credit limits
+- Procurement risks
+- Management’s supplier negotiation plan
+
+Create realistic fictional supplier names, but do not use real companies.
+
+SECTION 13 — Historical Financial Statements
+
+Generate full historical financial statements for FY2021, FY2022, FY2023, FY2024, and FY2025.
+
+A. Income Statement
+
+Rows must include at least:
+
+- Revenue
+- Cost of goods sold
+- Gross profit
+- Selling expenses
+- Logistics and fulfillment expenses
+- Technology and platform expenses
+- General and administrative expenses
+- Bad debt expense
+- EBITDA
+- Depreciation and amortization
+- EBIT
+- Interest expense
+- FX gain/loss
+- Other income/expense
+- Earnings before tax
+- Income tax
+- Net income
+
+B. Balance Sheet
+
+Rows must include at least:
+
+Assets:
+
+- Cash and equivalents
+- Accounts receivable
+- Inventory
+- Prepaid expenses
+- Other current assets
+- Total current assets
+- Property, plant and equipment
+- Right-of-use assets
+- Intangible assets
+- Deferred tax assets
+- Total non-current assets
+- Total assets
+
+Liabilities:
+
+- Accounts payable
+- Short-term debt
+- Current lease liabilities
+- Accrued expenses
+- Taxes payable
+- Total current liabilities
+- Long-term debt
+- Long-term lease liabilities
+- Deferred tax liabilities
+- Other liabilities
+- Total non-current liabilities
+- Total liabilities
+
+Equity:
+
+- Share capital
+- Retained earnings
+- Other reserves
+- Total equity
+- Total liabilities and equity
+
+C. Cash Flow Statement
+
+Rows must include at least:
+
+- Net income
+- Depreciation and amortization
+- Change in accounts receivable
+- Change in inventory
+- Change in accounts payable
+- Change in other working capital
+- Net cash from operating activities
+- Capital expenditures
+- Technology investments
+- Net cash from investing activities
+- New debt issued
+- Debt repayment
+- Lease payments
+- Dividends
+- Net cash from financing activities
+- Net change in cash
+- Beginning cash
+- Ending cash
+
+SECTION 14 — Notes to Historical Financial Statements
+
+Include explanatory notes similar to management-prepared financial statement notes.
+
+Notes should cover:
+
+- Basis of preparation
+- Revenue recognition
+- Inventory accounting
+- Accounts receivable and credit losses
+- Supplier rebates
+- Property, plant and equipment
+- Leases
+- Intangible assets
+- Debt
+- Related-party transactions, if any
+- FX exposure
+- Tax assumptions
+- Subsequent events
+- Management estimates
+- Limitations of synthetic unaudited data
+
+SECTION 15 — Management Discussion and Analysis
+
+Write a long-form MD&A-style section.
+
+Cover:
+
+- Revenue trends
+- Channel mix evolution
+- Gross margin changes
+- Logistics cost pressure
+- Marketplace fees
+- Technology spending
+- Bad debt expense
+- EBITDA evolution
+- Net income evolution
+- Working capital absorption
+- Inventory build-up
+- Accounts receivable collection
+- Accounts payable management
+- Debt increase
+- Liquidity position
+- Capex projects
+- Management actions
+- Outlook
+
+SECTION 16 — Ratio Analysis
+
+Calculate and explain ratios for FY2021–FY2025:
+
+Profitability:
+
+- Revenue growth
+- Gross margin
+- EBITDA margin
+- EBIT margin
+- Net margin
+- Return on assets
+- Return on equity
+
+Liquidity:
+
+- Current ratio
+- Quick ratio
+- Cash ratio
+
+Efficiency:
+
+- Inventory turnover
+- Days inventory outstanding
+- Days sales outstanding
+- Days payable outstanding
+- Cash conversion cycle
+- Asset turnover
+
+Leverage:
+
+- Total debt
+- Net debt
+- Net debt / EBITDA
+- Debt / equity
+- Debt / total capitalization
+
+Coverage:
+
+- Interest coverage
+- DSCR
+- Fixed charge coverage ratio
+- Operating cash flow conversion
+- Free cash flow conversion
+
+Include interpretation, but do not make a bank approval decision.
+
+SECTION 17 — Working Capital Analysis
+
+Include:
+
+- Working capital overview
+- Accounts receivable analysis
+- Inventory analysis
+- Accounts payable analysis
+- Cash conversion cycle
+- Seasonal working capital needs
+- Working capital pressure points
+- Management actions to improve working capital
+- Requested financing connection to working capital needs
+
+Create detailed tables for:
+
+Accounts receivable aging:
+
+- Current
+- 1–30 days
+- 31–60 days
+- 61–90 days
+- Over 90 days
+- Total
+
+Inventory aging:
+
+- Current
+- 31–90 days
+- 91–180 days
+- 181–365 days
+- Over 365 days
+- Total
+
+Accounts payable aging:
+
+- Current
+- 1–30 days
+- 31–60 days
+- 61–90 days
+- Over 90 days
+- Total
+
+SECTION 18 — Receivables Detail
+
+Include:
+
+- AR by customer segment
+- AR by aging bucket
+- AR by region
+- AR by channel
+- Top 20 debtors
+- Average payment terms
+- Actual collection behavior
+- Disputed receivables
+- Past-due receivables
+- Receivables considered lower quality
+- Management collection plan
+- Credit policy overview
+
+SECTION 19 — Inventory Detail
+
+Include:
+
+- Inventory by category
+- Inventory by location
+- Inventory by aging bucket
+- Inventory by turnover speed
+- Imported inventory
+- Domestic inventory
+- Marketplace fulfillment inventory
+- Slow-moving inventory
+- Obsolete inventory estimate
+- Safety stock
+- Inventory write-down policy
+- Management liquidation plan
+- SKU rationalization plan
+
+SECTION 20 — Accounts Payable and Supplier Terms
+
+Include:
+
+- AP by supplier group
+- AP by aging bucket
+- AP by currency
+- Payment terms
+- Supplier concentration
+- Supplier credit limits
+- Early payment discounts
+- Renegotiation opportunities
+- Risks if supplier terms tighten
+
+SECTION 21 — Existing Debt Schedule
+
+Include:
+
+- Bank loans
+- Equipment loans
+- Lease liabilities
+- Supplier financing
+- Short-term debt
+- Long-term debt
+- Interest rates
+- Maturities
+- Amortization
+- Collateral pledged
+- Existing covenants, if any
+- Purpose of original debt
+- Current outstanding balance
+
+SECTION 22 — Requested Financing Detail
+
+Include detailed information about each requested facility:
+
+- Revolving credit facility
+- Term loan
+- Ancillary facility
+
+For each:
+
+- Requested amount
+- Purpose
+- Tenor
+- Expected repayment source
+- Expected utilization pattern
+- Seasonality
+- Proposed collateral
+- Management rationale
+- Financial statements affected
+- Key supporting schedules
+
+SECTION 23 — Collateral Information Submitted by the Company
+
+Include a management-prepared collateral schedule.
+
+Collateral types:
+
+- Accounts receivable
+- Inventory
+- Real estate
+- Machinery and equipment
+- Vehicles and logistics equipment
+- Warehouse automation assets
+- Software or platform assets, if any
+- Corporate guarantees, if applicable
+
+For each collateral class include:
+
+- Book value
+- Estimated market value
+- Estimated orderly liquidation value
+- Estimated forced liquidation value
+- Existing liens
+- Insurance status
+- Location
+- Documentation status
+- Management comments
+
+Important:
+Do not conclude whether collateral is sufficient. Present information for bank review.
+
+SECTION 24 — Borrowing Base Support Schedule
+
+Create a borrower-prepared borrowing base support schedule.
+
+Include:
+
+- Gross accounts receivable
+- Less ineligible receivables
+- Eligible accounts receivable
+- Gross inventory
+- Less obsolete inventory
+- Less slow-moving inventory
+- Less ineligible inventory
+- Eligible inventory
+- Suggested advance-rate illustration
+- Estimated borrowing base support
+- Existing utilization
+- Requested revolver size
+- Seasonal peak need
+- Management comments
+
+Important:
+The borrowing base schedule should support bank analysis, but should not instruct the bank to approve or reject.
+
+SECTION 25 — Capital Expenditure and Asset Base
+
+Include:
+
+- Distribution center expansion
+- Store refurbishments
+- Fleet and logistics equipment
+- Warehouse automation
+- E-commerce platform investments
+- ERP upgrades
+- Maintenance capex
+- Growth capex
+- Useful life assumptions
+- Depreciation schedule
+- Capex by year
+- Capex already completed
+- Capex still pending
+- Expected operational benefits
+- Expected cash flow impact
+
+SECTION 26 — Forecast Assumptions
+
+Create forecasts for FY2026, FY2027, and FY2028.
+
+Include assumptions for:
+
+- Revenue growth by channel
+- Revenue growth by product family
+- Gross margin
+- Logistics costs
+- Marketplace fees
+- Technology costs
+- G&A expenses
+- Bad debt expense
+- Working capital
+- AR days
+- Inventory days
+- AP days
+- Capex
+- Debt repayment
+- Interest rates
+- Tax rate
+- FX rates
+- Inflation
+- Private-label penetration
+- E-commerce conversion
+- SKU rationalization
+- Supplier payment terms
+- Inventory liquidation plan
+
+SECTION 27 — Forecast Financial Statements
+
+Generate forecast financial statements for FY2026, FY2027, and FY2028.
+
+Include:
+
+- Forecast income statement
+- Forecast balance sheet
+- Forecast cash flow statement
+
+Forecast statements must connect logically to FY2025 historical results.
+
+SECTION 28 — Cash Flow and Repayment Support Information
+
+This section should provide information that helps a bank evaluate repayment capacity, but without making a lending decision.
+
+Include:
+
+- EBITDA
+- Operating cash flow
+- Free cash flow
+- Debt service
+- Interest expense
+- Scheduled amortization
+- Estimated cash available for debt service
+- DSCR
+- Interest coverage
+- Fixed charge coverage
+- Revolver usage pattern
+- Cash balance forecast
+- Liquidity sources and uses
+- Management explanation of repayment sources
+- Risks to cash flow
+- Mitigating actions planned by management
+
+SECTION 29 — Scenario Information
+
+Create three management scenarios:
+
+- Base case
+- Downside case
+- Upside case
+
+For each scenario include:
+
+- Narrative description
+- Revenue assumptions
+- Margin assumptions
+- Working capital assumptions
+- Capex assumptions
+- Debt assumptions
+- Cash flow implications
+- Forecast revenue
+- Forecast EBITDA
+- Forecast net income
+- Forecast operating cash flow
+- Forecast free cash flow
+- Forecast cash balance
+- Forecast net debt
+- Forecast DSCR
+- Forecast interest coverage
+
+Do not say which scenario the bank should use. Present the information neutrally.
+
+SECTION 30 — Sensitivity Tables
+
+Include sensitivity tables for:
+
+- Revenue growth vs EBITDA
+- Gross margin vs EBITDA
+- Inventory days vs cash tied up
+- DSO vs cash tied up
+- DPO vs cash preserved
+- Interest rate increase vs net income
+- FX depreciation vs gross margin
+- Marketplace fee increase vs EBITDA
+- Private-label penetration vs gross margin
+- Capex delay vs cash balance
+- Debt amortization speed vs liquidity
+
+SECTION 31 — Operational KPI Dashboard
+
+Include KPIs such as:
+
+- Number of stores
+- Number of distribution centers
+- Number of SKUs
+- Active customers
+- B2B customers
+- Online customers
+- Marketplace orders
+- Average order value
+- Fulfillment time
+- Return rate
+- On-time delivery rate
+- Inventory accuracy
+- Stockout rate
+- Private-label penetration
+- Gross margin by channel
+- Revenue per employee
+- Sales per square meter
+- Warehouse utilization
+- E-commerce conversion rate
+
+SECTION 32 — Risk Disclosures Prepared by Management
+
+Include a balanced risk disclosure section.
+
+Risks must include:
+
+- Market risk
+- Competitive pricing risk
+- Marketplace dependency
+- Inventory obsolescence
+- Slow-moving inventory
+- Customer credit risk
+- Supplier concentration
+- Import disruption
+- FX volatility
+- Logistics cost pressure
+- Cybersecurity risk
+- ERP limitations
+- Liquidity risk
+- Refinancing risk
+- Interest rate risk
+- Tax risk
+- Legal risk
+- Labor risk
+- ESG and safety risk
+- Data quality risk
+
+For each risk include:
+
+- Risk description
+- Possible financial impact
+- Current mitigation
+- Planned mitigation
+- Management owner
+- Monitoring KPI
+
+SECTION 33 — Management Improvement Plan
+
+Include specific management initiatives:
+
+- Data-driven pricing model
+- SKU-level price floors
+- Inventory liquidation plan
+- Slow-moving inventory reduction
+- Private-label growth
+- Supplier term renegotiation
+- AR collection improvement
+- Customer credit policy revision
+- Demand forecasting
+- E-commerce conversion optimization
+- Marketplace margin control
+- Logistics route optimization
+- ERP reporting improvement
+- Weekly cash dashboard
+- Monthly inventory dashboard
+- Monthly AR dashboard
+- Financial reporting package for lenders
+- FX risk management policy
+
+For each initiative include:
+
+- Description
+- Expected financial impact
+- Timeline
+- Responsible department
+- Required data
+- KPI
+- Current status
+
+SECTION 34 — Supporting Bank Information Checklist
+
+Include a checklist of information that would normally be provided to a bank.
+
+Include:
+
+- Historical financial statements
+- Forecast financial statements
+- Tax declarations, synthetic reference only
+- Bank statements, synthetic reference only
+- AR aging
+- Inventory aging
+- AP aging
+- Debt schedule
+- Capex schedule
+- Collateral schedule
+- Corporate ownership chart
+- Customer concentration report
+- Supplier concentration report
+- Insurance certificates, synthetic reference only
+- Real estate documents, synthetic reference only
+- Equipment invoices, synthetic reference only
+- Board authorization, synthetic reference only
+- Legal documentation, synthetic reference only
+
+Important:
+Do not generate real legal documents. Only include a checklist and synthetic descriptions.
+
+SECTION 35 — Appendix Section
+
+Include many appendices.
+
+Appendices must include:
+
+- Appendix A: Detailed income statement
+- Appendix B: Detailed balance sheet
+- Appendix C: Detailed cash flow statement
+- Appendix D: Revenue by channel
+- Appendix E: Revenue by product family
+- Appendix F: Gross margin by product family
+- Appendix G: Revenue by customer segment
+- Appendix H: Top customer schedule
+- Appendix I: Supplier concentration schedule
+- Appendix J: SKU productivity table
+- Appendix K: Inventory by category
+- Appendix L: Inventory aging
+- Appendix M: AR aging
+- Appendix N: AP aging
+- Appendix O: Existing debt schedule
+- Appendix P: Requested financing schedule
+- Appendix Q: Collateral schedule
+- Appendix R: Borrowing base support schedule
+- Appendix S: Capex schedule
+- Appendix T: Depreciation schedule
+- Appendix U: Forecast assumptions
+- Appendix V: Forecast financial statements
+- Appendix W: Scenario outputs
+- Appendix X: Sensitivity tables
+- Appendix Y: Operational KPI glossary
+- Appendix Z: Synthetic data methodology
+
+HTML DESIGN REQUIREMENTS
+
+The HTML should look like a professional financial package submitted to a bank.
+
+Use:
+
+- Clean typography
+- Professional corporate colors
+- Cover page
+- Table of contents
+- Section title pages
+- KPI cards
+- Management comment boxes
+- Financing request boxes
+- Risk disclosure boxes
+- Tables with clear headers
+- Alternating table rows
+- Status tags
+- Footnotes
+- Small-print disclaimers
+- Page breaks
+- Appendix title pages
+- Print-friendly styling
+
+The style should look serious, conservative, and finance-oriented.
+
+Avoid:
+
+- Flashy startup-style design
+- Excessive colors
+- Unprofessional language
+- Unsupported claims
+- Real-world citations
+- Real company references
+
+CONTENT TONE REQUIREMENTS
+
+The writing style should be:
+
+- Professional
+- Financial
+- Credible
+- CFO-like
+- Detailed
+- Neutral
+- Transparent
+- Bank-facing
+- Focused on information disclosure
+
+The company’s management may explain strengths and plans, but the report must also openly disclose risks, weaknesses, and financial pressure points.
+
+Do not make exaggerated marketing claims.
+
+Do not use phrases such as:
+
+- “The bank should approve”
+- “The bank should reject”
+- “Final credit recommendation”
+- “Credit committee decision”
+- “Approved”
+- “Denied”
+- “Bank rating”
+- “Internal bank risk grade”
+
+The report can include financial metrics useful to a bank, but it must not make the bank’s decision.
+
+SYNTHETIC DATA REQUIREMENTS
+
+All company data must be fictional and generated within the script.
+
+The script should create:
+
+- Financial statements
+- Customer names
+- Supplier names
+- Product category data
+- SKU productivity data
+- Inventory aging
+- AR aging
+- AP aging
+- Debt schedule
+- Capex schedule
+- Collateral schedule
+- Forecast assumptions
+- Scenario assumptions
+- Sensitivity outputs
+- Operational KPIs
+
+Use realistic fictional names.
+
+Do not use real customer names, real supplier names, real banks, or real public companies.
+
+The data must be internally consistent across sections. For example:
+
+- Total revenue by channel should reconcile to total revenue
+- Total revenue by product family should reconcile to total revenue
+- AR aging should reconcile to balance sheet accounts receivable
+- Inventory aging should reconcile to balance sheet inventory
+- AP aging should reconcile to balance sheet accounts payable
+- Debt schedule should reconcile to balance sheet debt
+- Capex schedule should connect to PP&E and depreciation
+- Cash flow ending cash should reconcile to balance sheet cash
+
+LENGTH REQUIREMENTS
+
+The generated HTML must be extensive.
+
+To reach approximately 80 PDF pages, the script should generate:
+
+- Long-form narratives in each major section
+- Detailed financial tables for 8 years total, FY2021–FY2028
+- Several appendices
+- At least 20 product-category rows
+- At least 20 customer rows
+- At least 15 supplier rows
+- At least 30 SKU productivity rows
+- At least 20 risk disclosure rows
+- At least 15 management initiatives
+- At least 10 sensitivity tables
+- At least 15 charts
+- Detailed notes to financial statements
+- Detailed management discussion and analysis
+- Detailed supporting bank information checklist
+
+Do not use meaningless filler. Every section should contain useful financial or operational information.
+
+FINAL SCRIPT BEHAVIOR
+
+The Python script should:
+
+1. Generate the synthetic data.
+2. Validate all financial relationships.
+3. Build the full HTML string.
+4. Write the HTML file to the current working directory.
+5. Print this message:
+
+"Generated fictional_company_bank_financial_package.html successfully."
+
+The generated HTML must include this instruction:
+
+"Open this HTML file in a browser and use Print > Save as PDF."
+
+FINAL REMINDER
+
+Return only the complete Python script.
+
+The script must be executable as-is.
+
+The generated report must be a borrower-submitted financial information package for a bank financing review, not a bank credit memo and not a bank approval recommendation.
