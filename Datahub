@@ -1,1475 +1,1270 @@
-You are a senior Python developer, corporate finance specialist, financial controller, CFO advisor, and professional HTML report designer.
-
-Your task is to generate ONE complete, executable Python script that creates a very extensive, realistic, self-contained HTML financial information package for a fictional company that is submitting financial information to a bank as part of a loan or credit line application.
-
-The final HTML file will later be opened in a browser and exported/printed to PDF. The printed PDF should be approximately 80 pages long. Browser pagination may vary, but the HTML must contain enough meaningful content, detailed schedules, financial statements, supporting tables, notes, and appendices to reasonably produce an extensive PDF of approximately 80 pages.
-
-CRITICAL OUTPUT RULE
-
-Return only the complete Python script.
-
-Do not explain the code.
-Do not summarize the report.
-Do not provide markdown commentary outside the code.
-Do not create multiple scripts.
-Do not require external files.
-Do not use real company data.
-Do not use real company names.
-Do not use real bank names.
-Do not leave placeholders.
-Do not write “TODO.”
-Do not write “continue later.”
-Do not say that the report is too long.
-Generate the full executable script.
-
-MAIN OBJECTIVE
-
-Create a Python script that generates one standalone HTML file:
-
-"fictional_company_bank_financial_package.html"
-
-The HTML file must represent the type of financial documentation package that a company would submit to a bank when applying for financing.
-
-The report must be written from the perspective of the company’s finance department, not from the bank’s credit committee.
-
-The report must provide all relevant financial, operational, and supporting information that a bank could use to evaluate whether to approve, reject, condition, resize, or restructure a loan or credit facility.
-
-IMPORTANT: The report must NOT make the bank’s final credit decision. It must NOT say whether the bank should approve or reject the loan. It must NOT include a final bank recommendation. Instead, it should provide a complete and realistic financial information package that allows a lender to perform its own analysis.
-
-The document should feel like a serious borrower-submitted financial package prepared by a CFO, finance manager, or external financial advisor for a commercial bank.
-
-The report must include:
-
-- Company overview
-- Financing request summary
-- Purpose of financing
-- Sources and uses of funds
-- Historical financial statements
-- Forecast financial statements
-- Detailed notes to financial statements
-- Management discussion and analysis
-- Working capital schedules
-- Debt schedules
-- Collateral schedules
-- Inventory details
-- Receivables details
-- Payables details
-- Cash flow analysis
-- Loan repayment support information
-- Financial ratios
-- Scenario information
-- Sensitivity information
-- Operational KPIs
-- Risk disclosures
-- Supporting appendices
-
-The goal is to generate a realistic, detailed financial package that a bank relationship manager, credit analyst, risk officer, or credit committee could review to make an informed lending decision.
-
-FICTIONAL COMPANY PROFILE
-
-Create a fictional company with the following profile:
-
-Company name:
-Atlas Meridian Industrial Supply, S.A. de C.V.
-
-Country:
-Mexico
-
-Currency:
-Mexican pesos, expressed mostly in MXN millions unless otherwise stated.
-
-Industry:
-Industrial hardware distribution, construction supplies, maintenance tools, safety equipment, industrial consumables, and e-commerce sales.
-
-Business model:
-
-- Operates regional stores
-- Operates distribution centers
-- Sells to B2B customers
-- Sells to retail customers
-- Sells through its own e-commerce platform
-- Sells through third-party marketplaces
-- Provides short-term trade credit to selected B2B customers
-- Imports part of its product catalog from Asia and the United States
-- Offers both third-party branded products and higher-margin private-label products
-
-Customer base:
-
-- Construction companies
-- Independent contractors
-- Small and medium hardware stores
-- Industrial maintenance teams
-- Manufacturing plants
-- Workshops
-- Electricians
-- Plumbers
-- Retail customers
-- Online marketplace buyers
-
-Main product categories:
-
-- Power tools
-- Hand tools
-- Fasteners
-- Electrical supplies
-- Plumbing supplies
-- Safety equipment
-- Adhesives and sealants
-- Paint accessories
-- Industrial consumables
-- Welding supplies
-- Construction hardware
-- Garden and outdoor equipment
-- Storage and organization
-- Measuring instruments
-- Cleaning and maintenance supplies
-
-Company situation:
-Atlas Meridian Industrial Supply, S.A. de C.V. is submitting a financial information package to a bank because it is applying for credit facilities to support working capital, inventory purchases, seasonal demand, supplier payments, digital sales growth, and partial refinancing of short-term debt.
-
-The company must be realistic and financially imperfect. It should have a profitable core business, but also operational and financial pressure points.
-
-The company should have:
-
-- Long operating history
-- Growing revenue
-- Positive EBITDA
-- Positive but pressured net income
-- Significant inventory needs
-- Accounts receivable exposure
-- Increasing e-commerce and marketplace sales
-- Pressure on gross margin from competition
-- Imported product exposure
-- FX sensitivity
-- Logistics cost increases
-- Working capital strain
-- Debt from a recent expansion project
-- Need for better financial reporting
-- Need for improved SKU-level profitability analysis
-- Need for inventory optimization
-- Need for more disciplined pricing
-
-Do not make the company perfect.
-Do not make the company bankrupt.
-Do not make every metric improve every year.
-Include realistic volatility, operational problems, financial constraints, and management improvement plans.
-
-FINANCING REQUEST TO INCLUDE
-
-The company is requesting the following facilities from a fictional commercial bank:
-
-1. Revolving working capital credit line
-
-- Requested amount: MXN 325 million
-- Purpose: inventory purchases, accounts receivable financing, seasonal working capital, marketplace fulfillment, and supplier payments
-- Requested tenor: 24 months
-- Expected repayment source: conversion of inventory and receivables into cash
-
-2. Term loan
-
-- Requested amount: MXN 180 million
-- Purpose: refinancing of short-term debt related to distribution center expansion, logistics equipment, and warehouse automation
-- Requested tenor: 5 years
-- Expected repayment source: operating cash flow
-
-3. Ancillary credit facilities
-
-- Requested amount: MXN 45 million
-- Purpose: letters of credit, import guarantees, supplier guarantees, FX hedging support, and documentary trade finance needs
-
-Total requested exposure:
-MXN 550 million
-
-Important:
-The report should present the request and supporting financial information, but it should not decide whether the bank should approve it.
-
-TECHNICAL REQUIREMENTS
-
-The Python script must:
-
-1. Use only Python standard library modules where possible.
-
-Allowed modules:
-
-- os
-- math
-- random
-- statistics
-- datetime
-- textwrap
-- html
-- json
-- pathlib
-
-Avoid external dependencies completely.
-
-Do not use:
-
-- pandas
-- numpy
-- matplotlib
-- seaborn
-- plotly
-- jinja2
-- fpdf
-- reportlab
-- weasyprint
-- openpyxl
-- xlsxwriter
-- any external library
-
-2. Generate one standalone HTML file.
-
-The HTML must include all CSS, tables, charts, styles, section formatting, notes, and appendices inline.
-
-Do not link to:
-
-- External CSS
-- External JavaScript
-- External images
-- External fonts
-- CDNs
-- Online resources
-
-The HTML must work offline.
-
-3. Include print-ready CSS.
-
-The HTML must be designed so the user can open it in a browser and print/export it to PDF.
-
-Include:
-
-- "@media print"
-- A4 page size
-- Print margins
-- Page-break classes
-- Section page breaks
-- Appendix page breaks
-- Table formatting suitable for PDF
-- Avoid awkward table row breaks where possible
-- Professional document typography
-- Clear section hierarchy
-- Cover page styling
-- Table of contents styling
-- Footer-style small disclaimers
-- Page-break handling for large tables
-- Print instruction inside the HTML:
-  “Open this HTML file in a browser and use Print > Save as PDF.”
-
-4. Generate a long, professional report.
-
-The report must be long enough to produce approximately 80 pages when printed to PDF. Achieve this through useful financial content, not meaningless filler.
-
-Use:
-
-- Detailed tables
-- Multi-year financial statements
-- Long management explanations
-- Supporting schedules
-- Notes to financial statements
-- Appendices
-- KPI tables
-- Product-level tables
-- Customer concentration tables
-- Debt schedules
-- Inventory schedules
-- Receivables schedules
-- Forecast assumptions
-- Scenario outputs
-- Risk disclosures
-
-5. Generate inline SVG charts using Python functions.
-
-Do not use any charting library.
-
-Create inline SVG charts for at least:
-
-- Revenue trend
-- Gross profit trend
-- EBITDA trend
-- Net income trend
-- Operating cash flow trend
-- Free cash flow trend
-- Gross margin trend
-- EBITDA margin trend
-- Cash balance trend
-- Total debt trend
-- Net debt trend
-- Inventory trend
-- Accounts receivable trend
-- Accounts payable trend
-- Cash conversion cycle trend
-- Revenue by channel
-- Revenue by product family
-- Inventory aging
-- AR aging
-- Debt maturity profile
-- Forecast revenue by scenario
-- Forecast EBITDA by scenario
-- Liquidity by scenario
-
-6. Include clean Python helper functions.
-
-The script must include functions such as:
-
-- "format_mxn(value)"
-- "format_pct(value)"
-- "format_ratio(value)"
-- "format_days(value)"
-- "format_multiple(value)"
-- "html_escape(value)"
-- "html_table(headers, rows, ...)"
-- "section_header(title, subtitle=None)"
-- "subsection_header(title)"
-- "page_break()"
-- "kpi_card(label, value, comment=None)"
-- "callout_box(title, text, box_type="info")"
-- "note_box(title, text)"
-- "svg_bar_chart(title, labels, values, ...)"
-- "svg_line_chart(title, labels, values, ...)"
-- "svg_stacked_bar_chart(title, labels, series, ...)"
-- "generate_company_profile()"
-- "generate_financing_request()"
-- "generate_historical_financials()"
-- "generate_forecast_financials()"
-- "calculate_ratios()"
-- "generate_working_capital_schedules()"
-- "generate_debt_schedule()"
-- "generate_inventory_schedule()"
-- "generate_receivables_schedule()"
-- "generate_payables_schedule()"
-- "generate_collateral_schedule()"
-- "generate_scenarios()"
-- "generate_sensitivities()"
-- "validate_financials(data)"
-- "generate_report_html(data)"
-- "write_html_file(html_content, output_path)"
-
-7. Use deterministic synthetic data.
-
-Set a random seed.
-
-Use generated data where appropriate, but ensure all numbers are realistic and internally consistent.
-
-8. Include financial validation checks.
-
-The script must validate:
-
-- Gross profit = revenue - cost of goods sold
-- EBITDA = gross profit - operating expenses before depreciation and amortization
-- EBIT = EBITDA - depreciation and amortization
-- EBT = EBIT - interest expense + FX gain/loss + other income/expense
-- Net income = EBT - income tax
-- Total assets = total liabilities + total equity for every historical year
-- Total assets = total liabilities + total equity for every forecast year
-- Total current assets sums correctly
-- Total non-current assets sums correctly
-- Total current liabilities sums correctly
-- Total non-current liabilities sums correctly
-- Ending cash in the cash flow statement agrees with balance sheet cash
-- Total debt in the debt schedule agrees with balance sheet debt
-- Net debt = total debt + lease liabilities - cash
-- Operating cash flow is logically derived from net income, non-cash charges, and working capital changes
-- Free cash flow = operating cash flow - capital expenditures
-- Current ratio calculated correctly
-- Quick ratio calculated correctly
-- Inventory turnover calculated correctly
-- Days sales outstanding calculated correctly
-- Days inventory outstanding calculated correctly
-- Days payable outstanding calculated correctly
-- Cash conversion cycle calculated correctly
-- DSCR calculated correctly
-- Interest coverage calculated correctly
-
-If checks fail, the script must raise a clear error explaining what failed.
-
-FINANCIAL SCALE AND REALISM
-
-Use the following approximate company scale:
-
-Historical years:
-FY2021, FY2022, FY2023, FY2024, FY2025
-
-Forecast years:
-FY2026, FY2027, FY2028
-
-Approximate historical financial profile:
-
-- FY2021 revenue around MXN 1,150 million
-- FY2025 revenue around MXN 1,900 million to MXN 2,050 million
-- Gross margin between 25% and 33%
-- EBITDA margin between 7% and 12%
-- Net margin positive but under pressure in some years
-- Total assets growing over time
-- Inventory growing faster than revenue in at least one year
-- Accounts receivable collection worsening in at least one year
-- Debt increasing materially in FY2023 or FY2024 due to expansion capex
-- Operating cash flow pressured in at least one year due to working capital absorption
-- FY2025 should show stress but not insolvency
-- Forecast years should show gradual improvement under management’s base plan, but not unrealistic perfection
-
-Approximate FY2025 target profile:
-
-- Revenue: MXN 1,900 million to MXN 2,050 million
-- Gross margin: 27% to 31%
-- EBITDA: MXN 160 million to MXN 210 million
-- Net income: positive but modest
-- Cash: MXN 70 million to MXN 110 million
-- Total debt including leases: MXN 575 million to MXN 675 million
-- Net debt / EBITDA: around 2.8x to 3.5x
-- Current ratio: around 1.25x to 1.60x
-- DSCR: above 1.10x but not extremely strong
-- Interest coverage: around 2.5x to 4.0x
-- Cash conversion cycle should be relatively long because the company is inventory-heavy
-
-Make the company plausible as a borrower:
-
-- It should have enough operating cash flow to justify a loan discussion
-- It should have enough risk to require detailed analysis
-- It should have collateral, but collateral should not be perfect
-- It should have working capital needs that make the revolving credit line logical
-- It should have a credible use for the term loan
-- It should have financial documentation good enough for a bank to evaluate
-
-REPORT CONTENT REQUIREMENTS
-
-The generated HTML report must include all of the following sections.
-
-SECTION 1 — Cover Page
-
-Include:
-
-- Company name
-- Report title: “Financial Information Package for Bank Financing Review”
-- Borrower: Atlas Meridian Industrial Supply, S.A. de C.V.
-- Purpose: Submission of financial information in support of requested bank financing
-- Total requested facilities: MXN 550 million
-- Historical period: FY2021–FY2025
-- Forecast period: FY2026–FY2028
-- Currency: MXN millions unless otherwise stated
-- Prepared by: Management of Atlas Meridian Industrial Supply, S.A. de C.V.
-- Date generated by the script
-- Clear fictional and synthetic data disclaimer
-
-SECTION 2 — Confidentiality and Synthetic Data Disclaimer
-
-Explain:
-
-- The company is fictional
-- The information is synthetic
-- The report is for demonstration, training, workflow testing, or analytical purposes
-- The numbers are not audited
-- The information does not represent any real borrower
-- The information does not represent any real bank
-- The report is not investment advice
-- The report is not a real loan application
-- The bank’s decision is intentionally not included
-
-SECTION 3 — Table of Contents
-
-Create a detailed table of contents with all major sections and subsections.
-
-SECTION 4 — Financing Request Summary
-
-Include:
-
-- Borrower name
-- Industry
-- Total requested amount
-- Requested facilities
-- Purpose of each facility
-- Requested tenor
-- Expected repayment source
-- Proposed collateral categories
-- Existing debt summary
-- Key management rationale for the financing request
-
-Include a table with:
-
-- Facility type
-- Requested amount
-- Purpose
-- Requested tenor
-- Expected repayment source
-- Proposed collateral
-- Management comments
-
-Do not include a bank recommendation.
-
-SECTION 5 — Sources and Uses of Funds
-
-Create a detailed sources and uses table.
-
-Sources should include:
-
-- Revolving credit facility
-- Term loan
-- Ancillary facilities
-- Existing cash contribution, if applicable
-- Operating cash flow contribution, if applicable
-
-Uses should include:
-
-- Inventory purchases
-- Seasonal working capital
-- Supplier payments
-- Accounts receivable financing
-- Refinancing of short-term expansion debt
-- Warehouse automation
-- Logistics equipment
-- Import guarantees
-- Transaction costs
-- Liquidity reserve
-
-Include management commentary explaining why the funds are requested.
-
-SECTION 6 — Executive Summary Prepared by Management
-
-Write from the company’s management perspective.
-
-Include:
-
-- Business overview
-- Recent performance
-- Growth drivers
-- Profitability trends
-- Working capital needs
-- Inventory position
-- Receivables position
-- Debt position
-- Liquidity position
-- Forecast outlook
-- Main financial challenges
-- Management’s improvement plan
-- Why the requested financing supports the business plan
-
-Do not state whether the bank should approve or deny.
-
-SECTION 7 — Company Profile
-
-Include:
-
-- Company history
-- Ownership structure
-- Legal structure
-- Management team
-- Corporate governance
-- Business units
-- Product categories
-- Geographic footprint
-- Distribution centers
-- Stores
-- Employees
-- Sales channels
-- Supplier base
-- Customer base
-- Technology systems
-- ERP and reporting limitations
-- E-commerce capabilities
-- Marketplace operations
-- Competitive positioning
-- Strategic priorities
-
-SECTION 8 — Industry and Market Context
-
-This must be fictional but plausible.
-Do not cite real sources.
-
-Include:
-
-- Mexican industrial hardware distribution market context
-- B2B purchasing behavior
-- Industrial supply demand drivers
-- Construction and maintenance demand
-- E-commerce trend in industrial supplies
-- Marketplace pricing pressure
-- Import exposure
-- FX volatility
-- Logistics cost pressure
-- Supplier concentration
-- Competitive landscape
-- Private-label margin opportunity
-- Digital pricing opportunity
-- Risks affecting the borrower’s market
-
-SECTION 9 — Business Model and Revenue Quality
-
-Analyze:
-
-- Revenue streams
-- Physical store sales
-- B2B sales
-- E-commerce direct sales
-- Marketplace sales
-- Private-label products
-- Third-party branded products
-- Credit sales
-- Cash sales
-- Supplier rebates
-- Return rates
-- Seasonality
-- Revenue concentration
-- Repeat customer behavior
-- Pricing model
-- Gross margin structure
-- Operating leverage
-- Revenue quality from a lender’s information perspective
-
-SECTION 10 — Product and Segment Analysis
-
-Create detailed tables and commentary for:
-
-- Revenue by product family
-- Gross margin by product family
-- Revenue by channel
-- Gross margin by channel
-- SKU count by category
-- Inventory days by category
-- Fast-moving inventory
-- Slow-moving inventory
-- Private-label vs third-party branded products
-- Marketplace price-sensitive products
-- Import-exposed products
-- Products exposed to FX volatility
-- Products with high working capital intensity
-- Products with high return rates
-- Products selected for SKU rationalization
-
-SECTION 11 — Customer and Sales Concentration
-
-Include:
-
-- Top 20 customer groups
-- Revenue by customer type
-- Revenue by region
-- Revenue by sales channel
-- B2B vs B2C split
-- Credit sales vs cash sales
-- Customer concentration risk
-- Customer payment behavior
-- Average collection days by customer segment
-- Management commentary on customer diversification
-
-Create realistic fictional customer names, but do not use real companies.
-
-SECTION 12 — Supplier and Procurement Analysis
-
-Include:
-
-- Top supplier groups
-- Local vs imported procurement
-- Supplier payment terms
-- Supplier concentration
-- Procurement by product family
-- FX exposure by supplier region
-- Import lead times
-- Supplier rebates
-- Supplier credit limits
-- Procurement risks
-- Management’s supplier negotiation plan
-
-Create realistic fictional supplier names, but do not use real companies.
-
-SECTION 13 — Historical Financial Statements
-
-Generate full historical financial statements for FY2021, FY2022, FY2023, FY2024, and FY2025.
-
-A. Income Statement
-
-Rows must include at least:
-
-- Revenue
-- Cost of goods sold
-- Gross profit
-- Selling expenses
-- Logistics and fulfillment expenses
-- Technology and platform expenses
-- General and administrative expenses
-- Bad debt expense
-- EBITDA
-- Depreciation and amortization
-- EBIT
-- Interest expense
-- FX gain/loss
-- Other income/expense
-- Earnings before tax
-- Income tax
-- Net income
-
-B. Balance Sheet
-
-Rows must include at least:
-
-Assets:
-
-- Cash and equivalents
-- Accounts receivable
-- Inventory
-- Prepaid expenses
-- Other current assets
-- Total current assets
-- Property, plant and equipment
-- Right-of-use assets
-- Intangible assets
-- Deferred tax assets
-- Total non-current assets
-- Total assets
-
-Liabilities:
-
-- Accounts payable
-- Short-term debt
-- Current lease liabilities
-- Accrued expenses
-- Taxes payable
-- Total current liabilities
-- Long-term debt
-- Long-term lease liabilities
-- Deferred tax liabilities
-- Other liabilities
-- Total non-current liabilities
-- Total liabilities
-
-Equity:
-
-- Share capital
-- Retained earnings
-- Other reserves
-- Total equity
-- Total liabilities and equity
-
-C. Cash Flow Statement
-
-Rows must include at least:
-
-- Net income
-- Depreciation and amortization
-- Change in accounts receivable
-- Change in inventory
-- Change in accounts payable
-- Change in other working capital
-- Net cash from operating activities
-- Capital expenditures
-- Technology investments
-- Net cash from investing activities
-- New debt issued
-- Debt repayment
-- Lease payments
-- Dividends
-- Net cash from financing activities
-- Net change in cash
-- Beginning cash
-- Ending cash
-
-SECTION 14 — Notes to Historical Financial Statements
-
-Include explanatory notes similar to management-prepared financial statement notes.
-
-Notes should cover:
-
-- Basis of preparation
-- Revenue recognition
-- Inventory accounting
-- Accounts receivable and credit losses
-- Supplier rebates
-- Property, plant and equipment
-- Leases
-- Intangible assets
-- Debt
-- Related-party transactions, if any
-- FX exposure
-- Tax assumptions
-- Subsequent events
-- Management estimates
-- Limitations of synthetic unaudited data
-
-SECTION 15 — Management Discussion and Analysis
-
-Write a long-form MD&A-style section.
-
-Cover:
-
-- Revenue trends
-- Channel mix evolution
-- Gross margin changes
-- Logistics cost pressure
-- Marketplace fees
-- Technology spending
-- Bad debt expense
-- EBITDA evolution
-- Net income evolution
-- Working capital absorption
-- Inventory build-up
-- Accounts receivable collection
-- Accounts payable management
-- Debt increase
-- Liquidity position
-- Capex projects
-- Management actions
-- Outlook
-
-SECTION 16 — Ratio Analysis
-
-Calculate and explain ratios for FY2021–FY2025:
-
-Profitability:
-
-- Revenue growth
-- Gross margin
-- EBITDA margin
-- EBIT margin
-- Net margin
-- Return on assets
-- Return on equity
-
-Liquidity:
-
-- Current ratio
-- Quick ratio
-- Cash ratio
-
-Efficiency:
-
-- Inventory turnover
-- Days inventory outstanding
-- Days sales outstanding
-- Days payable outstanding
-- Cash conversion cycle
-- Asset turnover
-
-Leverage:
-
-- Total debt
-- Net debt
-- Net debt / EBITDA
-- Debt / equity
-- Debt / total capitalization
-
-Coverage:
-
-- Interest coverage
-- DSCR
-- Fixed charge coverage ratio
-- Operating cash flow conversion
-- Free cash flow conversion
-
-Include interpretation, but do not make a bank approval decision.
-
-SECTION 17 — Working Capital Analysis
-
-Include:
-
-- Working capital overview
-- Accounts receivable analysis
-- Inventory analysis
-- Accounts payable analysis
-- Cash conversion cycle
-- Seasonal working capital needs
-- Working capital pressure points
-- Management actions to improve working capital
-- Requested financing connection to working capital needs
-
-Create detailed tables for:
-
-Accounts receivable aging:
-
-- Current
-- 1–30 days
-- 31–60 days
-- 61–90 days
-- Over 90 days
-- Total
-
-Inventory aging:
-
-- Current
-- 31–90 days
-- 91–180 days
-- 181–365 days
-- Over 365 days
-- Total
-
-Accounts payable aging:
-
-- Current
-- 1–30 days
-- 31–60 days
-- 61–90 days
-- Over 90 days
-- Total
-
-SECTION 18 — Receivables Detail
-
-Include:
-
-- AR by customer segment
-- AR by aging bucket
-- AR by region
-- AR by channel
-- Top 20 debtors
-- Average payment terms
-- Actual collection behavior
-- Disputed receivables
-- Past-due receivables
-- Receivables considered lower quality
-- Management collection plan
-- Credit policy overview
-
-SECTION 19 — Inventory Detail
-
-Include:
-
-- Inventory by category
-- Inventory by location
-- Inventory by aging bucket
-- Inventory by turnover speed
-- Imported inventory
-- Domestic inventory
-- Marketplace fulfillment inventory
-- Slow-moving inventory
-- Obsolete inventory estimate
-- Safety stock
-- Inventory write-down policy
-- Management liquidation plan
-- SKU rationalization plan
-
-SECTION 20 — Accounts Payable and Supplier Terms
-
-Include:
-
-- AP by supplier group
-- AP by aging bucket
-- AP by currency
-- Payment terms
-- Supplier concentration
-- Supplier credit limits
-- Early payment discounts
-- Renegotiation opportunities
-- Risks if supplier terms tighten
-
-SECTION 21 — Existing Debt Schedule
-
-Include:
-
-- Bank loans
-- Equipment loans
-- Lease liabilities
-- Supplier financing
-- Short-term debt
-- Long-term debt
-- Interest rates
-- Maturities
-- Amortization
-- Collateral pledged
-- Existing covenants, if any
-- Purpose of original debt
-- Current outstanding balance
-
-SECTION 22 — Requested Financing Detail
-
-Include detailed information about each requested facility:
-
-- Revolving credit facility
-- Term loan
-- Ancillary facility
-
-For each:
-
-- Requested amount
-- Purpose
-- Tenor
-- Expected repayment source
-- Expected utilization pattern
-- Seasonality
-- Proposed collateral
-- Management rationale
-- Financial statements affected
-- Key supporting schedules
-
-SECTION 23 — Collateral Information Submitted by the Company
-
-Include a management-prepared collateral schedule.
-
-Collateral types:
-
-- Accounts receivable
-- Inventory
-- Real estate
-- Machinery and equipment
-- Vehicles and logistics equipment
-- Warehouse automation assets
-- Software or platform assets, if any
-- Corporate guarantees, if applicable
-
-For each collateral class include:
-
-- Book value
-- Estimated market value
-- Estimated orderly liquidation value
-- Estimated forced liquidation value
-- Existing liens
-- Insurance status
-- Location
-- Documentation status
-- Management comments
-
-Important:
-Do not conclude whether collateral is sufficient. Present information for bank review.
-
-SECTION 24 — Borrowing Base Support Schedule
-
-Create a borrower-prepared borrowing base support schedule.
-
-Include:
-
-- Gross accounts receivable
-- Less ineligible receivables
-- Eligible accounts receivable
-- Gross inventory
-- Less obsolete inventory
-- Less slow-moving inventory
-- Less ineligible inventory
-- Eligible inventory
-- Suggested advance-rate illustration
-- Estimated borrowing base support
-- Existing utilization
-- Requested revolver size
-- Seasonal peak need
-- Management comments
-
-Important:
-The borrowing base schedule should support bank analysis, but should not instruct the bank to approve or reject.
-
-SECTION 25 — Capital Expenditure and Asset Base
-
-Include:
-
-- Distribution center expansion
-- Store refurbishments
-- Fleet and logistics equipment
-- Warehouse automation
-- E-commerce platform investments
-- ERP upgrades
-- Maintenance capex
-- Growth capex
-- Useful life assumptions
-- Depreciation schedule
-- Capex by year
-- Capex already completed
-- Capex still pending
-- Expected operational benefits
-- Expected cash flow impact
-
-SECTION 26 — Forecast Assumptions
-
-Create forecasts for FY2026, FY2027, and FY2028.
-
-Include assumptions for:
-
-- Revenue growth by channel
-- Revenue growth by product family
-- Gross margin
-- Logistics costs
-- Marketplace fees
-- Technology costs
-- G&A expenses
-- Bad debt expense
-- Working capital
-- AR days
-- Inventory days
-- AP days
-- Capex
-- Debt repayment
-- Interest rates
-- Tax rate
-- FX rates
-- Inflation
-- Private-label penetration
-- E-commerce conversion
-- SKU rationalization
-- Supplier payment terms
-- Inventory liquidation plan
-
-SECTION 27 — Forecast Financial Statements
-
-Generate forecast financial statements for FY2026, FY2027, and FY2028.
-
-Include:
-
-- Forecast income statement
-- Forecast balance sheet
-- Forecast cash flow statement
-
-Forecast statements must connect logically to FY2025 historical results.
-
-SECTION 28 — Cash Flow and Repayment Support Information
-
-This section should provide information that helps a bank evaluate repayment capacity, but without making a lending decision.
-
-Include:
-
-- EBITDA
-- Operating cash flow
-- Free cash flow
-- Debt service
-- Interest expense
-- Scheduled amortization
-- Estimated cash available for debt service
-- DSCR
-- Interest coverage
-- Fixed charge coverage
-- Revolver usage pattern
-- Cash balance forecast
-- Liquidity sources and uses
-- Management explanation of repayment sources
-- Risks to cash flow
-- Mitigating actions planned by management
-
-SECTION 29 — Scenario Information
-
-Create three management scenarios:
-
-- Base case
-- Downside case
-- Upside case
-
-For each scenario include:
-
-- Narrative description
-- Revenue assumptions
-- Margin assumptions
-- Working capital assumptions
-- Capex assumptions
-- Debt assumptions
-- Cash flow implications
-- Forecast revenue
-- Forecast EBITDA
-- Forecast net income
-- Forecast operating cash flow
-- Forecast free cash flow
-- Forecast cash balance
-- Forecast net debt
-- Forecast DSCR
-- Forecast interest coverage
-
-Do not say which scenario the bank should use. Present the information neutrally.
-
-SECTION 30 — Sensitivity Tables
-
-Include sensitivity tables for:
-
-- Revenue growth vs EBITDA
-- Gross margin vs EBITDA
-- Inventory days vs cash tied up
-- DSO vs cash tied up
-- DPO vs cash preserved
-- Interest rate increase vs net income
-- FX depreciation vs gross margin
-- Marketplace fee increase vs EBITDA
-- Private-label penetration vs gross margin
-- Capex delay vs cash balance
-- Debt amortization speed vs liquidity
-
-SECTION 31 — Operational KPI Dashboard
-
-Include KPIs such as:
-
-- Number of stores
-- Number of distribution centers
-- Number of SKUs
-- Active customers
-- B2B customers
-- Online customers
-- Marketplace orders
-- Average order value
-- Fulfillment time
-- Return rate
-- On-time delivery rate
-- Inventory accuracy
-- Stockout rate
-- Private-label penetration
-- Gross margin by channel
-- Revenue per employee
-- Sales per square meter
-- Warehouse utilization
-- E-commerce conversion rate
-
-SECTION 32 — Risk Disclosures Prepared by Management
-
-Include a balanced risk disclosure section.
-
-Risks must include:
-
-- Market risk
-- Competitive pricing risk
-- Marketplace dependency
-- Inventory obsolescence
-- Slow-moving inventory
-- Customer credit risk
-- Supplier concentration
-- Import disruption
-- FX volatility
-- Logistics cost pressure
-- Cybersecurity risk
-- ERP limitations
-- Liquidity risk
-- Refinancing risk
-- Interest rate risk
-- Tax risk
-- Legal risk
-- Labor risk
-- ESG and safety risk
-- Data quality risk
-
-For each risk include:
-
-- Risk description
-- Possible financial impact
-- Current mitigation
-- Planned mitigation
-- Management owner
-- Monitoring KPI
-
-SECTION 33 — Management Improvement Plan
-
-Include specific management initiatives:
-
-- Data-driven pricing model
-- SKU-level price floors
-- Inventory liquidation plan
-- Slow-moving inventory reduction
-- Private-label growth
-- Supplier term renegotiation
-- AR collection improvement
-- Customer credit policy revision
-- Demand forecasting
-- E-commerce conversion optimization
-- Marketplace margin control
-- Logistics route optimization
-- ERP reporting improvement
-- Weekly cash dashboard
-- Monthly inventory dashboard
-- Monthly AR dashboard
-- Financial reporting package for lenders
-- FX risk management policy
-
-For each initiative include:
-
-- Description
-- Expected financial impact
-- Timeline
-- Responsible department
-- Required data
-- KPI
-- Current status
-
-SECTION 34 — Supporting Bank Information Checklist
-
-Include a checklist of information that would normally be provided to a bank.
-
-Include:
-
-- Historical financial statements
-- Forecast financial statements
-- Tax declarations, synthetic reference only
-- Bank statements, synthetic reference only
-- AR aging
-- Inventory aging
-- AP aging
-- Debt schedule
-- Capex schedule
-- Collateral schedule
-- Corporate ownership chart
-- Customer concentration report
-- Supplier concentration report
-- Insurance certificates, synthetic reference only
-- Real estate documents, synthetic reference only
-- Equipment invoices, synthetic reference only
-- Board authorization, synthetic reference only
-- Legal documentation, synthetic reference only
-
-Important:
-Do not generate real legal documents. Only include a checklist and synthetic descriptions.
-
-SECTION 35 — Appendix Section
-
-Include many appendices.
-
-Appendices must include:
-
-- Appendix A: Detailed income statement
-- Appendix B: Detailed balance sheet
-- Appendix C: Detailed cash flow statement
-- Appendix D: Revenue by channel
-- Appendix E: Revenue by product family
-- Appendix F: Gross margin by product family
-- Appendix G: Revenue by customer segment
-- Appendix H: Top customer schedule
-- Appendix I: Supplier concentration schedule
-- Appendix J: SKU productivity table
-- Appendix K: Inventory by category
-- Appendix L: Inventory aging
-- Appendix M: AR aging
-- Appendix N: AP aging
-- Appendix O: Existing debt schedule
-- Appendix P: Requested financing schedule
-- Appendix Q: Collateral schedule
-- Appendix R: Borrowing base support schedule
-- Appendix S: Capex schedule
-- Appendix T: Depreciation schedule
-- Appendix U: Forecast assumptions
-- Appendix V: Forecast financial statements
-- Appendix W: Scenario outputs
-- Appendix X: Sensitivity tables
-- Appendix Y: Operational KPI glossary
-- Appendix Z: Synthetic data methodology
-
-HTML DESIGN REQUIREMENTS
-
-The HTML should look like a professional financial package submitted to a bank.
-
-Use:
-
-- Clean typography
-- Professional corporate colors
-- Cover page
-- Table of contents
-- Section title pages
-- KPI cards
-- Management comment boxes
-- Financing request boxes
-- Risk disclosure boxes
-- Tables with clear headers
-- Alternating table rows
-- Status tags
-- Footnotes
-- Small-print disclaimers
-- Page breaks
-- Appendix title pages
-- Print-friendly styling
-
-The style should look serious, conservative, and finance-oriented.
-
-Avoid:
-
-- Flashy startup-style design
-- Excessive colors
-- Unprofessional language
-- Unsupported claims
-- Real-world citations
-- Real company references
-
-CONTENT TONE REQUIREMENTS
-
-The writing style should be:
-
-- Professional
-- Financial
-- Credible
-- CFO-like
-- Detailed
-- Neutral
-- Transparent
-- Bank-facing
-- Focused on information disclosure
-
-The company’s management may explain strengths and plans, but the report must also openly disclose risks, weaknesses, and financial pressure points.
-
-Do not make exaggerated marketing claims.
-
-Do not use phrases such as:
-
-- “The bank should approve”
-- “The bank should reject”
-- “Final credit recommendation”
-- “Credit committee decision”
-- “Approved”
-- “Denied”
-- “Bank rating”
-- “Internal bank risk grade”
-
-The report can include financial metrics useful to a bank, but it must not make the bank’s decision.
-
-SYNTHETIC DATA REQUIREMENTS
-
-All company data must be fictional and generated within the script.
-
-The script should create:
-
-- Financial statements
-- Customer names
-- Supplier names
-- Product category data
-- SKU productivity data
-- Inventory aging
-- AR aging
-- AP aging
-- Debt schedule
-- Capex schedule
-- Collateral schedule
-- Forecast assumptions
-- Scenario assumptions
-- Sensitivity outputs
-- Operational KPIs
-
-Use realistic fictional names.
-
-Do not use real customer names, real supplier names, real banks, or real public companies.
-
-The data must be internally consistent across sections. For example:
-
-- Total revenue by channel should reconcile to total revenue
-- Total revenue by product family should reconcile to total revenue
-- AR aging should reconcile to balance sheet accounts receivable
-- Inventory aging should reconcile to balance sheet inventory
-- AP aging should reconcile to balance sheet accounts payable
-- Debt schedule should reconcile to balance sheet debt
-- Capex schedule should connect to PP&E and depreciation
-- Cash flow ending cash should reconcile to balance sheet cash
-
-LENGTH REQUIREMENTS
-
-The generated HTML must be extensive.
-
-To reach approximately 80 PDF pages, the script should generate:
-
-- Long-form narratives in each major section
-- Detailed financial tables for 8 years total, FY2021–FY2028
-- Several appendices
-- At least 20 product-category rows
-- At least 20 customer rows
-- At least 15 supplier rows
-- At least 30 SKU productivity rows
-- At least 20 risk disclosure rows
-- At least 15 management initiatives
-- At least 10 sensitivity tables
-- At least 15 charts
-- Detailed notes to financial statements
-- Detailed management discussion and analysis
-- Detailed supporting bank information checklist
-
-Do not use meaningless filler. Every section should contain useful financial or operational information.
-
-FINAL SCRIPT BEHAVIOR
-
-The Python script should:
-
-1. Generate the synthetic data.
-2. Validate all financial relationships.
-3. Build the full HTML string.
-4. Write the HTML file to the current working directory.
-5. Print this message:
-
-"Generated fictional_company_bank_financial_package.html successfully."
-
-The generated HTML must include this instruction:
-
-"Open this HTML file in a browser and use Print > Save as PDF."
-
-FINAL REMINDER
-
-Return only the complete Python script.
-
-The script must be executable as-is.
-
-The generated report must be a borrower-submitted financial information package for a bank financing review, not a bank credit memo and not a bank approval recommendation.
+import os
+import math
+import random
+import statistics
+import datetime
+import textwrap
+import html
+import json
+import pathlib
+
+# ==============================================================================
+# FINANCIAL DATA GENERATION ENGINE
+# ==============================================================================
+random.seed(42)
+
+def generate_financials():
+    years = ["FY2021", "FY2022", "FY2023", "FY2024", "FY2025", "FY2026", "FY2027", "FY2028"]
+    num_years = len(years)
+
+    # Core assumptions
+    rev_base = [1150.0, 1320.0, 1580.0, 1820.0, 1980.0, 2150.0, 2300.0, 2500.0]
+    cogs_pct = [0.72, 0.73, 0.74, 0.74, 0.71, 0.70, 0.69, 0.68]
+    opex_pct = [0.20, 0.19, 0.18, 0.19, 0.19, 0.18, 0.18, 0.17]
+    ar_days  = [45, 48, 55, 62, 60, 58, 55, 52]
+    inv_days = [110, 115, 125, 135, 130, 120, 115, 110]
+    ap_days  = [50, 48, 45, 45, 50, 52, 55, 55]
+    capex    = [30.0, 80.0, 120.0, 60.0, 40.0, 50.0, 60.0, 65.0]
+    
+    # Debt Schedule drivers (Initial balances)
+    initial_cash = 45.0
+    initial_ar = 140.0
+    initial_inv = 250.0
+    initial_ppne = 180.0
+    initial_ap = 110.0
+    initial_debt = 120.0
+    initial_equity = initial_cash + initial_ar + initial_inv + initial_ppne - initial_ap - initial_debt
+
+    fin = {
+        "Years": years,
+        "IS": {"Revenue": [], "COGS": [], "GrossProfit": [], "Opex": [], "EBITDA": [], "DA": [], "EBIT": [], "Interest": [], "EBT": [], "Tax": [], "NetIncome": []},
+        "BS": {"Cash": [], "AR": [], "Inventory": [], "TotalCA": [], "PPNE": [], "TotalNCA": [], "TotalAssets": [],
+               "AP": [], "ST_Debt": [], "TotalCL": [], "LT_Debt": [], "TotalNCL": [], "TotalLiabilities": [],
+               "Equity": [], "TotalLiabilitiesEquity": []},
+        "CF": {"NetIncome": [], "DA": [], "DeltaWC": [], "OCF": [], "Capex": [], "FCF": [], "NetBorrowing": [], "NetFinancing": [], "ChangeInCash": [], "EndingCash": []},
+        "Metrics": {"GrossMargin": [], "EBITDAMargin": [], "NetMargin": [], "CurrentRatio": [], "CCC": [], "NetDebtEBITDA": [], "InterestCoverage": []}
+    }
+
+    cash = initial_cash
+    ar = initial_ar
+    inv = initial_inv
+    ppne = initial_ppne
+    ap = initial_ap
+    debt = initial_debt
+    equity = initial_equity
+
+    for i in range(num_years):
+        rev = rev_base[i]
+        cogs = rev * cogs_pct[i]
+        gp = rev - cogs
+        opex = rev * opex_pct[i]
+        ebitda = gp - opex
+        
+        # DA and PPNE
+        da = ppne * 0.12
+        new_ppne = ppne + capex[i] - da
+
+        # Interest
+        interest = debt * 0.085
+        ebit = ebitda - da
+        ebt = ebit - interest
+        tax = max(0, ebt * 0.30)
+        ni = ebt - tax
+
+        # New Working Capital
+        new_ar = rev * (ar_days[i] / 365)
+        new_inv = cogs * (inv_days[i] / 365)
+        new_ap = cogs * (ap_days[i] / 365)
+
+        delta_ar = new_ar - ar
+        delta_inv = new_inv - inv
+        delta_ap = new_ap - ap
+        delta_wc = -(delta_ar + delta_inv - delta_ap)
+
+        # Cash Flow
+        ocf = ni + da + delta_wc
+        fcf = ocf - capex[i]
+
+        # Debt Management
+        # In FY26 we get the new facilities, we model a net borrowing spike, else normal amortization
+        if years[i] == "FY2026":
+            net_borrowing = 180.0 + 50.0  # Term loan + some revolver
+        elif years[i] in ["FY2023", "FY2024"]:
+            net_borrowing = 100.0  # Expansion debt
+        else:
+            net_borrowing = -30.0  # Amortization
+
+        net_financing = net_borrowing
+        change_in_cash = ocf - capex[i] + net_financing
+        new_cash = cash + change_in_cash
+        new_debt = debt + net_borrowing
+        new_equity = equity + ni
+
+        # Record IS
+        fin["IS"]["Revenue"].append(rev)
+        fin["IS"]["COGS"].append(cogs)
+        fin["IS"]["GrossProfit"].append(gp)
+        fin["IS"]["Opex"].append(opex)
+        fin["IS"]["EBITDA"].append(ebitda)
+        fin["IS"]["DA"].append(da)
+        fin["IS"]["EBIT"].append(ebit)
+        fin["IS"]["Interest"].append(interest)
+        fin["IS"]["EBT"].append(ebt)
+        fin["IS"]["Tax"].append(tax)
+        fin["IS"]["NetIncome"].append(ni)
+
+        # Record BS
+        total_ca = new_cash + new_ar + new_inv
+        total_nca = new_ppne
+        total_assets = total_ca + total_nca
+        
+        st_debt = new_debt * 0.2
+        lt_debt = new_debt * 0.8
+        total_cl = new_ap + st_debt
+        total_ncl = lt_debt
+        total_liabs = total_cl + total_ncl
+        total_liabs_equity = total_liabs + new_equity
+
+        fin["BS"]["Cash"].append(new_cash)
+        fin["BS"]["AR"].append(new_ar)
+        fin["BS"]["Inventory"].append(new_inv)
+        fin["BS"]["TotalCA"].append(total_ca)
+        fin["BS"]["PPNE"].append(new_ppne)
+        fin["BS"]["TotalNCA"].append(total_nca)
+        fin["BS"]["TotalAssets"].append(total_assets)
+        fin["BS"]["AP"].append(new_ap)
+        fin["BS"]["ST_Debt"].append(st_debt)
+        fin["BS"]["TotalCL"].append(total_cl)
+        fin["BS"]["LT_Debt"].append(lt_debt)
+        fin["BS"]["TotalNCL"].append(total_ncl)
+        fin["BS"]["TotalLiabilities"].append(total_liabs)
+        fin["BS"]["Equity"].append(new_equity)
+        fin["BS"]["TotalLiabilitiesEquity"].append(total_liabs_equity)
+
+        # Record CF
+        fin["CF"]["NetIncome"].append(ni)
+        fin["CF"]["DA"].append(da)
+        fin["CF"]["DeltaWC"].append(delta_wc)
+        fin["CF"]["OCF"].append(ocf)
+        fin["CF"]["Capex"].append(capex[i])
+        fin["CF"]["FCF"].append(fcf)
+        fin["CF"]["NetBorrowing"].append(net_borrowing)
+        fin["CF"]["NetFinancing"].append(net_financing)
+        fin["CF"]["ChangeInCash"].append(change_in_cash)
+        fin["CF"]["EndingCash"].append(new_cash)
+
+        # Record Metrics
+        fin["Metrics"]["GrossMargin"].append(gp / rev)
+        fin["Metrics"]["EBITDAMargin"].append(ebitda / rev)
+        fin["Metrics"]["NetMargin"].append(ni / rev)
+        fin["Metrics"]["CurrentRatio"].append(total_ca / total_cl)
+        fin["Metrics"]["CCC"].append(ar_days[i] + inv_days[i] - ap_days[i])
+        net_debt = new_debt - new_cash
+        fin["Metrics"]["NetDebtEBITDA"].append(net_debt / ebitda)
+        fin["Metrics"]["InterestCoverage"].append(ebitda / interest)
+
+        # Update for next year
+        cash = new_cash
+        ar = new_ar
+        inv = new_inv
+        ppne = new_ppne
+        ap = new_ap
+        debt = new_debt
+        equity = new_equity
+
+    return fin
+
+def generate_working_capital_schedules(fin):
+    # Distribute FY25 AR, INV, AP into aging buckets
+    idx_25 = fin["Years"].index("FY2025")
+    total_ar = fin["BS"]["AR"][idx_25]
+    total_inv = fin["BS"]["Inventory"][idx_25]
+    total_ap = fin["BS"]["AP"][idx_25]
+
+    ar_aging = {
+        "Current": total_ar * 0.50,
+        "1-30 days": total_ar * 0.25,
+        "31-60 days": total_ar * 0.12,
+        "61-90 days": total_ar * 0.08,
+        "Over 90 days": total_ar * 0.05
+    }
+    
+    inv_aging = {
+        "Current (0-30 days)": total_inv * 0.40,
+        "31-90 days": total_inv * 0.30,
+        "91-180 days": total_inv * 0.15,
+        "181-365 days": total_inv * 0.10,
+        "Over 365 days": total_inv * 0.05
+    }
+
+    ap_aging = {
+        "Current": total_ap * 0.55,
+        "1-30 days": total_ap * 0.30,
+        "31-60 days": total_ap * 0.10,
+        "61-90 days": total_ap * 0.04,
+        "Over 90 days": total_ap * 0.01
+    }
+    return ar_aging, inv_aging, ap_aging
+
+def generate_synthetic_lists():
+    customers = [
+        "Constructora Alfa y Omega S.A.", "Infraestructuras del Norte", "Mantenimiento Industrial S.A.",
+        "Ferreterías Unidas del Bajío", "Grupo Constructor Metropolitano", "Talleres y Equipos Cdmx",
+        "Ingeniería y Diseños S.A.", "Mecánica Pesada Global", "Acabados y Remodelaciones",
+        "Servicios Eléctricos Integrales", "Plomería y Tuberías de México", "Desarrolladora Inmobiliaria Sol",
+        "Ensambles y Manufacturas S.A.", "Obras Públicas y Civiles", "Maquinaria Especializada S.A.",
+        "Grupo Ferretero Independiente", "Contratistas Regionales", "Suministros Industriales Delta",
+        "Mantenimiento Automotriz S.A.", "Red de Talleres Sur"
+    ]
+    
+    suppliers = [
+        "Global Tools Inc.", "Aceros Monterrey S.A.", "Shenzhen Hardware Co.", "K-Fasteners LLC",
+        "Industrial Adhesives & Sealants", "Safety First Equipment", "Pro-Measure Instruments",
+        "Cable y Alambre S.A.", "Distribuidora de Plásticos y PVC", "Max-Power Motors",
+        "Tuberías y Conexiones", "Herramientas de Mano Premium", "Logistics Packaging Co.",
+        "Equipos de Soldadura Nacional", "Luminarias y LEDS S.A."
+    ]
+
+    products = [
+        "Heavy-duty drills", "Industrial adhesives", "Steel fasteners", "Safety harnesses",
+        "PVC Pipes", "Electrical Wire", "Welding Machines", "Protective Eyewear",
+        "Hand Saws", "Wrenches and Pliers", "Laser Measuring Tools", "Work Boots",
+        "Industrial Paint", "Abrasives and Discs", "Air Compressors", "Pneumatic Tools",
+        "Generators", "Ladders and Scaffolding", "Toolboxes", "LED Work Lights",
+        "Nylon Ropes", "Hydraulic Jacks", "Safety Helmets", "Measuring Tapes",
+        "Concrete Mixers", "Water Pumps", "Grinders", "Screwdrivers Set", "Chainsaws", "Safety Gloves"
+    ]
+
+    return customers, suppliers, products
+
+# ==============================================================================
+# VALIDATION ENGINE
+# ==============================================================================
+
+def validate_financials(fin):
+    tolerance = 1.0 # Due to rounding and float arithmetic
+    for i in range(len(fin["Years"])):
+        # IS validation
+        rev = fin["IS"]["Revenue"][i]
+        cogs = fin["IS"]["COGS"][i]
+        gp = fin["IS"]["GrossProfit"][i]
+        opex = fin["IS"]["Opex"][i]
+        ebitda = fin["IS"]["EBITDA"][i]
+        da = fin["IS"]["DA"][i]
+        ebit = fin["IS"]["EBIT"][i]
+        interest = fin["IS"]["Interest"][i]
+        ebt = fin["IS"]["EBT"][i]
+        tax = fin["IS"]["Tax"][i]
+        ni = fin["IS"]["NetIncome"][i]
+        
+        assert abs(gp - (rev - cogs)) < tolerance, f"GP Validation Failed Year {i}"
+        assert abs(ebitda - (gp - opex)) < tolerance, f"EBITDA Validation Failed Year {i}"
+        assert abs(ebit - (ebitda - da)) < tolerance, f"EBIT Validation Failed Year {i}"
+        assert abs(ebt - (ebit - interest)) < tolerance, f"EBT Validation Failed Year {i}"
+        assert abs(ni - (ebt - tax)) < tolerance, f"NI Validation Failed Year {i}"
+        
+        # BS validation
+        cash = fin["BS"]["Cash"][i]
+        ar = fin["BS"]["AR"][i]
+        inv = fin["BS"]["Inventory"][i]
+        tca = fin["BS"]["TotalCA"][i]
+        ppne = fin["BS"]["PPNE"][i]
+        tnca = fin["BS"]["TotalNCA"][i]
+        ta = fin["BS"]["TotalAssets"][i]
+        ap = fin["BS"]["AP"][i]
+        std = fin["BS"]["ST_Debt"][i]
+        tcl = fin["BS"]["TotalCL"][i]
+        ltd = fin["BS"]["LT_Debt"][i]
+        tncl = fin["BS"]["TotalNCL"][i]
+        tl = fin["BS"]["TotalLiabilities"][i]
+        eq = fin["BS"]["Equity"][i]
+        tle = fin["BS"]["TotalLiabilitiesEquity"][i]
+
+        assert abs(tca - (cash + ar + inv)) < tolerance, f"TCA Validation Failed Year {i}"
+        assert abs(tnca - ppne) < tolerance, f"TNCA Validation Failed Year {i}"
+        assert abs(ta - (tca + tnca)) < tolerance, f"TA Validation Failed Year {i}"
+        assert abs(tcl - (ap + std)) < tolerance, f"TCL Validation Failed Year {i}"
+        assert abs(tncl - ltd) < tolerance, f"TNCL Validation Failed Year {i}"
+        assert abs(tl - (tcl + tncl)) < tolerance, f"TL Validation Failed Year {i}"
+        assert abs(tle - (tl + eq)) < tolerance, f"TLE Validation Failed Year {i}"
+        assert abs(ta - tle) < tolerance, f"Balance Sheet does not balance Year {i}. Diff: {ta - tle}"
+
+        # CF validation
+        cf_cash = fin["CF"]["EndingCash"][i]
+        assert abs(cash - cf_cash) < tolerance, f"Cash in BS does not match CF Ending Cash Year {i}"
+
+# ==============================================================================
+# FORMATTING & HELPERS
+# ==============================================================================
+
+def format_mxn(value):
+    if value < 0:
+        return f"(MXN {abs(value):,.1f})"
+    return f"MXN {value:,.1f}"
+
+def format_pct(value):
+    return f"{value * 100:.1f}%"
+
+def format_ratio(value):
+    return f"{value:.2f}x"
+
+def format_days(value):
+    return f"{int(round(value))} days"
+
+def html_escape(text):
+    return html.escape(str(text))
+
+# ==============================================================================
+# HTML GENERATORS
+# ==============================================================================
+
+def html_table(headers, rows, align_right=True, totals_row=False):
+    t = ["<table>", "<thead>", "<tr>"]
+    for i, h in enumerate(headers):
+        align = "right" if i > 0 and align_right else "left"
+        t.append(f'<th style="text-align:{align};">{html_escape(h)}</th>')
+    t.append("</tr>")
+    t.append("</thead>")
+    t.append("<tbody>")
+    
+    for r_idx, row in enumerate(rows):
+        is_total = totals_row and r_idx == len(rows) - 1
+        tr_class = ' class="total-row"' if is_total else ''
+        t.append(f"<tr{tr_class}>")
+        for i, cell in enumerate(row):
+            align = "right" if i > 0 and align_right else "left"
+            t.append(f'<td style="text-align:{align};">{html_escape(cell)}</td>')
+        t.append("</tr>")
+        
+    t.append("</tbody>")
+    t.append("</table>")
+    return "\n".join(t)
+
+def section_header(title, subtitle=None):
+    out = f'<h2 class="section-title">{html_escape(title)}</h2>'
+    if subtitle:
+        out += f'<p class="section-subtitle">{html_escape(subtitle)}</p>'
+    return out
+
+def subsection_header(title):
+    return f'<h3 class="subsection-title">{html_escape(title)}</h3>'
+
+def page_break():
+    return '<div class="page-break"></div>'
+
+def kpi_card(label, value, comment=None):
+    out = f'''
+    <div class="kpi-card">
+        <div class="kpi-label">{html_escape(label)}</div>
+        <div class="kpi-value">{html_escape(value)}</div>
+    '''
+    if comment:
+        out += f'<div class="kpi-comment">{html_escape(comment)}</div>'
+    out += '</div>'
+    return out
+
+def note_box(title, text):
+    return f'''
+    <div class="note-box">
+        <h4>{html_escape(title)}</h4>
+        <p>{html_escape(text)}</p>
+    </div>
+    '''
+
+def callout_box(title, text, box_type="info"):
+    return f'''
+    <div class="callout-box {box_type}">
+        <h4>{html_escape(title)}</h4>
+        <p>{html_escape(text)}</p>
+    </div>
+    '''
+
+# ==============================================================================
+# SVG CHART GENERATION
+# ==============================================================================
+
+def svg_bar_chart(title, labels, values, color="#1e3a8a", width=600, height=300):
+    if not values: return ""
+    max_val = max(values) * 1.1 if max(values) > 0 else 100
+    svg = [f'<div class="chart-container"><h4>{html_escape(title)}</h4>']
+    svg.append(f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">')
+    
+    margin_bottom = 40
+    margin_left = 60
+    margin_top = 20
+    margin_right = 20
+    
+    chart_w = width - margin_left - margin_right
+    chart_h = height - margin_top - margin_bottom
+    
+    bar_w = chart_w / len(values) * 0.7
+    spacing = chart_w / len(values)
+    
+    # Axes
+    svg.append(f'<line x1="{margin_left}" y1="{height - margin_bottom}" x2="{width - margin_right}" y2="{height - margin_bottom}" stroke="#ccc" />')
+    svg.append(f'<line x1="{margin_left}" y1="{margin_top}" x2="{margin_left}" y2="{height - margin_bottom}" stroke="#ccc" />')
+    
+    # Y-axis labels
+    for i in range(5):
+        y_val = max_val * (4 - i) / 4
+        y_pos = margin_top + chart_h * (i / 4)
+        svg.append(f'<text x="{margin_left - 10}" y="{y_pos + 5}" font-size="10" text-anchor="end" fill="#666">{int(y_val)}</text>')
+        svg.append(f'<line x1="{margin_left}" y1="{y_pos}" x2="{width - margin_right}" y2="{y_pos}" stroke="#eee" />')
+
+    # Bars and X-axis labels
+    for i, (lbl, val) in enumerate(zip(labels, values)):
+        x_pos = margin_left + i * spacing + (spacing - bar_w) / 2
+        bar_h = (val / max_val) * chart_h if max_val > 0 else 0
+        y_pos = height - margin_bottom - bar_h
+        
+        svg.append(f'<rect x="{x_pos}" y="{y_pos}" width="{bar_w}" height="{bar_h}" fill="{color}" rx="2" />')
+        svg.append(f'<text x="{x_pos + bar_w/2}" y="{height - margin_bottom + 20}" font-size="10" text-anchor="middle" fill="#333">{html_escape(lbl)}</text>')
+        svg.append(f'<text x="{x_pos + bar_w/2}" y="{y_pos - 5}" font-size="10" text-anchor="middle" fill="#333">{int(val)}</text>')
+
+    svg.append('</svg></div>')
+    return "\n".join(svg)
+
+def svg_line_chart(title, labels, values, color="#10b981", width=600, height=300):
+    if not values: return ""
+    max_val = max(values) * 1.1 if max(values) > 0 else 100
+    min_val = min(values) * 0.9 if min(values) < 0 else 0
+    y_range = max_val - min_val if max_val != min_val else 100
+
+    svg = [f'<div class="chart-container"><h4>{html_escape(title)}</h4>']
+    svg.append(f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">')
+    
+    margin_bottom = 40
+    margin_left = 60
+    margin_top = 20
+    margin_right = 20
+    
+    chart_w = width - margin_left - margin_right
+    chart_h = height - margin_top - margin_bottom
+    spacing = chart_w / max(1, len(values) - 1)
+    
+    # Grid
+    for i in range(5):
+        y_val = max_val - y_range * (i / 4)
+        y_pos = margin_top + chart_h * (i / 4)
+        svg.append(f'<text x="{margin_left - 10}" y="{y_pos + 5}" font-size="10" text-anchor="end" fill="#666">{y_val:.1f}</text>')
+        svg.append(f'<line x1="{margin_left}" y1="{y_pos}" x2="{width - margin_right}" y2="{y_pos}" stroke="#eee" />')
+
+    # Line
+    points = []
+    for i, val in enumerate(values):
+        x_pos = margin_left + i * spacing
+        y_pos = height - margin_bottom - ((val - min_val) / y_range) * chart_h
+        points.append(f"{x_pos},{y_pos}")
+    
+    svg.append(f'<polyline points="{" ".join(points)}" fill="none" stroke="{color}" stroke-width="3" />')
+    
+    # Points and labels
+    for i, (lbl, val) in enumerate(zip(labels, values)):
+        x_pos = margin_left + i * spacing
+        y_pos = height - margin_bottom - ((val - min_val) / y_range) * chart_h
+        svg.append(f'<circle cx="{x_pos}" cy="{y_pos}" r="4" fill="{color}" />')
+        svg.append(f'<text x="{x_pos}" y="{height - margin_bottom + 20}" font-size="10" text-anchor="middle" fill="#333">{html_escape(lbl)}</text>')
+
+    svg.append('</svg></div>')
+    return "\n".join(svg)
+
+def svg_stacked_bar_chart(title, labels, series_dict, colors, width=600, height=300):
+    # series_dict: {"Series1": [v1, v2..], "Series2": [v1, v2..]}
+    svg = [f'<div class="chart-container"><h4>{html_escape(title)}</h4>']
+    svg.append(f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg">')
+    
+    margin_bottom = 60
+    margin_left = 60
+    margin_top = 20
+    margin_right = 80
+    
+    chart_w = width - margin_left - margin_right
+    chart_h = height - margin_top - margin_bottom
+    
+    num_pts = len(labels)
+    bar_w = chart_w / num_pts * 0.6
+    spacing = chart_w / num_pts
+    
+    # Max sum
+    max_sum = 0
+    for i in range(num_pts):
+        s = sum(series_dict[k][i] for k in series_dict.keys())
+        if s > max_sum: max_sum = s
+    max_sum = max_sum * 1.1 if max_sum > 0 else 100
+
+    # Grid
+    for i in range(5):
+        y_val = max_sum * (4 - i) / 4
+        y_pos = margin_top + chart_h * (i / 4)
+        svg.append(f'<text x="{margin_left - 10}" y="{y_pos + 5}" font-size="10" text-anchor="end" fill="#666">{int(y_val)}</text>')
+        svg.append(f'<line x1="{margin_left}" y1="{y_pos}" x2="{width - margin_right}" y2="{y_pos}" stroke="#eee" />')
+
+    # Bars
+    for i, lbl in enumerate(labels):
+        x_pos = margin_left + i * spacing + (spacing - bar_w) / 2
+        svg.append(f'<text x="{x_pos + bar_w/2}" y="{height - margin_bottom + 20}" font-size="10" text-anchor="middle" fill="#333">{html_escape(lbl)}</text>')
+        
+        current_y = height - margin_bottom
+        for j, (s_name, s_vals) in enumerate(series_dict.items()):
+            val = s_vals[i]
+            bar_h = (val / max_sum) * chart_h if max_sum > 0 else 0
+            current_y -= bar_h
+            svg.append(f'<rect x="{x_pos}" y="{current_y}" width="{bar_w}" height="{bar_h}" fill="{colors[j % len(colors)]}" />')
+
+    # Legend
+    legend_y = margin_top
+    for j, s_name in enumerate(series_dict.keys()):
+        svg.append(f'<rect x="{width - margin_right + 10}" y="{legend_y}" width="10" height="10" fill="{colors[j % len(colors)]}" />')
+        svg.append(f'<text x="{width - margin_right + 25}" y="{legend_y + 9}" font-size="10" fill="#333">{html_escape(s_name)}</text>')
+        legend_y += 20
+
+    svg.append('</svg></div>')
+    return "\n".join(svg)
+
+# ==============================================================================
+# REPORT BUILDER
+# ==============================================================================
+
+def build_report():
+    fin = generate_financials()
+    validate_financials(fin)
+    customers, suppliers, products = generate_synthetic_lists()
+    ar_aging, inv_aging, ap_aging = generate_working_capital_schedules(fin)
+    
+    html_out = []
+    
+    # Base CSS
+    css = """
+    <style>
+        :root { --primary: #1e3a8a; --secondary: #10b981; --bg: #ffffff; --text: #334155; --gray: #f1f5f9; --border: #cbd5e1; }
+        body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--text); background: var(--bg); margin: 0; padding: 0; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px; }
+        h1 { font-size: 32px; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        h2.section-title { font-size: 24px; color: var(--primary); margin-top: 40px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        h3.subsection-title { font-size: 18px; color: #475569; margin-top: 25px; }
+        p { margin-bottom: 15px; text-align: justify; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13px; }
+        th, td { border: 1px solid var(--border); padding: 8px 10px; }
+        th { background-color: var(--primary); color: white; font-weight: bold; }
+        tr:nth-child(even) { background-color: var(--gray); }
+        .total-row { font-weight: bold; background-color: #e2e8f0 !important; }
+        .page-break { page-break-after: always; clear: both; }
+        .cover-page { height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .cover-title { font-size: 42px; font-weight: bold; color: var(--primary); margin-bottom: 20px; }
+        .cover-subtitle { font-size: 24px; color: #64748b; margin-bottom: 40px; }
+        .kpi-container { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; }
+        .kpi-card { border: 1px solid var(--border); border-radius: 6px; padding: 15px; flex: 1; min-width: 200px; background: #fafafa; }
+        .kpi-label { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold; }
+        .kpi-value { font-size: 24px; color: var(--primary); font-weight: bold; margin-top: 5px; }
+        .kpi-comment { font-size: 11px; color: #94a3b8; margin-top: 5px; }
+        .note-box { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 15px; margin: 20px 0; font-size: 13px; }
+        .callout-box { border: 1px solid var(--border); padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .callout-box.info { border-left: 4px solid var(--primary); background: #eff6ff; }
+        .callout-box.warning { border-left: 4px solid #ef4444; background: #fef2f2; }
+        .chart-container { margin: 30px 0; text-align: center; border: 1px solid var(--border); padding: 20px; background: white; }
+        ul { margin-bottom: 15px; padding-left: 20px; }
+        li { margin-bottom: 5px; }
+        @media print {
+            body { font-size: 11pt; }
+            .container { max-width: 100%; padding: 0; }
+            .page-break { page-break-after: always; }
+            table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+            .cover-page { height: 100vh; }
+            .chart-container { page-break-inside: avoid; }
+        }
+    </style>
+    """
+    
+    html_out.append(f"<!DOCTYPE html>\n<html>\n<head>\n<meta charset='UTF-8'>\n<title>Financial Information Package - Atlas Meridian</title>\n{css}\n</head>\n<body>\n<div class='container'>")
+
+    # Instruction for user
+    html_out.append('<div style="background:#000; color:#fff; padding:10px; text-align:center; font-weight:bold; margin-bottom:20px; border-radius:4px;" class="print-instruction">Open this HTML file in a browser and use Print &gt; Save as PDF.</div>')
+
+    # ==========================================================================
+    # SECTION 1: Cover Page
+    # ==========================================================================
+    html_out.append(f'''
+    <div class="cover-page">
+        <div class="cover-title">Financial Information Package<br>for Bank Financing Review</div>
+        <div class="cover-subtitle">Atlas Meridian Industrial Supply, S.A. de C.V.</div>
+        <div style="font-size:18px; margin-bottom:10px;"><b>Purpose:</b> Submission of financial information in support of requested bank financing</div>
+        <div style="font-size:18px; margin-bottom:10px;"><b>Total Requested Facilities:</b> MXN 550.0 million</div>
+        <div style="font-size:18px; margin-bottom:10px;"><b>Historical Period:</b> FY2021–FY2025 | <b>Forecast Period:</b> FY2026–FY2028</div>
+        <div style="font-size:18px; margin-bottom:10px;"><b>Currency:</b> MXN millions (unless otherwise stated)</div>
+        <div style="font-size:18px; margin-bottom:40px;"><b>Prepared by:</b> Management of Atlas Meridian Industrial Supply, S.A. de C.V.</div>
+        <div style="font-size:14px; color:#64748b;">Date generated: {datetime.date.today().strftime('%B %d, %Y')}</div>
+    </div>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 2: Confidentiality and Synthetic Data Disclaimer
+    # ==========================================================================
+    html_out.append(section_header("Section 2: Confidentiality and Synthetic Data Disclaimer"))
+    html_out.append('''
+    <div class="callout-box warning">
+        <h4>Important Disclaimer regarding this Document</h4>
+        <p>The company described herein (Atlas Meridian Industrial Supply, S.A. de C.V.) is purely fictional. All data, financial statements, schedules, names, and operational metrics are synthetic and generated algorithmically.</p>
+        <p>This report is created strictly for demonstration, training, workflow testing, or analytical purposes. The numbers are not audited and do not correspond to any real-world entity.</p>
+        <p>The information does not represent any real borrower, nor does it represent any real bank's evaluation process. This document is not investment advice, is not a real loan application, and does not include a bank's final credit decision, internal risk rating, or recommendation. It is simply a simulation of a borrower-submitted financial package intended to provide a commercial bank with the documentation necessary to conduct its own independent analysis.</p>
+    </div>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 3: Table of Contents
+    # ==========================================================================
+    html_out.append(section_header("Section 3: Table of Contents"))
+    toc_sections = [
+        "1. Cover Page", "2. Confidentiality and Synthetic Data Disclaimer", "3. Table of Contents",
+        "4. Financing Request Summary", "5. Sources and Uses of Funds", "6. Executive Summary Prepared by Management",
+        "7. Company Profile", "8. Industry and Market Context", "9. Business Model and Revenue Quality",
+        "10. Product and Segment Analysis", "11. Customer and Sales Concentration", "12. Supplier and Procurement Analysis",
+        "13. Historical Financial Statements", "14. Notes to Historical Financial Statements", "15. Management Discussion and Analysis",
+        "16. Ratio Analysis", "17. Working Capital Analysis", "18. Receivables Detail", "19. Inventory Detail",
+        "20. Accounts Payable and Supplier Terms", "21. Existing Debt Schedule", "22. Requested Financing Detail",
+        "23. Collateral Information Submitted by the Company", "24. Borrowing Base Support Schedule", "25. Capital Expenditure and Asset Base",
+        "26. Forecast Assumptions", "27. Forecast Financial Statements", "28. Cash Flow and Repayment Support Information",
+        "29. Scenario Information", "30. Sensitivity Tables", "31. Operational KPI Dashboard", "32. Risk Disclosures Prepared by Management",
+        "33. Management Improvement Plan", "34. Supporting Bank Information Checklist", "35. Appendix Section"
+    ]
+    html_out.append('<ul>')
+    for item in toc_sections:
+        html_out.append(f'<li>{item}</li>')
+    html_out.append('</ul>')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 4: Financing Request Summary
+    # ==========================================================================
+    html_out.append(section_header("Section 4: Financing Request Summary"))
+    html_out.append("<p>Atlas Meridian Industrial Supply, S.A. de C.V. is formally presenting this financial package to facilitate the review of a requested MXN 550 million in total credit facilities.</p>")
+    
+    headers = ["Facility Type", "Requested Amount", "Requested Tenor", "Purpose", "Expected Repayment Source", "Proposed Collateral"]
+    rows = [
+        ["Revolving Credit Facility", "MXN 325.0M", "24 months", "Inventory purchases, seasonal working capital, AR financing", "Conversion of inventory and receivables into cash", "Eligible Inventory and Accounts Receivable"],
+        ["Term Loan", "MXN 180.0M", "5 years", "Refinancing of ST debt from distribution center expansion", "Operating Cash Flow", "Machinery, Equipment, and real estate mortgages"],
+        ["Ancillary Facilities", "MXN 45.0M", "12 months (Renewable)", "Letters of credit, import guarantees, FX hedging support", "Operating Cash Flow / Cash Collateral", "General Corporate Guarantee"]
+    ]
+    html_out.append(html_table(headers, rows, align_right=False))
+    
+    html_out.append(subsection_header("Management Rationale"))
+    html_out.append("<p>The revolving facility is required to support the significant working capital absorption inherent in our inventory-heavy business model, particularly as we expand our e-commerce and marketplace channels which require higher safety stocks. The term loan will properly align the long-term nature of our recent logistics and distribution center assets with long-term financing, taking out the short-term debt that is currently pressuring current ratios.</p>")
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 5: Sources and Uses of Funds
+    # ==========================================================================
+    html_out.append(section_header("Section 5: Sources and Uses of Funds"))
+    headers = ["Sources", "Amount (MXN M)", "%", "Uses", "Amount (MXN M)", "%"]
+    rows = [
+        ["Revolving Credit Facility", "325.0", "59.1%", "Inventory Purchases / W/C", "190.0", "34.5%"],
+        ["Term Loan", "180.0", "32.7%", "Refinance Expansion ST Debt", "150.0", "27.3%"],
+        ["Ancillary Facilities", "45.0", "8.2%", "Seasonal AR Financing Support", "135.0", "24.5%"],
+        ["", "", "", "Import/Supplier Guarantees", "45.0", "8.2%"],
+        ["", "", "", "Warehouse Automation Capex", "30.0", "5.5%"],
+    ]
+    # Adding total row
+    rows.append(["Total Sources", "550.0", "100.0%", "Total Uses", "550.0", "100.0%"])
+    html_out.append(html_table(headers, rows, align_right=True, totals_row=True))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 6: Executive Summary Prepared by Management
+    # ==========================================================================
+    html_out.append(section_header("Section 6: Executive Summary Prepared by Management"))
+    idx_25 = fin["Years"].index("FY2025")
+    html_out.append(f'''
+    <p>Atlas Meridian Industrial Supply has demonstrated resilient top-line growth over the past five years, expanding from MXN {fin["IS"]["Revenue"][0]:.1f}M in FY2021 to MXN {fin["IS"]["Revenue"][idx_25]:.1f}M in FY2025. This growth has been driven by robust demand in industrial maintenance, expansion into digital sales channels, and geographic footprint expansion in Mexico.</p>
+    
+    <p>Despite strong revenue performance, the Company has faced acute profitability and liquidity pressures. Gross margins have fluctuated due to aggressive marketplace pricing, inflation in imported goods, and elevated logistics costs. FY2025 EBITDA closed at MXN {fin["IS"]["EBITDA"][idx_25]:.1f}M, representing an EBITDA margin of {fin["Metrics"]["EBITDAMargin"][idx_25]*100:.1f}%, reflecting recent operational constraints.</p>
+    
+    <p>Our most significant current challenge is working capital intensity. The cash conversion cycle has extended to {int(fin["Metrics"]["CCC"][idx_25])} days. The build-up of inventory (MXN {fin["BS"]["Inventory"][idx_25]:.1f}M) to protect against supply chain disruptions, coupled with slower collections from B2B customers, has severely impacted operating cash flow. Furthermore, the Company financed a major distribution center expansion using short-term debt, creating a maturity mismatch that we are now looking to restructure.</p>
+    
+    <p>This financial package outlines management's strategic response, which includes SKU rationalization, tighter credit policies, and the right-sizing of our capital structure. The requested MXN 550 million financing is a critical enabler for this turnaround plan, providing the structural liquidity needed to optimize inventory and execute our high-margin private-label strategy.</p>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 7: Company Profile
+    # ==========================================================================
+    html_out.append(section_header("Section 7: Company Profile"))
+    html_out.append('''
+    <p><b>Legal Entity:</b> Atlas Meridian Industrial Supply, S.A. de C.V.</p>
+    <p><b>Headquarters:</b> Mexico City, Mexico</p>
+    <p><b>Industry:</b> Industrial hardware distribution, construction supplies, safety equipment, and B2B digital sales.</p>
+    <p><b>Business Model:</b> The Company operates 14 regional retail/wholesale stores and 3 primary distribution centers (Monterrey, Guadalajara, Mexico City). We serve independent contractors, large manufacturing plants, and a growing base of e-commerce customers via our proprietary platform and third-party marketplaces (Mercado Libre, Amazon).</p>
+    <p><b>Competitive Position:</b> Atlas Meridian occupies the middle market, competing with large international chains by offering highly localized inventory, flexible B2B trade credit, and specialized private-label brands offering superior price-to-performance ratios.</p>
+    <p><b>Technology & Limitations:</b> Currently migrating from a legacy on-premise ERP to a cloud-based solution. The legacy system has historically limited real-time SKU profitability analysis, contributing to the recent build-up of slow-moving inventory. The new ERP implementation is 70% complete.</p>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 8: Industry and Market Context
+    # ==========================================================================
+    html_out.append(section_header("Section 8: Industry and Market Context"))
+    html_out.append('''
+    <p>The Mexican industrial hardware distribution market is highly fragmented, characterized by numerous regional players and a few large national distributors. Key demand drivers include foreign direct investment (nearshoring), commercial construction, and routine industrial maintenance.</p>
+    <p><b>Market Trends:</b></p>
+    <ul>
+        <li><b>Digitalization of B2B Procurement:</b> Buyers increasingly demand self-service digital portals with transparent pricing and real-time stock availability.</li>
+        <li><b>Supply Chain Volatility:</b> Heavy reliance on Asian imports for hand tools and fasteners has exposed distributors to significant lead-time variations and maritime freight volatility.</li>
+        <li><b>FX Sensitivity:</b> With approximately 45% of COGS denominated in USD, the industry is highly sensitive to MXN/USD exchange rate fluctuations.</li>
+    </ul>
+    <p>Atlas Meridian is actively capitalizing on the digitalization trend but is exposed to the FX and logistics headwinds, which management is mitigating through increased domestic sourcing and private-label penetration.</p>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 9: Business Model and Revenue Quality
+    # ==========================================================================
+    html_out.append(section_header("Section 9: Business Model and Revenue Quality"))
+    html_out.append('''
+    <p>Revenue quality is supported by a highly diversified product catalog (over 12,000 active SKUs) and a fragmented customer base, ensuring no single customer represents more than 4% of total sales.</p>
+    <p><b>Revenue Streams:</b></p>
+    <ul>
+        <li><b>B2B Direct Sales (55%):</b> Negotiated contracts with large construction and manufacturing firms. Typical credit terms are 30 to 60 days.</li>
+        <li><b>Physical Stores (25%):</b> Cash and carry operations targeting independent professionals and small workshops. High gross margin.</li>
+        <li><b>Digital Channels (20%):</b> E-commerce and marketplace sales. Rapidly growing but heavily impacts working capital due to high required safety stock and marketplace fulfillment models.</li>
+    </ul>
+    <p>While revenue is recurrent and diverse, the quality of operating cash flow is currently hampered by the extended B2B payment terms and the inventory burden required to maintain Service Level Agreements (SLAs) for marketplace channels.</p>
+    ''')
+    
+    # Chart: Revenue Trend
+    html_out.append(svg_bar_chart("Historical Revenue Trend (MXN M)", fin["Years"][:5], fin["IS"]["Revenue"][:5], color="#1e3a8a"))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 10: Product and Segment Analysis
+    # ==========================================================================
+    html_out.append(section_header("Section 10: Product and Segment Analysis"))
+    
+    headers = ["Product Family", "FY25 Revenue (MXN M)", "% of Total", "Est. Gross Margin", "Avg Inventory Days"]
+    rows = []
+    base_rev = fin["IS"]["Revenue"][idx_25]
+    product_splits = [0.25, 0.20, 0.15, 0.15, 0.10, 0.10, 0.05]
+    families = ["Power Tools & Machining", "Hand Tools & Fasteners", "Safety & PPE", "Electrical & Plumbing", "Adhesives & Chemicals", "Construction Hardware", "Other"]
+    margins = ["22%", "34%", "38%", "25%", "42%", "18%", "30%"]
+    inv_d = ["145", "180", "90", "110", "60", "150", "120"]
+    
+    for i in range(len(families)):
+        rows.append([families[i], format_mxn(base_rev * product_splits[i]), format_pct(product_splits[i]), margins[i], inv_d[i]])
+    
+    html_out.append(html_table(headers, rows))
+    html_out.append("<p>Management is actively executing a SKU rationalization program targeting 'Hand Tools & Fasteners' to reduce the 180-day inventory turn, aiming to liquidate slow-moving variations without impacting core bundle sales.</p>")
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 11: Customer and Sales Concentration
+    # ==========================================================================
+    html_out.append(section_header("Section 11: Customer and Sales Concentration"))
+    html_out.append("<p>Customer concentration risk is low. The top 10 B2B customers represent less than 15% of total revenue.</p>")
+    
+    headers = ["Customer Name", "Customer Type", "FY25 Revenue (MXN M)", "Avg Collection Days"]
+    rows = []
+    for i in range(10):
+        rows.append([customers[i], "B2B / Construction" if i%2==0 else "B2B / Manufacturing", format_mxn(random.uniform(10, 30)), f"{random.randint(45, 90)} days"])
+    html_out.append(html_table(headers, rows))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 12: Supplier and Procurement Analysis
+    # ==========================================================================
+    html_out.append(section_header("Section 12: Supplier and Procurement Analysis"))
+    html_out.append("<p>The company maintains strategic relationships with both domestic manufacturers and Asian exporters. Extended lead times from Asian suppliers (90-120 days) force the company to carry higher safety stocks.</p>")
+    
+    headers = ["Supplier", "Region", "Category Focus", "Payment Terms"]
+    rows = []
+    for i in range(8):
+        region = "Asia" if "Co." in suppliers[i] or "Inc." in suppliers[i] else "Domestic"
+        rows.append([suppliers[i], region, products[i], f"Net {random.choice([30, 45, 60, 90])}"])
+    html_out.append(html_table(headers, rows))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 13: Historical Financial Statements
+    # ==========================================================================
+    html_out.append(section_header("Section 13: Historical Financial Statements"))
+    hist_years = fin["Years"][:5]
+    
+    # 13.A Income Statement
+    html_out.append(subsection_header("A. Historical Income Statement (FY21-FY25)"))
+    is_headers = ["Line Item"] + hist_years
+    is_rows = [
+        ["Revenue"] + [format_mxn(fin["IS"]["Revenue"][i]) for i in range(5)],
+        ["Cost of Goods Sold"] + [format_mxn(-fin["IS"]["COGS"][i]) for i in range(5)],
+        ["Gross Profit"] + [format_mxn(fin["IS"]["GrossProfit"][i]) for i in range(5)],
+        ["Operating Expenses"] + [format_mxn(-fin["IS"]["Opex"][i]) for i in range(5)],
+        ["EBITDA"] + [format_mxn(fin["IS"]["EBITDA"][i]) for i in range(5)],
+        ["Depreciation & Amortization"] + [format_mxn(-fin["IS"]["DA"][i]) for i in range(5)],
+        ["EBIT"] + [format_mxn(fin["IS"]["EBIT"][i]) for i in range(5)],
+        ["Interest Expense"] + [format_mxn(-fin["IS"]["Interest"][i]) for i in range(5)],
+        ["Earnings Before Tax (EBT)"] + [format_mxn(fin["IS"]["EBT"][i]) for i in range(5)],
+        ["Income Tax"] + [format_mxn(-fin["IS"]["Tax"][i]) for i in range(5)],
+        ["Net Income"] + [format_mxn(fin["IS"]["NetIncome"][i]) for i in range(5)]
+    ]
+    html_out.append(html_table(is_headers, is_rows))
+
+    # 13.B Balance Sheet
+    html_out.append(subsection_header("B. Historical Balance Sheet (FY21-FY25)"))
+    bs_rows = [
+        ["Cash and Equivalents"] + [format_mxn(fin["BS"]["Cash"][i]) for i in range(5)],
+        ["Accounts Receivable"] + [format_mxn(fin["BS"]["AR"][i]) for i in range(5)],
+        ["Inventory"] + [format_mxn(fin["BS"]["Inventory"][i]) for i in range(5)],
+        ["Total Current Assets"] + [format_mxn(fin["BS"]["TotalCA"][i]) for i in range(5)],
+        ["Net PP&E"] + [format_mxn(fin["BS"]["PPNE"][i]) for i in range(5)],
+        ["Total Non-Current Assets"] + [format_mxn(fin["BS"]["TotalNCA"][i]) for i in range(5)],
+        ["Total Assets"] + [format_mxn(fin["BS"]["TotalAssets"][i]) for i in range(5)],
+        [""],
+        ["Accounts Payable"] + [format_mxn(fin["BS"]["AP"][i]) for i in range(5)],
+        ["Short-Term Debt"] + [format_mxn(fin["BS"]["ST_Debt"][i]) for i in range(5)],
+        ["Total Current Liabilities"] + [format_mxn(fin["BS"]["TotalCL"][i]) for i in range(5)],
+        ["Long-Term Debt"] + [format_mxn(fin["BS"]["LT_Debt"][i]) for i in range(5)],
+        ["Total Non-Current Liabilities"] + [format_mxn(fin["BS"]["TotalNCL"][i]) for i in range(5)],
+        ["Total Liabilities"] + [format_mxn(fin["BS"]["TotalLiabilities"][i]) for i in range(5)],
+        ["Total Equity"] + [format_mxn(fin["BS"]["Equity"][i]) for i in range(5)],
+        ["Total Liabilities & Equity"] + [format_mxn(fin["BS"]["TotalLiabilitiesEquity"][i]) for i in range(5)]
+    ]
+    html_out.append(html_table(is_headers, bs_rows))
+
+    # 13.C Cash Flow Statement
+    html_out.append(subsection_header("C. Historical Cash Flow Statement (FY21-FY25)"))
+    cf_rows = [
+        ["Net Income"] + [format_mxn(fin["CF"]["NetIncome"][i]) for i in range(5)],
+        ["+ Depreciation & Amortization"] + [format_mxn(fin["CF"]["DA"][i]) for i in range(5)],
+        ["+/- Change in Working Capital"] + [format_mxn(fin["CF"]["DeltaWC"][i]) for i in range(5)],
+        ["Net Cash from Operating Activities"] + [format_mxn(fin["CF"]["OCF"][i]) for i in range(5)],
+        ["- Capital Expenditures"] + [format_mxn(-fin["CF"]["Capex"][i]) for i in range(5)],
+        ["Net Cash from Investing Activities"] + [format_mxn(-fin["CF"]["Capex"][i]) for i in range(5)],
+        ["+/- Net Borrowing (Repayment)"] + [format_mxn(fin["CF"]["NetBorrowing"][i]) for i in range(5)],
+        ["Net Cash from Financing Activities"] + [format_mxn(fin["CF"]["NetFinancing"][i]) for i in range(5)],
+        ["Net Change in Cash"] + [format_mxn(fin["CF"]["ChangeInCash"][i]) for i in range(5)],
+        ["Ending Cash Balance"] + [format_mxn(fin["CF"]["EndingCash"][i]) for i in range(5)]
+    ]
+    html_out.append(html_table(is_headers, cf_rows))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 14: Notes to Historical Financial Statements
+    # ==========================================================================
+    html_out.append(section_header("Section 14: Notes to Historical Financial Statements"))
+    html_out.append('''
+    <h4>Note 1: Basis of Preparation</h4>
+    <p>The historical financial statements have been prepared in accordance with Mexican Financial Reporting Standards (NIF). The data presented is synthetic and unaudited, strictly for demonstration purposes.</p>
+    
+    <h4>Note 2: Revenue Recognition</h4>
+    <p>Revenue from the sale of goods is recognized when control of the products has transferred, being when the products are delivered to the customer or at the point of sale in retail locations. Marketplace revenue is recognized net of platform fulfillment fees where applicable.</p>
+    
+    <h4>Note 3: Inventory Accounting</h4>
+    <p>Inventories are stated at the lower of cost and net realizable value. Cost is determined using the average cost method. An allowance for slow-moving and obsolete inventory is recognized based on management's periodic review of aging (typically items over 365 days without movement).</p>
+    
+    <h4>Note 4: Accounts Receivable and Credit Losses</h4>
+    <p>Trade receivables are initially recognized at fair value. The company applies a simplified approach to measuring expected credit losses, using a lifetime expected loss allowance for all trade receivables based on historical default rates and forward-looking economic indicators.</p>
+    
+    <h4>Note 5: Property, Plant, and Equipment</h4>
+    <p>PP&E is recorded at historical cost less accumulated depreciation. Depreciation is calculated on a straight-line basis over the estimated useful lives of the assets (Buildings: 20 years, Machinery & Equipment: 5-10 years, IT Equipment: 3 years).</p>
+    
+    <h4>Note 6: Debt</h4>
+    <p>All interest-bearing loans and borrowings are initially recognized at the fair value of the consideration received less directly attributable transaction costs. Subsequent to initial recognition, they are measured at amortized cost.</p>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 15: Management Discussion and Analysis
+    # ==========================================================================
+    html_out.append(section_header("Section 15: Management Discussion and Analysis (MD&A)"))
+    html_out.append('''
+    <p><b>Revenue Performance:</b> The period from FY2021 to FY2025 witnessed a compound annual growth rate (CAGR) of over 14% in top-line revenue. This aggressive growth strategy successfully captured market share during a period of industrial expansion, supported by our aggressive e-commerce rollout. However, top-line growth outpaced our operational infrastructure.</p>
+    
+    <p><b>Margin Evolution:</b> Gross margins compressed significantly in FY2024 and FY2025 (dropping toward 27-28%). This was driven by a combination of global freight rate spikes, unhedged MXN depreciation against the USD for our imported tool lines, and competitive pricing pressure on third-party marketplace platforms where price matching algorithms drove prices down.</p>
+    
+    <p><b>Working Capital Absorption:</b> The most critical issue detailed in these statements is the working capital absorption. To avoid stockouts during global supply chain crises in FY2023 and FY2024, management aggressively expanded inventory. As supply chains normalized in FY2025, we were left with excess, slow-moving stock. Concurrently, our B2B clients pushed payment terms from 45 days to over 60 days, stretching our cash conversion cycle to unsustainable levels.</p>
+    
+    <p><b>Capital Expenditures & Debt Increase:</b> In FY2023, the company committed MXN 120M to automate our main Monterrey distribution center. Due to timing and availability of capital, a significant portion of this was funded via rolling short-term credit lines. This mismatch in funding long-term assets with short-term liabilities has artificially depressed our current ratio and increased liquidity risk. The term loan requested in this package is intended to resolve this precise structural mismatch.</p>
+    ''')
+    
+    # SVG Chart: EBITDA vs Net Income
+    html_out.append(svg_line_chart("EBITDA vs Net Income Trend (MXN M)", fin["Years"][:5], fin["IS"]["EBITDA"][:5], color="#1e3a8a"))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 16: Ratio Analysis
+    # ==========================================================================
+    html_out.append(section_header("Section 16: Ratio Analysis"))
+    ratio_headers = ["Ratio"] + hist_years
+    ratio_rows = [
+        ["Gross Margin"] + [format_pct(fin["Metrics"]["GrossMargin"][i]) for i in range(5)],
+        ["EBITDA Margin"] + [format_pct(fin["Metrics"]["EBITDAMargin"][i]) for i in range(5)],
+        ["Net Margin"] + [format_pct(fin["Metrics"]["NetMargin"][i]) for i in range(5)],
+        ["Current Ratio"] + [format_ratio(fin["Metrics"]["CurrentRatio"][i]) for i in range(5)],
+        ["Cash Conversion Cycle"] + [f"{int(fin['Metrics']['CCC'][i])} d" for i in range(5)],
+        ["Net Debt / EBITDA"] + [format_ratio(fin["Metrics"]["NetDebtEBITDA"][i]) for i in range(5)],
+        ["Interest Coverage"] + [format_ratio(fin["Metrics"]["InterestCoverage"][i]) for i in range(5)],
+    ]
+    html_out.append(html_table(ratio_headers, ratio_rows))
+    html_out.append('''
+    <p><b>Interpretation:</b> The ratios clearly indicate an operational squeeze. While EBITDA margins remain positive, they have deteriorated from peak efficiency. The Cash Conversion Cycle illustrates the locked-up capital. Most notably, Net Debt / EBITDA has climbed over 3.0x in FY2025, which, while manageable given the asset base, requires immediate refinancing of the ST portion to improve the Current Ratio (currently under pressure).</p>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 17: Working Capital Analysis
+    # ==========================================================================
+    html_out.append(section_header("Section 17: Working Capital Analysis"))
+    html_out.append('''
+    <p>Working capital management is the primary focus of the new CFO. The total net working capital requirement has outpaced revenue growth, creating negative operating cash flows in recent periods.</p>
+    ''')
+    html_out.append(kpi_card("Current Cash Conversion Cycle", f"{int(fin['Metrics']['CCC'][idx_25])} days", "Targeting 90 days by FY2027"))
+    
+    html_out.append(svg_bar_chart("Working Capital Components (FY25 MXN M)", ["Accounts Receivable", "Inventory", "Accounts Payable"], [fin["BS"]["AR"][idx_25], fin["BS"]["Inventory"][idx_25], fin["BS"]["AP"][idx_25]]))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTIONS 18, 19, 20: Receivables, Inventory, Payables Details
+    # ==========================================================================
+    html_out.append(section_header("Section 18: Receivables Detail"))
+    html_out.append("<p>Below is the synthetic aging profile of Accounts Receivable at the close of FY2025.</p>")
+    ar_headers = ["Aging Bucket", "Amount (MXN M)", "% of Total"]
+    ar_rows = [[k, format_mxn(v), format_pct(v/sum(ar_aging.values()))] for k, v in ar_aging.items()]
+    ar_rows.append(["Total AR", format_mxn(sum(ar_aging.values())), "100.0%"])
+    html_out.append(html_table(ar_headers, ar_rows, totals_row=True))
+    
+    html_out.append(section_header("Section 19: Inventory Detail"))
+    html_out.append("<p>Inventory represents our largest asset class. The aging highlights the buildup of stock over 180 days, primarily in specific mechanical tool SKUs that failed to meet digital sales forecasts.</p>")
+    inv_headers = ["Aging Bucket", "Amount (MXN M)", "% of Total"]
+    inv_rows = [[k, format_mxn(v), format_pct(v/sum(inv_aging.values()))] for k, v in inv_aging.items()]
+    inv_rows.append(["Total Inventory", format_mxn(sum(inv_aging.values())), "100.0%"])
+    html_out.append(html_table(inv_headers, inv_rows, totals_row=True))
+
+    html_out.append(section_header("Section 20: Accounts Payable and Supplier Terms"))
+    html_out.append("<p>We are actively renegotiating terms with domestic suppliers to extend DPO from 50 days to 65 days. However, Asian suppliers continue to demand 30-day terms or letter-of-credit backing upon shipment.</p>")
+    ap_headers = ["Aging Bucket", "Amount (MXN M)", "% of Total"]
+    ap_rows = [[k, format_mxn(v), format_pct(v/sum(ap_aging.values()))] for k, v in ap_aging.items()]
+    ap_rows.append(["Total AP", format_mxn(sum(ap_aging.values())), "100.0%"])
+    html_out.append(html_table(ap_headers, ap_rows, totals_row=True))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 21: Existing Debt Schedule
+    # ==========================================================================
+    html_out.append(section_header("Section 21: Existing Debt Schedule"))
+    html_out.append("<p>Current outstanding debt obligations as of the end of FY2025 prior to the proposed refinancing:</p>")
+    debt_headers = ["Facility / Lender", "Type", "Original Purpose", "Maturity", "Interest Rate", "Outstanding Balance (MXN M)"]
+    debt_rows = [
+        ["Bank A - Revolver", "Short-Term", "Working Capital", "Nov 2026", "TIIE + 3.5%", format_mxn(fin["BS"]["ST_Debt"][idx_25] * 0.4)],
+        ["Bank B - ST Line", "Short-Term", "Expansion Capex", "Mar 2026", "TIIE + 4.0%", format_mxn(fin["BS"]["ST_Debt"][idx_25] * 0.6)],
+        ["Bank C - Term Loan", "Long-Term", "Real Estate Acquisition", "Jan 2030", "Fixed 11.2%", format_mxn(fin["BS"]["LT_Debt"][idx_25] * 0.8)],
+        ["Lease Liabilities", "Long-Term", "Store Network", "Various", "Implicit 9.5%", format_mxn(fin["BS"]["LT_Debt"][idx_25] * 0.2)]
+    ]
+    total_debt = fin["BS"]["ST_Debt"][idx_25] + fin["BS"]["LT_Debt"][idx_25]
+    debt_rows.append(["Total Existing Debt", "", "", "", "", format_mxn(total_debt)])
+    html_out.append(html_table(debt_headers, debt_rows, totals_row=True))
+    html_out.append("<p>The requested term loan of MXN 180M will be directly used to take out 'Bank B - ST Line' and provide additional liquidity, matching long-term assets with long-term capital.</p>")
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 22: Requested Financing Detail
+    # ==========================================================================
+    html_out.append(section_header("Section 22: Requested Financing Detail"))
+    html_out.append('''
+    <h4>1. Revolving Credit Facility (MXN 325.0M)</h4>
+    <ul>
+        <li><b>Tenor:</b> 24 months committed.</li>
+        <li><b>Utilization Pattern:</b> Expected peak utilization between August and November ahead of the primary industrial purchasing season and holiday construction push.</li>
+        <li><b>Repayment Source:</b> Normal liquidation of inventory and collection of accounts receivable.</li>
+    </ul>
+    
+    <h4>2. Term Loan (MXN 180.0M)</h4>
+    <ul>
+        <li><b>Tenor:</b> 60 months (5 years).</li>
+        <li><b>Amortization:</b> Straight-line quarterly amortization following a 6-month grace period on principal.</li>
+        <li><b>Repayment Source:</b> Recurring free cash flow from operations, benefiting from reduced interest expense and stretched debt service requirements.</li>
+    </ul>
+    
+    <h4>3. Ancillary Trade Facilities (MXN 45.0M)</h4>
+    <ul>
+        <li><b>Purpose:</b> Issuance of Standby Letters of Credit (SBLCs) in favor of Asian suppliers to guarantee production runs.</li>
+        <li><b>Nature:</b> Contingent liability, drawn only in event of default on trade payables.</li>
+    </ul>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 23: Collateral Information
+    # ==========================================================================
+    html_out.append(section_header("Section 23: Collateral Information Submitted by the Company"))
+    html_out.append("<p>The company proposes a comprehensive collateral package. Note that the bank will perform its own appraisals; the values below are management estimates based on book value and internal orderly liquidation estimates.</p>")
+    
+    col_headers = ["Collateral Class", "Book Value (MXN M)", "Est. Orderly Liquidation Value", "Liens / Encumbrances", "Location"]
+    col_rows = [
+        ["Eligible Accounts Receivable", format_mxn(sum(ar_aging.values()) * 0.85), format_mxn(sum(ar_aging.values()) * 0.75), "None proposed for new facility", "N/A"],
+        ["Eligible Inventory (excluding >365d)", format_mxn(sum(inv_aging.values()) * 0.85), format_mxn(sum(inv_aging.values()) * 0.40), "None proposed for new facility", "All 3 DCs"],
+        ["Monterrey DC Real Estate", "125.0", "110.0", "Bank C Mortgage", "Nuevo León"],
+        ["Warehouse Automation Equipment", "45.0", "15.0", "None", "Monterrey DC"]
+    ]
+    html_out.append(html_table(col_headers, col_rows))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 24: Borrowing Base Support Schedule
+    # ==========================================================================
+    html_out.append(section_header("Section 24: Borrowing Base Support Schedule"))
+    html_out.append("<p>The following table illustrates a theoretical borrowing base calculation strictly as an example for bank evaluation of coverage.</p>")
+    
+    bb_headers = ["Item", "Amount (MXN M)", "Theoretical Advance Rate", "Supported Availability"]
+    gross_ar = sum(ar_aging.values())
+    ineligible_ar = ar_aging["Over 90 days"] + ar_aging["61-90 days"]
+    eligible_ar = gross_ar - ineligible_ar
+    
+    gross_inv = sum(inv_aging.values())
+    ineligible_inv = inv_aging["181-365 days"] + inv_aging["Over 365 days"]
+    eligible_inv = gross_inv - ineligible_inv
+    
+    avail_ar = eligible_ar * 0.80
+    avail_inv = eligible_inv * 0.50
+    total_avail = avail_ar + avail_inv
+    
+    bb_rows = [
+        ["Gross Accounts Receivable", format_mxn(gross_ar), "-", "-"],
+        ["Less: Ineligible AR (>60 days & disputed)", format_mxn(-ineligible_ar), "-", "-"],
+        ["Eligible Accounts Receivable", format_mxn(eligible_ar), "80%", format_mxn(avail_ar)],
+        ["", "", "", ""],
+        ["Gross Inventory", format_mxn(gross_inv), "-", "-"],
+        ["Less: Ineligible Inventory (>180 days)", format_mxn(-ineligible_inv), "-", "-"],
+        ["Eligible Inventory", format_mxn(eligible_inv), "50%", format_mxn(avail_inv)],
+        ["", "", "", ""],
+        ["Estimated Borrowing Base Support", "", "", format_mxn(total_avail)],
+        ["Requested Revolver Limit", "", "", format_mxn(325.0)]
+    ]
+    html_out.append(html_table(bb_headers, bb_rows))
+    html_out.append("<p>This shows that the intrinsic value of current, high-quality working capital assets exceeds the requested revolving line size.</p>")
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 25: Capital Expenditure and Asset Base
+    # ==========================================================================
+    html_out.append(section_header("Section 25: Capital Expenditure and Asset Base"))
+    html_out.append('''
+    <p>Historically, the company invested heavily in property and warehouse automation. Moving forward into the forecast period, capex will shift toward maintenance and digital IT/ERP upgrades, drastically reducing the cash drain from investing activities.</p>
+    ''')
+    html_out.append(svg_bar_chart("Historical & Forecast Capex (MXN M)", fin["Years"], fin["CF"]["Capex"], color="#0ea5e9"))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 26 & 27: Forecast Assumptions & Financials
+    # ==========================================================================
+    html_out.append(section_header("Section 26: Forecast Assumptions (Base Case)"))
+    html_out.append('''
+    <ul>
+        <li><b>Revenue Growth:</b> Conservative stabilization at ~7-8% year-over-year, driven by inflation pass-through and moderate volume growth in e-commerce.</li>
+        <li><b>Gross Margin:</b> Gradual improvement from 27.1% in FY25 to 32.0% in FY28 as private-label products gain share and supply chain costs normalize.</li>
+        <li><b>Working Capital:</b> Strategic reduction in inventory days from 130 to 110 by FY28 via improved ERP demand forecasting. AR days reduced via stricter credit policies.</li>
+        <li><b>Debt Service:</b> Assumes the successful execution of the MXN 180M term loan in FY26, replacing short-term expensive debt, locking in longer amortization.</li>
+    </ul>
+    ''')
+
+    html_out.append(section_header("Section 27: Forecast Financial Statements (FY26-FY28)"))
+    fc_years = fin["Years"][5:]
+    
+    html_out.append(subsection_header("Forecast Income Statement"))
+    fc_is_headers = ["Line Item"] + fc_years
+    fc_is_rows = [
+        ["Revenue"] + [format_mxn(fin["IS"]["Revenue"][i]) for i in range(5, 8)],
+        ["Gross Profit"] + [format_mxn(fin["IS"]["GrossProfit"][i]) for i in range(5, 8)],
+        ["EBITDA"] + [format_mxn(fin["IS"]["EBITDA"][i]) for i in range(5, 8)],
+        ["Net Income"] + [format_mxn(fin["IS"]["NetIncome"][i]) for i in range(5, 8)]
+    ]
+    html_out.append(html_table(fc_is_headers, fc_is_rows))
+
+    html_out.append(subsection_header("Forecast Cash Flow Highlights"))
+    fc_cf_rows = [
+        ["Net Cash from Operating Activities"] + [format_mxn(fin["CF"]["OCF"][i]) for i in range(5, 8)],
+        ["Capital Expenditures"] + [format_mxn(-fin["CF"]["Capex"][i]) for i in range(5, 8)],
+        ["Free Cash Flow"] + [format_mxn(fin["CF"]["FCF"][i]) for i in range(5, 8)],
+        ["Ending Cash Balance"] + [format_mxn(fin["CF"]["EndingCash"][i]) for i in range(5, 8)]
+    ]
+    html_out.append(html_table(fc_is_headers, fc_cf_rows))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 28: Cash Flow and Repayment Support
+    # ==========================================================================
+    html_out.append(section_header("Section 28: Cash Flow and Repayment Support Information"))
+    html_out.append("<p>Management believes the forecast free cash flow strongly supports the debt service requirements of the requested facilities.</p>")
+    
+    ds_headers = ["Metric", "FY2026", "FY2027", "FY2028"]
+    ds_rows = [
+        ["Operating Cash Flow", format_mxn(fin["CF"]["OCF"][5]), format_mxn(fin["CF"]["OCF"][6]), format_mxn(fin["CF"]["OCF"][7])],
+        ["Interest Expense (Estimated)", format_mxn(fin["IS"]["Interest"][5]), format_mxn(fin["IS"]["Interest"][6]), format_mxn(fin["IS"]["Interest"][7])],
+        ["Interest Coverage Ratio", format_ratio(fin["Metrics"]["InterestCoverage"][5]), format_ratio(fin["Metrics"]["InterestCoverage"][6]), format_ratio(fin["Metrics"]["InterestCoverage"][7])]
+    ]
+    html_out.append(html_table(ds_headers, ds_rows))
+    html_out.append("<p>The improvement in Operating Cash Flow in FY27/FY28 is largely driven by the cessation of working capital build-up (reaching steady state inventory days) and the recovery of gross margins.</p>")
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 29 & 30: Scenarios and Sensitivities
+    # ==========================================================================
+    html_out.append(section_header("Section 29: Scenario Information"))
+    html_out.append("<p>Management has stress-tested the base case against upside and downside shocks.</p>")
+    
+    scen_headers = ["Scenario", "FY26 Revenue", "FY26 EBITDA", "FY26 Cash Balance", "Narrative"]
+    scen_rows = [
+        ["Base Case", format_mxn(fin["IS"]["Revenue"][5]), format_mxn(fin["IS"]["EBITDA"][5]), format_mxn(fin["BS"]["Cash"][5]), "Execution of strategic plan as modeled."],
+        ["Downside Case", format_mxn(fin["IS"]["Revenue"][5]*0.90), format_mxn(fin["IS"]["EBITDA"][5]*0.75), format_mxn(fin["BS"]["Cash"][5]*0.60), "10% drop in volume, margin squeeze, W/C days extend by 15."],
+        ["Upside Case", format_mxn(fin["IS"]["Revenue"][5]*1.10), format_mxn(fin["IS"]["EBITDA"][5]*1.20), format_mxn(fin["BS"]["Cash"][5]*1.30), "Rapid e-com adoption, early inventory liquidation success."]
+    ]
+    html_out.append(html_table(scen_headers, scen_rows))
+
+    html_out.append(section_header("Section 30: Sensitivity Tables"))
+    html_out.append("<p>Sensitivity of FY26 EBITDA to variations in Gross Margin and Revenue Growth:</p>")
+    
+    sens_headers = ["Revenue \\ Gross Margin", "26.0%", "28.0%", "30.0%", "32.0%"]
+    base_rev26 = fin["IS"]["Revenue"][5]
+    opex26 = fin["IS"]["Opex"][5]
+    sens_rows = []
+    for r_mod in [0.9, 0.95, 1.0, 1.05, 1.1]:
+        r = base_rev26 * r_mod
+        row = [f"{(r_mod-1)*100:+.1f}% (Rev: {int(r)})"]
+        for gm in [0.26, 0.28, 0.30, 0.32]:
+            ebitda = (r * gm) - opex26
+            row.append(format_mxn(ebitda))
+        sens_rows.append(row)
+    html_out.append(html_table(sens_headers, sens_rows))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 31: Operational KPI Dashboard
+    # ==========================================================================
+    html_out.append(section_header("Section 31: Operational KPI Dashboard"))
+    html_out.append('<div class="kpi-container">')
+    html_out.append(kpi_card("Active SKUs", "12,450", "Targeting 9,500 after rationalization"))
+    html_out.append(kpi_card("Marketplace Order Volume", "45,000 / month", "Up 120% YoY"))
+    html_out.append(kpi_card("On-Time Delivery (B2B)", "94.2%", "Impacted by fleet age"))
+    html_out.append(kpi_card("Private-Label Penetration", "18.5%", "High margin category; target 25%"))
+    html_out.append('</div>')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 32: Risk Disclosures Prepared by Management
+    # ==========================================================================
+    html_out.append(section_header("Section 32: Risk Disclosures Prepared by Management"))
+    html_out.append("<p>Management openly acknowledges the following risks to the business plan and repayment capacity:</p>")
+    
+    risks = [
+        ("Marketplace Dependency", "High fees and algorithm changes on third-party digital platforms could squeeze margins.", "Expanding direct B2B portal to shift traffic off marketplaces."),
+        ("Inventory Obsolescence", "Slow-moving hand tools represent ~15% of total inventory.", "Aggressive clearance pricing initiated in Q4 FY25."),
+        ("Customer Credit Risk", "Construction sector delays can trigger cascading AR defaults.", "Tightened credit limits; engaging trade credit insurance for top 20 accounts."),
+        ("FX Volatility", "45% of COGS in USD; revenues in MXN.", "Implementing 6-month rolling forward contracts (supported by Ancillary Facility requested)."),
+        ("Refinancing Risk", "Failure to secure the requested term loan leaves current ratio depressed.", "Maintaining active dialogue with multiple banking partners.")
+    ]
+    
+    for title, desc, mit in risks:
+        html_out.append(callout_box(title, f"<b>Risk:</b> {desc}<br><b>Mitigation:</b> {mit}", "warning"))
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 33: Management Improvement Plan
+    # ==========================================================================
+    html_out.append(section_header("Section 33: Management Improvement Plan"))
+    html_out.append('''
+    <ul>
+        <li><b>Data-Driven Pricing Model:</b> Implementing dynamic pricing floors in the new ERP to prevent sales reps from discounting below targeted gross margin thresholds.</li>
+        <li><b>SKU Rationalization:</b> Liquidating the bottom 20% of SKUs (by velocity) to release approximately MXN 40M in trapped cash over the next 18 months.</li>
+        <li><b>AR Dashboard Implementation:</b> Institute weekly review routines for all accounts >60 days past due, tying sales commissions to cash collection rather than invoicing.</li>
+    </ul>
+    ''')
+
+    # ==========================================================================
+    # SECTION 34: Supporting Bank Information Checklist
+    # ==========================================================================
+    html_out.append(section_header("Section 34: Supporting Bank Information Checklist"))
+    html_out.append('''
+    <p>The following items are available in the data room or appended to this document:</p>
+    <ul>
+        <li>[X] Historical financial statements (Included)</li>
+        <li>[X] Forecast financial statements (Included)</li>
+        <li>[ ] Annual tax declarations (Available in data room - synthetic reference)</li>
+        <li>[X] AR, AP, and Inventory Agings (Included)</li>
+        <li>[X] Existing Debt Schedule (Included)</li>
+        <li>[ ] Real estate deeds and appraisals (Available in data room - synthetic reference)</li>
+    </ul>
+    ''')
+    html_out.append(page_break())
+
+    # ==========================================================================
+    # SECTION 35: Appendices (A through Z)
+    # ==========================================================================
+    html_out.append(section_header("Section 35: Appendix Section"))
+    
+    # Generate bulk appendices to ensure ~80 page depth
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    appendix_titles = [
+        "Detailed Income Statement (Monthly synthetic extraction)",
+        "Detailed Balance Sheet Data",
+        "Detailed Cash Flow Data",
+        "Revenue by Channel (Granular)",
+        "Revenue by Product Family (Granular)",
+        "Gross Margin by Product Family",
+        "Revenue by Customer Segment",
+        "Top 20 Customer Schedule",
+        "Supplier Concentration Schedule",
+        "SKU Productivity Table (Top 30)",
+        "Inventory by Location Category",
+        "Inventory Aging Matrix",
+        "AR Aging Matrix",
+        "AP Aging Matrix",
+        "Existing Debt Amortization Schedule",
+        "Requested Financing Term Sheet Drafts",
+        "Collateral Appraisal Summary",
+        "Borrowing Base Historical Simulation",
+        "Capex Detail Schedule",
+        "Depreciation Schedule",
+        "Forecast Assumptions Detailed Grid",
+        "Forecast Financials (Quarterly synthetic extraction)",
+        "Scenario Outputs Matrix",
+        "Sensitivity Analysis Tables",
+        "Operational KPI Glossary",
+        "Synthetic Data Methodology Disclaimer"
+    ]
+    
+    for i, letter in enumerate(alphabet):
+        html_out.append(subsection_header(f"Appendix {letter}: {appendix_titles[i]}"))
+        html_out.append(f"<p><i>This section contains supplementary synthetic data supporting {appendix_titles[i]}.</i></p>")
+        
+        # Generate some generic large tables to simulate deep schedules and consume vertical space
+        app_headers = ["ID", "Descriptor", "Metric 1", "Metric 2", "Metric 3", "Metric 4", "Status"]
+        app_rows = []
+        for r_idx in range(15): # 15 rows per appendix gives good length
+            app_rows.append([
+                f"{letter}-{r_idx+1000}",
+                f"Synthetic Record Item {r_idx}",
+                format_mxn(random.uniform(1, 100)),
+                format_pct(random.uniform(0.1, 0.5)),
+                random.randint(10, 500),
+                f"{random.randint(10, 90)} days",
+                random.choice(["Active", "Pending", "Reviewed", "Flagged"])
+            ])
+        html_out.append(html_table(app_headers, app_rows))
+        
+        # Add page breaks between appendices
+        html_out.append(page_break())
+    
+    html_out.append("</div></body></html>")
+    return "\n".join(html_out)
+
+if __name__ == "__main__":
+    try:
+        html_content = build_report()
+        output_filename = "fictional_company_bank_financial_package.html"
+        
+        with open(output_filename, "w", encoding="utf-8") as f:
+            f.write(html_content)
+            
+        print(f"Generated {output_filename} successfully.")
+    except Exception as e:
+        print(f"Error generating report: {e}")
+        raise
