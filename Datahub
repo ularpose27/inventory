@@ -1,70 +1,91 @@
-import os
-import math
-import random
-import statistics
-import datetime
-import textwrap
-import html
-import json
-from pathlib import Path
+Slide 2
+“Let me start with the key message.
+When AI gives us a weak output, it’s usually not just a tool issue. A lot of the time, it comes from how we brief the tool.
+If the prompt is vague, the output will probably need more review, more corrections and therefore  more work.
 
-OUTPUT_FILE = "fictional_company_bank_financial_package.html"
-RANDOM_SEED = 4217
-random.seed(RANDOM_SEED)
+That’s why having a simple prompt standard matters: it helps us get better first drafts, faster, and reduces rework.
 
+Today I’ll focus on one practical structure we can use for day-to-day requests: R + T + C + O — Role, Task, Context, and Output.”
 
-def html_escape(value):
-    return html.escape(str(value), quote=True)
+Slide 3
+“Why does this matter?
+What we want from AI is not only a faster answer. We want something we can actually use: a clearer first draft, less back and forth, and less rework.
+Most of the time, when an AI output is not useful, it’s because the request was too open. The tool has to guess what we need: the audience, the purpose, the level of detail, and the format.
+So today’s focus is very practical: one repeatable formula that helps us brief the tool better and get stronger outputs from the first attempt.”
 
 
-def format_mxn(value):
-    if value is None:
-        return "—"
-    sign = "-" if value < 0 else ""
-    return f"{sign}{abs(value):,.1f}"
+Slide 4
+“Here is the simple structure I’m proposing: R + T + C + O.
+The first element is Role. This tells the AI what perspective or level of expertise it should use. For example, should it respond as a business analyst, a relationship manager, or a senior credit reviewer, ?
+
+The second is Task. This is the specific action we want: summarize, rewrite, compare, or extract. The clearer the verb, the better the output.
+
+The third is Context. This is where we explain the audience, the purpose, what matters, what to include, what to avoid, and any source material the AI should use.
+
+And finally, Output. This defines what ‘done’ looks like: the format, structure, tone, and length.
+
+After using this formula the benefit is simple: less rework, fewer surprises, and more consistent quality.”
+
+Slide 5
+“Building on the previous slide, this is the same idea converted into a simple copy-paste template.
+The point is not to overcomplicate prompting. It is just to make sure every request gives the AI the minimum information it needs.
+
+The final review line is useful because it asks the AI to flag missing information instead of making assumptions. 
+
+So for recurring tasks, this template can become the starting point.”
+
+Slide 6
+“Here I’m showing the starting point: a very common vague prompt — ‘Give me a summary of the attached file.’
+
+The issue here is not that the request is wrong, but that it leaves too much open and the AI does not know the audience, the purpose, the level of detail, or the expected format.
+
+So the output may be generic and still require several rounds of correction. 
+
+Slide 7 and 8
+““Here we can see the result of the vague prompt. The AI gives us a summary, but the answer becomes very broad and quite long.
+
+It is not wrong, but it is not immediately useful either. We would still need to review it, shorten it, and reshape it.
 
 
-def format_pct(value):
-    if value is None:
-        return "—"
-    return f"{value * 100:.1f}%"
+
+Slide 9
+“Now we move from the vague prompt to a more professional prompt.
+
+Before, the request was simply: ‘Give me a summary of the attached file.’ Here, we apply R + T + C + O: we define the role, the task, the context, and the expected output.
+
+The highlighted part is especially important because it tells the AI exactly what structure we want: a Business Overview and a Financial Snapshot table with specific metrics.
+
+So instead of asking for a generic summary, we are guiding the tool toward a more useful, business-ready output. ”
+
+Slide 11 and 12
+“Here we can see the result of the improved prompt.
+Now the output is much more aligned with what we asked for. Instead of giving a generic summary, the tool created the specific output that I wanted.
+As you can see, here is the Business Overview section that I wanted and in the next slide I have the table that I asked for.
+
+So the value here is not only that AI summarized the document. The value is that it organized the information in a way that is closer to a business-ready draft.”
+
+Slide 13
+“To close... these are small prompt upgrades that are easy to apply but can make the output much more useful.
+In practice, it means adding a few extra instructions when needed: be clear about the format, set boundaries like ‘don’t invent numbers,’ ask for a specific structure, define the tone, or request something that can be reused directly.
+The recommended next step is simple: for recurring tasks, let’s standardize our prompts using the R + T + C + O template. This should help us get better first drafts, faster, with less rework.
+
+At the end of the day, the better we ask, the better the output we get.”
 
 
-def format_ratio(value):
-    if value is None:
-        return "—"
-    return f"{value:.2f}x"
 
 
-def format_multiple(value):
-    return format_ratio(value)
 
 
-def format_days(value):
-    if value is None:
-        return "—"
-    return f"{value:.0f} days"
 
 
-def is_close(a, b, tolerance=0.15):
-    return abs(a - b) <= tolerance
 
 
-def allocate_total(total, weights, labels=None):
-    raw = [total * w / sum(weights) for w in weights]
-    rounded = [round(x, 1) for x in raw]
-    rounded[-1] = round(total - sum(rounded[:-1]), 1)
-    if labels:
-        return dict(zip(labels, rounded))
-    return rounded
 
 
-def page_break():
-    return '<div class="page-break"></div>'
 
 
-def section_header(title, subtitle=None):
-    subtitle_html = f"<p class='section-subtitle'>{html_escape(subtitle)}</p>" if subtitle else ""
+
+subtitle_html = f"<p class='section-subtitle'>{html_escape(subtitle)}</p>" if subtitle else ""
     return f"""
     <section class="section-title-page">
         <div class="section-rule"></div>
