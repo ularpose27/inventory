@@ -1,26 +1,18 @@
-Hi everyone,
+Hi Ron,
 
-Further to our team meeting today, I’m sharing the presentation on better prompting in the Productivity Suite.
+I hope you are doing well.
 
-As discussed, please find below the prompt template, together with the example used during the session. The idea is to use this structure for recurring tasks to get clearer first drafts, reduce rework, and make AI outputs more useful from the start.
+Similar to last quarter, we have been asked to work on the 1Q 2026 MANCO Governance presentation, and I would appreciate your input on a few items before we start updating the deck.
 
-Prompt template
+First, regarding the Helios controls, could you please confirm whether the version you shared with us last quarter is still applicable, or if there is an updated version we should use? I am attaching the prior-quarter file for reference.
 
-Role: You are a [role].
-Task: [single clear action verb + what you want].
-Context: [audience, purpose, background, constraints, what to include/exclude].
-Output: Provide [format], in [tone], max [length]. Include [sections].
+Also, for the Issues slide, could you please confirm whether there are any issues that should be included this time? If there are no relevant items, we will exclude the slide from the presentation.
 
-Review: If anything is missing or ambiguous, ask up to 3 clarifying questions before you start.
+For the Service Feedback slide, could you also let me know whether we should include anything this quarter? Last time, we referenced the Nebraska Land case, but I would like to confirm if there is any new feedback or if the slide should be omitted.
 
-Example
+Lastly, given that the last days of June may be quite busy for you due to quarter-end activities, would it be possible to schedule the MANCO Governance meeting during the first week of July?
 
-Role: You are a Corporate Banking Relationship Manager at a large international bank. You are highly skilled at analyzing companies and producing engaging reports.
-Task: Using only the information provided in the attached file, draft a credit-focused company summary for a senior Credit Committee reviewer. Do not invent or assume facts, figures, peers, market shares, or outlook. If an item is missing, write “Not provided” and capture it in the “Information Gaps / Follow-up Questions” section.
-Context: The audience is a Senior Credit Reviewer. The purpose is to provide a concise, decision-useful overview of the borrower and the key credit risks to support an approve/decline credit decision.
-Output: Provide an executive summary using the agreed structure, including a Business Overview, Financial Snapshot table, and Information Gaps / Follow-up Questions.
+Thank you very much, and please let me know your thoughts.
 
-I hope this is useful. Please let me know if you have any questions.
-
-Best,
+Best regards,
 Armando
